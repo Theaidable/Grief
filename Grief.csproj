@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -16,9 +16,7 @@
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Classes\DesignPatterns\Command\Commands\" />
     <Folder Include="Classes\DesignPatterns\Builder\" />
-    <Folder Include="Classes\DesignPatterns\Composite\ObjectComponents\" />
     <Folder Include="Classes\DesignPatterns\Factories\ObjectFactories\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">

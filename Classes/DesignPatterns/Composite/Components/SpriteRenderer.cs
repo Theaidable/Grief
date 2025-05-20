@@ -1,35 +1,41 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
-namespace Grief.Classes.DesignPatterns.Composite.Sprite
+namespace Grief.Classes.DesignPatterns.Composite.Components
 {
+    public enum SpriteType
+    {
+        Sprite,
+        Rectangle
+    }
+
     public class SpriteRenderer : Component
     {
-        //Properties til at tilgå værdier som skal bruges for at sætte en sprite til et object
         public Vector2 Origin { get; set; }
         public Texture2D Sprite { get; set; }
-        public Color Color { get; set; } = Color.White;
-        public Rectangle? SourceRectangle { get; set; } = null;
+        public Color Color { get; set; }
+        public Rectangle? SourceRectangle { get; set; }
+        public event Action OnSpriteChanged;
 
-        /// <summary>
-        /// Tom Constructor, men nødvendig da den nedarver fra component
-        /// </summary>
-        /// <param name="gameObject"></param>
-        public SpriteRenderer(GameObject gameObject) : base(gameObject) { }
-
-        /// <summary>
-        /// Metode til at sætte et objects sprite
-        /// </summary>
-        /// <param name="spriteName"></param>
-        /// <param name="sourceRect"></param>
-        public void SetSprite(string spriteName, Rectangle? sourceRect = null)
+        public SpriteRenderer(GameObject gameObject) : base(gameObject)
         {
-            Sprite = GameWorld.Instance.Content.Load<Texture2D>(spriteName);
-            SourceRectangle = sourceRect;
+            Color = Color.White;
         }
 
         /// <summary>
-        /// Sætter origin i midten af objektets sprite i stedet for venstre hjørne
+        /// Sæt sprite af et object, kan gøre brug af et spriteSheet hvis nødvendigt
+        /// </summary>
+        /// <param name="spriteName"></param>
+        public void SetSprite(string spriteName, Rectangle? sourceRectangle = null)
+        {
+            Sprite = GameWorld.Instance.Content.Load<Texture2D>(spriteName);
+            SourceRectangle = sourceRectangle;
+            OnSpriteChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Sæt origin til midten af valgt sprite
         /// </summary>
         public override void Start()
         {
@@ -43,14 +49,18 @@ namespace Grief.Classes.DesignPatterns.Composite.Sprite
             }
         }
 
+        public void InvokeOnSpriteChanged()
+        {
+            OnSpriteChanged?.Invoke();
+        }
+
         /// <summary>
-        /// Tegner spriten
+        /// Tegn sprite af object
         /// </summary>
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Sprite, GameObject.Transform.Position, SourceRectangle, Color, GameObject.Transform.Rotation, Origin, GameObject.Transform.Scale, SpriteEffects.None, 0);
-
         }
     }
 }
