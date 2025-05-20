@@ -4,7 +4,7 @@ using Grief.Classes.DesignPatterns.Composite.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -13,7 +13,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         //Private fields
         private Animator animator;
         private Vector2 moveDirection;
-
+        private Vector2 velocity;
+        private float gravity = 800f;
+        private float jumpForce = -400f;
 
         //Walk animation frames
         private Texture2D[] walkLeftFrames;
@@ -25,6 +27,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         //Public properties
         public float MovementSpeed { get; private set; }
+        public bool Grounded { get; set; }
 
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
@@ -39,12 +42,47 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             BindCommands();
         }
 
+        public override void Update()
+        {
+            if(Grounded == false)
+            {
+                velocity.Y += gravity * GameWorld.Instance.DeltaTime;
+            }
+
+            //Bevæg spilleren baseret på velocity
+            GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
+
+            //Her skal vi lave et collisoncheck om player står på jorden, før man kan hoppe. Dette skal implementeres når levelet er lavet
+            //Dette er udelukkende for at jeg ved hvordan collision i levelet fungere
+
+            if (velocity.Y > 0)
+            {
+                PlayFallAnimation();
+            }
+        }
+
         public void Move(Vector2 direction)
         {
             moveDirection = direction;
             GameObject.Transform.Translate(direction * MovementSpeed * GameWorld.Instance.DeltaTime);
             PlayMoveAnimation(direction);
         }
+
+        public void Stop()
+        {
+            PlayStopAnimation(moveDirection);
+        }
+
+        public void Jump()
+        {
+            if (Grounded == true)
+            {
+                velocity.Y = jumpForce;
+                Grounded = false;
+                PlayJumpAnimation();
+            }
+        }
+
         private void AddAnimations()
         {
             /*
@@ -82,11 +120,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void PlayMoveAnimation(Vector2 direction)
         {
-            if (direction.Y < 0)
-            {
-                animator.PlayAnimation("Jump");
-            }
-            else if (direction.X < 0)
+            if (direction.X < 0)
             {
                 animator.PlayAnimation("WalkLeft");
             }
@@ -98,11 +132,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void PlayStopAnimation(Vector2 direction)
         {
-            if (direction.Y > 0)
-            {
-                animator.PlayAnimation("Fall");
-            }
-            else if (direction.X < 0)
+            if (direction.X < 0)
             {
                 animator.PlayAnimation("IdleLeft");
             }
@@ -112,9 +142,20 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-        public void Stop()
+        private void PlayJumpAnimation()
         {
-            PlayStopAnimation(moveDirection);
+            if (moveDirection.Y < 0)
+            {
+                animator.PlayAnimation("Jump");
+            }
+        }
+
+        private void PlayFallAnimation()
+        {
+            if (moveDirection.Y > 0)
+            {
+                animator.PlayAnimation("Fall");
+            }
         }
 
         private void BindCommands()
@@ -124,14 +165,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(new Vector2(1, 0), this));
 
             //Jump on W or Spacebar
-            InputHandler.Instance.AddUpdateCommand(Keys.W, new MoveCommand(new Vector2(0, -1), this));
-            InputHandler.Instance.AddUpdateCommand(Keys.Space, new MoveCommand(new Vector2(0, -1), this));
+            InputHandler.Instance.AddUpdateCommand(Keys.W, new JumpCommand(this));
+            InputHandler.Instance.AddUpdateCommand(Keys.Space, new JumpCommand(this));
 
             //Idle hvis man stopper med at gå eller man begynder at falde
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));
             InputHandler.Instance.AddButtonUpCommand(Keys.D, new StopCommand(this));
-            InputHandler.Instance.AddButtonUpCommand(Keys.W, new StopCommand(this));
-            InputHandler.Instance.AddButtonUpCommand(Keys.Space, new StopCommand(this));
         }
     }
 }

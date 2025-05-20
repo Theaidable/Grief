@@ -11,8 +11,9 @@ namespace Grief.Classes.DesignPatterns.Composite
         //Liste af components
         private List<Component> components = new List<Component>();
 
-        //Property til at tilgå position
+        //Properties
         public Transform Transform { get; private set; }
+        public string Tag { get; set; }
 
         /// <summary>
         /// Constructor af et gameobject, hvor vi altid tilføjer en transformer

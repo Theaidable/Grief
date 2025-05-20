@@ -1,4 +1,6 @@
-﻿using Grief.Classes.DesignPatterns.Command;
+﻿using Grief.Classes.DesignPatterns.Builder;
+using Grief.Classes.DesignPatterns.Builder.Builders;
+using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
 using Microsoft.Xna.Framework;
@@ -45,6 +47,11 @@ namespace Grief
 
         protected override void Initialize()
         {
+
+            PlayerBuilder playerBuilder = new PlayerBuilder();
+            GameObjectDirector director = new GameObjectDirector(playerBuilder);
+            GameObjects.Add(director.Construct("Player"));
+
             foreach (GameObject gameObject in GameObjects)
             {
                 gameObject.Awake();
