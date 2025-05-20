@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
+using Grief.Classes.DesignPatterns.Composite.Components;
 
 namespace Grief.Classes.DesignPatterns.Composite
 {
@@ -8,8 +11,9 @@ namespace Grief.Classes.DesignPatterns.Composite
         //Liste af components
         private List<Component> components = new List<Component>();
 
-        //Property til at tilgå position
+        //Properties
         public Transform Transform { get; private set; }
+        public string Tag { get; set; }
 
         /// <summary>
         /// Constructor af et gameobject, hvor vi altid tilføjer en transformer
@@ -65,18 +69,6 @@ namespace Grief.Classes.DesignPatterns.Composite
         }
 
         /// <summary>
-        /// Collision håndtering for gameobjectet
-        /// </summary>
-        /// <param name="collider"></param>
-        public void OnCollisionEnter(Collider collider)
-        {
-            foreach (var component in components)
-            {
-                component.OnCollisionEnter(collider);
-            }
-        }
-
-        /// <summary>
         /// Metode til at tilføje et component til gameobjectet
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -114,17 +106,5 @@ namespace Grief.Classes.DesignPatterns.Composite
         {
             return components.OfType<T>().FirstOrDefault();
         }
-
-        public Component AddComponentWithExistingValues(Component component)
-        {
-            components.Add(component);
-            return component;
-        }
-
-        public Vector2 GetCenter(int width = 64, int height = 64)
-        {
-            return Transform.Position + new Vector2(width / 2f, height / 2f);
-        }
-
     }
 }

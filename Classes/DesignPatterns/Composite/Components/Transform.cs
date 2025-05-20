@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Grief.Classes.DesignPatterns.Composite.Transform
+namespace Grief.Classes.DesignPatterns.Composite.Components
 {
     public class Transform : Component
     {
@@ -11,10 +11,6 @@ namespace Grief.Classes.DesignPatterns.Composite.Transform
         public Vector2 Scale { get; set; } = Vector2.One;
         public float Rotation { get; set; }
 
-        /// <summary>
-        /// Tom constructor som er nødvendig på grund af nedarvning
-        /// </summary>
-        /// <param name="gameObject"></param>
         public Transform(GameObject gameObject) : base(gameObject) { }
 
         /// <summary>
