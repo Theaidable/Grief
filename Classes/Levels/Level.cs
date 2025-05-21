@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Command;
 using Microsoft.Xna.Framework.Input;
+using Grief.Classes.Quests;
 
 namespace Grief.Classes.Levels
 {
@@ -31,7 +32,22 @@ namespace Grief.Classes.Levels
                     //Her kan vi lave koden til en main menu
                     break;
                 case "Level1":
+
+                    //Tilføj player
                     GameObjects.Add(CreatePlayer(new Vector2(100,400))); //Sæt positionen for spilleren her
+                    
+                    //Tilføj en NPC i spillet
+                    GameObjects.Add(CreateNPC(
+                        new Vector2(200, 400),
+                        "Mor",
+                        new List<string>
+                        {
+                            "Have you seen my daughter?",
+                            "I know she is somewhere around here...",
+                            "Can you help me find her?"
+                        },
+                        new Quest()));
+
                     //Vi kan tilføje flere GameObjects i Level 1 her
                     break;
             }
@@ -44,6 +60,18 @@ namespace Grief.Classes.Levels
             var player = director.Construct("Player");
             playerBuilder.SetPosition(position);
             return player;
+        }
+
+        private GameObject CreateNPC(Vector2 position, string name, List<string> dialog, Quest quest = null)
+        {
+            NpcBuilder npcBuilder = new NpcBuilder();
+            GameObjectDirector director = new GameObjectDirector(npcBuilder);
+            var npc = director.Construct($"{name}");
+            npcBuilder.SetPosition(position);
+            npcBuilder.SetName(name);
+            npcBuilder.SetDialog(dialog);
+            npcBuilder.SetQuest(quest);
+            return npc;
         }
 
         public void AddGameObject(GameObject gameObject)

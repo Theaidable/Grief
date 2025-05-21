@@ -22,18 +22,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] attackLeftFrames;
         private Texture2D[] attackRightFrames;
 
-
-        public int Health { get; private set; }
-        public int Damage {  get; private set; }
-        public float Speed { get; private set; }
-        public int DetectionRange { get; private set; } //Skal muligivis være en rectangle eller en cirkel, sådan eller bruge detectionrange som radius.
-
+        public string SpriteName { get; set; }
+        public int Health { get; set; }
+        public int Damage { get; set; }
+        public float Speed { get; set; }
+        public int DetectionRange { get; set; } //Skal muligivis være en rectangle eller en cirkel, sådan eller bruge detectionrange som radius.
         public List<Vector2> PatrolPoints { get; set; }
 
-        public EnemyComponent(GameObject gameObject) : base(gameObject)
-        {
-            //Lav switch case omkring enemytype i forhold til health, damage, speed og detectionRange
-        }
+        public EnemyComponent(GameObject gameObject) : base(gameObject) { }
 
         public override void Start()
         {
@@ -44,6 +40,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public override void Update()
         {
             //Her skal vi lave physics for at sørge for at når velocity er over 0, så skal FallAnimation afspilles
+        }
+
+        public void SetStats()
+        {
+
         }
 
         public void Patrol()

@@ -15,13 +15,11 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
 
     public class EnemyFactory : Factory
     {
-        private string enemySpriteName;
-        private static readonly Dictionary<EnemyType, string> enemySpriteNames = new Dictionary<EnemyType, string>()
+        private static readonly Dictionary<EnemyType, string> enemyStatsDict = new Dictionary<EnemyType, string>()
         {
             { EnemyType.Enemy1, "" },
             { EnemyType.Enemy2, "" },
         };
-
 
         //Oprettelse af Singleton af EnemyFactory
         private static EnemyFactory instance;
@@ -51,9 +49,11 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             Animator animator = enemyObject.AddComponent<Animator>();
             Collider collider = enemyObject.AddComponent<Collider>();
             var enemy = enemyObject.AddComponent<EnemyComponent>();
-            enemySpriteName = enemySpriteNames[enemyType];
-            spriteRenderer.SetSprite(enemySpriteName);
+
             enemyObject.Transform.Position = position;
+            spriteRenderer.SetSprite(stats.EnemySpriteName);
+            enemy.SetStats();
+
             return enemyObject;
         }
     }
