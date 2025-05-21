@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
-namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
+namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 {
     public enum EnemyType
     {
@@ -15,10 +15,16 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
 
     public class EnemyFactory : Factory
     {
-        private static readonly Dictionary<EnemyType, string> enemyStatsDict = new Dictionary<EnemyType, string>()
+        private static readonly Dictionary<EnemyType, string> enemySpriteNames = new Dictionary<EnemyType, string>()
         {
             { EnemyType.Enemy1, "" },
             { EnemyType.Enemy2, "" },
+        };
+
+        private static readonly Dictionary<EnemyType, EnemyStats> enemyStats = new Dictionary<EnemyType, EnemyStats>()
+        {
+            {EnemyType.Enemy1, new EnemyStats(100,20,200,400)},
+            {EnemyType.Enemy2, new EnemyStats(100,20,200,400)},
         };
 
         //Oprettelse af Singleton af EnemyFactory
@@ -51,8 +57,18 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             var enemy = enemyObject.AddComponent<EnemyComponent>();
 
             enemyObject.Transform.Position = position;
-            spriteRenderer.SetSprite(stats.EnemySpriteName);
-            enemy.SetStats();
+
+            //Sæt sprite
+            if(enemySpriteNames.TryGetValue(enemyType, out var spriteName))
+            {
+                spriteRenderer.SetSprite(spriteName);
+            }
+
+            //Sæt stats
+            if(enemyStats.TryGetValue(enemyType, out var stats))
+            {
+                enemy.SetStats(stats);
+            }
 
             return enemyObject;
         }

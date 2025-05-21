@@ -1,5 +1,6 @@
 ﻿using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -22,11 +23,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] attackLeftFrames;
         private Texture2D[] attackRightFrames;
 
-        public string SpriteName { get; set; }
-        public int Health { get; set; }
-        public int Damage { get; set; }
-        public float Speed { get; set; }
-        public int DetectionRange { get; set; } //Skal muligivis være en rectangle eller en cirkel, sådan eller bruge detectionrange som radius.
+        public int EnemyHealth { get; private set; }
+        public int EnemyDamage { get; private set; }
+        public float EnemySpeed { get; private set; }
+        public int EnemyDetectionRange { get; private set; } //Skal muligivis være en rectangle eller en cirkel, sådan eller bruge detectionrange som radius.
+        
         public List<Vector2> PatrolPoints { get; set; }
 
         public EnemyComponent(GameObject gameObject) : base(gameObject) { }
@@ -42,9 +43,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Her skal vi lave physics for at sørge for at når velocity er over 0, så skal FallAnimation afspilles
         }
 
-        public void SetStats()
+        public void SetStats(EnemyStats stats)
         {
-
+            EnemyHealth = stats.Health;
+            EnemyDamage = stats.Damage;
+            EnemySpeed = stats.Speed;
+            EnemyDetectionRange = stats.DetectionRange;
         }
 
         public void Patrol()
