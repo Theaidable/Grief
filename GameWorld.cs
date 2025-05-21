@@ -16,15 +16,12 @@ namespace Grief
         //Private fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
         private LevelManager levelManager;
 
         //Public properties
         public float DeltaTime { get; private set; }
         public Texture2D Pixel { get; private set; }
-
-        //Lister
-        public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
-        private List<GameObject> objectsToRemove = new List<GameObject>();
 
         //Oprettelse af Singleton af GameWorld
         private static GameWorld instance;
@@ -52,8 +49,6 @@ namespace Grief
             //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
             levelManager = new LevelManager();
             levelManager.LoadLevel("Level1"); //Skal ændres til Level0 når vi laver mainmenu
-
-            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
             base.Initialize();
         }

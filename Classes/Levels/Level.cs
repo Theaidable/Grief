@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
+using Grief.Classes.DesignPatterns.Command.Commands;
+using Grief.Classes.DesignPatterns.Command;
+using Microsoft.Xna.Framework.Input;
 
 namespace Grief.Classes.Levels
 {
@@ -20,6 +23,7 @@ namespace Grief.Classes.Levels
         {
             map = GameWorld.Instance.Content.Load<TiledMap>(levelName);
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, map);
+            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
             switch (levelName)
             {

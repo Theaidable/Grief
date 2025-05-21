@@ -16,6 +16,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Vector2 velocity;
         private float gravity = 800f;
         private float jumpForce = -400f;
+        private float attackCooldown = 0.1f;
+        private float cooldownTimer = 0f;
+        private bool isAttacking = false;
 
         //Walk animation frames
         private Texture2D[] walkLeftFrames;
@@ -40,11 +43,17 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator = GameObject.GetComponent<Animator>();
             AddAnimations();
             BindCommands();
+            animator.PlayAnimation("IdleRight");
         }
 
         public override void Update()
         {
-            if(Grounded == false)
+            if (cooldownTimer > 0)
+            {
+                cooldownTimer -= GameWorld.Instance.DeltaTime;
+            }
+
+            if (Grounded == false)
             {
                 velocity.Y += gravity * GameWorld.Instance.DeltaTime;
             }
@@ -83,6 +92,30 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        public void Attack()
+        {
+            //Her skal vi lave logikken for players attack
+
+            if (cooldownTimer <= 0f)
+            {
+                animator.ClearOnAnimationComplete();
+                isAttacking = true;
+                PlayAttackAnimation();
+
+                animator.OnAnimationComplete = () =>
+                {
+                    cooldownTimer = attackCooldown;
+                    Stop();
+                    isAttacking = false;
+                };
+            }
+        }
+
+        public bool CanUseAttack()
+        {
+            return cooldownTimer <= 0f;
+        }
+
         private void AddAnimations()
         {
             /*
@@ -98,6 +131,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
              * jumpFrames = LoadFrames("stien for at finde den sprite som er jump", antal frames);
              * fallFrames = LoadFrames("stien for at finde den sprite som er fall", antal frames);
              * 
+             * AttackFrames
+             * attackLeftFrames = LoadFrames("stien for at finde den sprite som er attackLeft", antal frames);
+             * attackRightFrames = LoadFrames("stien for at finde den sprite som er attackRight", antal frames);
+             * 
              * AddAnimations
              * animator.AddAnimation(new Animation("WalkLeft", 2.5f, true, walkLeftFrames));
              * animator.AddAnimation(new Animation("WalkRight", 2.5f, true, walkRightFrames));
@@ -105,6 +142,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
              * animator.AddAnimation(new Animation("IdleRight", 2.5f, true, idleRightFrames));
              * animator.AddAnimation(new Animation("Jump", 2.5f, false, jumpFrames));
              * animator.AddAnimation(new Animation("Fall", 2.5f, false, fallFrames));
+             * animator.AddAnimation(new Animation("AttackLeft", 2.5f, false, attackLeftFrames));
+             * animator.AddAnimation(new Animation("AttackRight", 2.5f, false, attackRightFrames));
              */
         }
 
@@ -144,6 +183,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void PlayJumpAnimation()
         {
+            animator.ClearOnAnimationComplete();
+
             if (moveDirection.Y < 0)
             {
                 animator.PlayAnimation("Jump");
@@ -152,10 +193,28 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void PlayFallAnimation()
         {
+            animator.ClearOnAnimationComplete();
+
             if (moveDirection.Y > 0)
             {
                 animator.PlayAnimation("Fall");
             }
+        }
+
+        private void PlayAttackAnimation()
+        {
+            animator.ClearOnAnimationComplete();
+
+            if (moveDirection.X < 0)
+            {
+                animator.PlayAnimation("AttackLeft");
+            }
+            else if (moveDirection.X > 0)
+            {
+                animator.PlayAnimation("AttackRight");
+            }
+
+            //Hvis vi vil tilføje angreb op og ned, så skal det være i forhold til moveDirection.Y større eller mindre end 0
         }
 
         private void BindCommands()
@@ -171,6 +230,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Idle hvis man stopper med at gå eller man begynder at falde
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));
             InputHandler.Instance.AddButtonUpCommand(Keys.D, new StopCommand(this));
+
+            //Attack med musen
+            InputHandler.Instance.AddMouseButtonDownCommand(MouseButton.Left, new AttackCommand(this));
         }
     }
 }
