@@ -1,4 +1,5 @@
 ﻿using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -7,12 +8,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
     public class EnemyComponent : Component
     {
-        public enum EnemyType
-        {
-            Enemy1,
-            Enemy2
-        }
-
         private Animator animator;
 
         private Texture2D[] walkLeftFrames;
@@ -37,7 +32,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public EnemyComponent(GameObject gameObject) : base(gameObject)
         {
-            //Lav if statement omkring enemytype i forhold til health, damage, speed og detectionRange
+            //Lav switch case omkring enemytype i forhold til health, damage, speed og detectionRange
         }
 
         public override void Start()
