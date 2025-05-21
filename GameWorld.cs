@@ -51,7 +51,7 @@ namespace Grief
         {
             //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
             levelManager = new LevelManager();
-            levelManager.LoadLevel("Level1"); 
+            levelManager.LoadLevel("Level1"); //Skal ændres til Level0 når vi laver mainmenu
 
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
