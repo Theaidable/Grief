@@ -3,6 +3,7 @@ using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,13 +17,11 @@ namespace Grief
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        private LevelManager levelManager;
+
         //Public properties
         public float DeltaTime { get; private set; }
         public Texture2D Pixel { get; private set; }
-
-        //Lister
-        public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
-        private List<GameObject> objectsToRemove = new List<GameObject>();
 
         //Oprettelse af Singleton af GameWorld
         private static GameWorld instance;
@@ -47,17 +46,9 @@ namespace Grief
 
         protected override void Initialize()
         {
-
-            PlayerBuilder playerBuilder = new PlayerBuilder();
-            GameObjectDirector director = new GameObjectDirector(playerBuilder);
-            GameObjects.Add(director.Construct("Player"));
-
-            foreach (GameObject gameObject in GameObjects)
-            {
-                gameObject.Awake();
-            }
-
-            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
+            //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
+            levelManager = new LevelManager();
+            levelManager.LoadLevel("Level1"); //Skal ændres til Level0 når vi laver mainmenu
 
             base.Initialize();
         }
@@ -68,10 +59,6 @@ namespace Grief
             Pixel = new Texture2D(GraphicsDevice, 1, 1);
             Pixel.SetData(new[] { Color.White });
 
-            foreach (GameObject gameObject in GameObjects)
-            {
-                gameObject.Start();
-            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -85,16 +72,7 @@ namespace Grief
 
             InputHandler.Instance.Execute();
 
-            foreach (GameObject gameObject in GameObjects)
-            {
-                gameObject.Update();
-            }
-
-            foreach (var obj in objectsToRemove)
-            {
-                GameObjects.Remove(obj);
-            }
-            objectsToRemove.Clear();
+            levelManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -103,10 +81,11 @@ namespace Grief
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            foreach (GameObject gameObject in GameObjects)
-            {
-                gameObject.Draw(_spriteBatch);
-            }
+            _spriteBatch.Begin();
+
+            levelManager.Draw(_spriteBatch);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
