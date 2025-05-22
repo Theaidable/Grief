@@ -1,15 +1,45 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Greif.Classes.Cameras;
+using Grief.Classes.DesignPatterns.Builder;
+using Grief.Classes.DesignPatterns.Builder.Builders;
+using Grief.Classes.DesignPatterns.Command;
+using Grief.Classes.DesignPatterns.Command.Commands;
+using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.Levels;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
-namespace Grief
+namespace Greif
 {
-    public class Game1 : Game
+    public class GameWorld : Game
     {
+        //Private fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        public Game1()
+        private LevelManager levelManager;
+
+        //Public properties
+        public float DeltaTime { get; private set; }
+        public Texture2D Pixel { get; private set; }
+        public Camera Camera { get; private set; }
+
+        //Oprettelse af Singleton af GameWorld
+        private static GameWorld instance;
+        public static GameWorld Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new GameWorld();
+                }
+                return instance;
+            }
+        }
+
+        private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -18,7 +48,10 @@ namespace Grief
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
+            levelManager = new LevelManager();
+            levelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
+            Camera = new Camera();
 
             base.Initialize();
         }
@@ -26,16 +59,23 @@ namespace Grief
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            Pixel = new Texture2D(GraphicsDevice, 1, 1);
+            Pixel.SetData(new[] { Color.White });
 
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 Exit();
+            }
 
-            // TODO: Add your update logic here
+            DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            InputHandler.Instance.Execute();
+
+            levelManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -44,7 +84,11 @@ namespace Grief
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            levelManager.Draw(_spriteBatch, Camera.ViewMatrix);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
