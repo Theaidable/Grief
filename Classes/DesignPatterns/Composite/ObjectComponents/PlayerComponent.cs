@@ -18,11 +18,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Animator animator;
         private Vector2 moveDirection;
         private Vector2 velocity;
-        private float gravity = 800f;
-        private float jumpForce = -400f;
+        private float gravity = 600f;
+        private float jumpForce = -200f;
         private float attackCooldown = 0.1f;
         private float cooldownTimer = 0f;
         private bool isAttacking = false;
+
+        private float groundLevelY;
 
         //Walk animation frames
         private Texture2D[] idleFrames;
@@ -46,11 +48,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         //Public properties
         public float MovementSpeed { get; private set; }
-        public bool Grounded { get; set; }
+        public bool Grounded { get; private set; } = true;
 
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
-            MovementSpeed = 100f;
+            MovementSpeed = 50f;
             moveDirection = Vector2.One;
         }
 
@@ -58,12 +60,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             animator = GameObject.GetComponent<Animator>();
 
+            groundLevelY = GameObject.Transform.Position.Y;
+
             AddAnimations();
             BindCommands();
             animator.PlayAnimation("Idle");
         }
 
-        /*
+        
         public override void Update()
         {
             if (cooldownTimer > 0)
@@ -79,28 +83,65 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Bevæg spilleren baseret på velocity
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
 
-            //Her skal vi lave et collisoncheck om player står på jorden, før man kan hoppe. Dette skal implementeres når levelet er lavet
-            //Dette er udelukkende for at jeg ved hvordan collision i levelet fungere
-
-            if (velocity.Y > 0)
+            if(GameObject.Transform.Position.Y >= groundLevelY)
             {
-                Debug.WriteLine($"{moveDirection}");
-                PlayFallAnimation();
+                GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, groundLevelY);
+                velocity.Y = 0f;
+
+                if(Grounded == false)
+                {
+                    Grounded = true;
+                    animator.PlayAnimation("Idle");
+                }
+            }
+            else
+            {
+                Grounded = false;
+            }
+
+            if (Grounded == false)
+            {
+                if(velocity.Y < 0)
+                {
+                    animator.PlayAnimation("Jump");
+                }
+                else
+                {
+                    animator.PlayAnimation("Fall");
+                }
             }
         }
-        */
-
+        
         public void Move(Vector2 direction)
         {
+            var spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             moveDirection = direction;
+            
+            //Flip sprite baseret på direction
+            if(direction.X < 0)
+            {
+                spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
+            } 
+            else if(direction.X > 0)
+            {
+                spriteRenderer.Effects = SpriteEffects.None;
+            }
+
             GameObject.Transform.Translate(direction * MovementSpeed * GameWorld.Instance.DeltaTime);
             Debug.WriteLine($"{moveDirection}");
-            PlayMoveAnimation(direction);
+
+            if(isAttacking == false)
+            {
+                PlayMoveAnimation(direction);
+            }
         }
 
         public void Stop()
         {
-            PlayStopAnimation(moveDirection);
+            if(isAttacking == false)
+            {
+                PlayStopAnimation(moveDirection);
+            }
         }
 
         public void Jump()
@@ -109,18 +150,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 velocity.Y = jumpForce;
                 Grounded = false;
-                PlayJumpAnimation();
             }
         }
 
         public void Attack()
         {
-            //Her skal vi lave logikken for players attack
-
             if (cooldownTimer <= 0f)
             {
-                animator.ClearOnAnimationComplete();
                 isAttacking = true;
+                animator.ClearOnAnimationComplete();
                 PlayAttackAnimation();
 
                 animator.OnAnimationComplete = () =>
@@ -152,16 +190,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             sitFrames = LoadFrames("MainCharacter/Sit/Sit",6);
 
             //Add animations
-            animator.AddAnimation(new Animation("Idle", 3f, true, idleFrames));
-            animator.AddAnimation(new Animation("Walk", 2.5f, true, walkFrames));
+            animator.AddAnimation(new Animation("Idle", 3.5f, true, idleFrames));
+            animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Run", 10f, true, runFrames));
-            animator.AddAnimation(new Animation("Jump", 2.5f, false, jumpFrames));
-            animator.AddAnimation(new Animation("Fall", 2.5f, false, fallFrames));
-            animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
-            animator.AddAnimation(new Animation("Blink", 2.5f, false, blinkFrames));
-            animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
-            animator.AddAnimation(new Animation("Die", 2.5f, false, dieFrames));
-            animator.AddAnimation(new Animation("Sit", 2.5f, true, sitFrames));
+            animator.AddAnimation(new Animation("Jump", 5f, false, jumpFrames));
+            animator.AddAnimation(new Animation("Fall", 15f, false, fallFrames));
+            animator.AddAnimation(new Animation("Attack", 12f, false, attackFrames));
+            animator.AddAnimation(new Animation("Blink", 5f, false, blinkFrames));
+            animator.AddAnimation(new Animation("Death", 5f, false, deathFrames));
+            animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
+            animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
 
         private Texture2D[] LoadFrames(string basePath, int frameCount)
@@ -199,26 +237,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-        private void PlayJumpAnimation()
-        {
-            animator.ClearOnAnimationComplete();
-
-            if (moveDirection.Y < 0)
-            {
-                animator.PlayAnimation("Jump");
-            }
-        }
-
-        private void PlayFallAnimation()
-        {
-            animator.ClearOnAnimationComplete();
-
-            if (moveDirection.Y > 0)
-            {
-                animator.PlayAnimation("Fall");
-            }
-        }
-
         private void PlayAttackAnimation()
         {
             animator.ClearOnAnimationComplete();
@@ -231,8 +249,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 animator.PlayAnimation("Attack");
             }
-
-            //Hvis vi vil tilføje angreb op og ned, så skal det være i forhold til moveDirection.Y større eller mindre end 0
         }
         
 
@@ -243,8 +259,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(new Vector2(1, 0), this));
 
             //Jump on W or Spacebar
-            InputHandler.Instance.AddUpdateCommand(Keys.W, new JumpCommand(this));
-            InputHandler.Instance.AddUpdateCommand(Keys.Space, new JumpCommand(this));
+            InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(this));
+            InputHandler.Instance.AddButtonDownCommand(Keys.Space, new JumpCommand(this));
 
             //Idle hvis man stopper med at gå eller man begynder at falde
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));
