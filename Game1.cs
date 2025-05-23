@@ -8,6 +8,7 @@ using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using System.Collections.Generic;
 
 namespace Greif
@@ -18,12 +19,11 @@ namespace Greif
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private LevelManager levelManager;
-
         //Public properties
         public float DeltaTime { get; private set; }
         public Texture2D Pixel { get; private set; }
         public Camera Camera { get; private set; }
+        public LevelManager LevelManager { get; private set; }
 
         //Oprettelse af Singleton af GameWorld
         private static GameWorld instance;
@@ -49,8 +49,8 @@ namespace Greif
         protected override void Initialize()
         {
             //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
-            levelManager = new LevelManager();
-            levelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
+            LevelManager = new LevelManager();
+            LevelManager.LoadLevel("GriefMap2"); //Skal ændres til Level0 når vi laver mainmenu
             Camera = new Camera();
 
             base.Initialize();
@@ -75,7 +75,7 @@ namespace Greif
 
             InputHandler.Instance.Execute();
 
-            levelManager.Update(gameTime);
+            LevelManager.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -86,7 +86,7 @@ namespace Greif
 
             _spriteBatch.Begin();
 
-            levelManager.Draw(_spriteBatch, Camera.ViewMatrix);
+            LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
 
             _spriteBatch.End();
 

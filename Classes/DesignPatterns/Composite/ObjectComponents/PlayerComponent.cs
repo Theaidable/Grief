@@ -83,12 +83,37 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Bevæg spilleren baseret på velocity
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
 
-            if(GameObject.Transform.Position.Y >= groundLevelY)
+
+            //var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
+            //Grounded = CheckCollisionBelow(playerCollider, out Rectangle groundRect);
+
+            if (Grounded == true && velocity.Y > 0)
+            {
+                velocity.Y = 0;
+
+                //Sæt position oven på tilen
+                //GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, groundRect.Top - (playerCollider.Height / 2f));
+                
+                animator.PlayAnimation("Idle");
+            }
+            else if (Grounded == false)
+            {
+                if (velocity.Y < 0)
+                {
+                    animator.PlayAnimation("Jump");
+                }
+                else
+                {
+                    animator.PlayAnimation("Fall");
+                }
+            }
+
+            if (GameObject.Transform.Position.Y >= groundLevelY)
             {
                 GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, groundLevelY);
                 velocity.Y = 0f;
 
-                if(Grounded == false)
+                if (Grounded == false)
                 {
                     Grounded = true;
                     animator.PlayAnimation("Idle");
@@ -111,10 +136,33 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 }
             }
         }
-        
+
+        /*
+        private bool CheckCollisionBelow(Rectangle playerCollider, out Rectangle groundRect)
+        {
+            var currentLevel = GameWorld.Instance.LevelManager.CurrentLevel;
+
+            foreach (var rect in currentLevel.CollisionRectangles)
+            {
+                // Sørg for at vi kun tjekker under spilleren (tolerance på Y-retning)
+                if (playerCollider.Bottom <= rect.Top &&
+                    playerCollider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= rect.Top &&
+                    playerCollider.Right > rect.Left &&
+                    playerCollider.Left < rect.Right)
+                {
+                    groundRect = rect;
+                    return true;
+                }
+            }
+
+            groundRect = Rectangle.Empty;
+            return false;
+        }
+        */
+
         public void Move(Vector2 direction)
         {
-            var spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
+            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             moveDirection = direction;
             
             //Flip sprite baseret på direction
@@ -130,7 +178,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             GameObject.Transform.Translate(direction * MovementSpeed * GameWorld.Instance.DeltaTime);
             Debug.WriteLine($"{moveDirection}");
 
-            if(isAttacking == false)
+            if(isAttacking == false && Grounded == true)
             {
                 PlayMoveAnimation(direction);
             }
@@ -138,7 +186,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Stop()
         {
-            if(isAttacking == false)
+            if(isAttacking == false && Grounded == true)
             {
                 PlayStopAnimation(moveDirection);
             }
@@ -158,15 +206,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             if (cooldownTimer <= 0f)
             {
                 isAttacking = true;
-                animator.ClearOnAnimationComplete();
                 PlayAttackAnimation();
+                animator.ClearOnAnimationComplete();
 
                 animator.OnAnimationComplete = () =>
                 {
-                    cooldownTimer = attackCooldown;
-                    Stop();
                     isAttacking = false;
+                    animator.PlayAnimation(Grounded ? "Idle" : "Fall");
                 };
+
+                cooldownTimer = attackCooldown;
             }
         }
 
@@ -258,8 +307,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(new Vector2(-1, 0), this));
             InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(new Vector2(1, 0), this));
 
-            //Jump on W or Spacebar
-            InputHandler.Instance.AddButtonDownCommand(Keys.W, new JumpCommand(this));
+            //Jump on Spacebar
             InputHandler.Instance.AddButtonDownCommand(Keys.Space, new JumpCommand(this));
 
             //Idle hvis man stopper med at gå eller man begynder at falde

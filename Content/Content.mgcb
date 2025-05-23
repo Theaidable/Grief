@@ -927,6 +927,18 @@
 /processorParam:TextureFormat=Color
 /build:TileMaps/Assets/Ground/Ground_TIleset.png;TileMaps/Assets/Ground/Ground_TIleset
 
+#begin TileMaps/Assets/Ground/GroundTileset.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/Ground/GroundTileset.png
+
 #begin TileMaps/Assets/Ground/Tileset_Ground.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1183,4 +1195,9 @@
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
 /build:TileMaps/GriefMap1.tmx
+
+#begin TileMaps/GriefMap2.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:TileMaps/GriefMap2.tmx
 

@@ -25,6 +25,7 @@ namespace Grief.Classes.Levels
         private TiledMapRenderer mapRenderer;
 
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
+        public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
 
         public void Load(string levelName)
         {
@@ -37,8 +38,33 @@ namespace Grief.Classes.Levels
                 case "Level0":
                     //Her kan vi lave koden til en main menu
                     break;
-                case "GriefMap1":
-                    
+                case "GriefMap2":
+
+
+                    /* Forsøg på at instansiere tiles fra tmx filen til at finde deres collider
+                    TiledMapTileLayer collisionLayer = map.GetLayer<TiledMapTileLayer>("Ground");
+                    for (int x = 0; x < collisionLayer.Width; x++)
+                    {
+                        for (int y = 0; y < collisionLayer.Height; y++)
+                        {
+                            TiledMapTile? tile;
+                            
+                            if(collisionLayer.TryGetTile((ushort)x, (ushort)y, out tile) && tile.HasValue)
+                            {
+                                var tileset = map.GetTilesetByTileGlobalIdentifier(tile.Value.GlobalIdentifier);
+                                var tileId = tile.Value.GlobalIdentifier - map.GetTilesetFirstGlobalIdentifier(tileset);
+                                var tileProperties = tileset.Tiles.FirstOrDefault(t => t.LocalTileIdentifier == tileId);
+
+                                if (tileProperties.Properties.ContainsKey("collidable") && tileProperties.Properties["collidable"] == "true")
+                                {
+                                    var tileRectangle = new Rectangle(x * map.TileWidth, y * map.TileHeight, map.TileWidth, map.TileHeight);
+                                    CollisionRectangles.Add(tileRectangle);
+                                }
+                            }
+                        }
+                    }
+                    */
+
                     AddGameObject(CreatePlayer(new Vector2(250,207)));
 
                     /*
