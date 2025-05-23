@@ -20,7 +20,12 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         public NpcBuilder()
         {
             npc = new GameObject();
-            npc.AddComponent<NpcComponent>();
+        }
+
+        public IGameObjectBuilder SetTag(string tag)
+        {
+            npc.Tag = tag;
+            return this;
         }
 
         public IGameObjectBuilder SetPosition(Vector2 position)
@@ -48,7 +53,8 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
 
         public IGameObjectBuilder AddSpriteRenderer()
         {
-            npc.AddComponent<SpriteRenderer>();
+            var spriteRenderer = npc.AddComponent<SpriteRenderer>();
+            spriteRenderer.SetSprite("MainCharacter/Idle/Idle01");
             return this;
         }
 
@@ -64,10 +70,9 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
             return this;
         }
 
-        public IGameObjectBuilder SetTag(string tag)
+        public Component AddScriptComponent<T>() where T : Component
         {
-            npc.Tag = tag;
-            return this;
+            return npc.AddComponent<T>();
         }
 
         public GameObject GetResult()

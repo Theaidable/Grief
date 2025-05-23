@@ -2,6 +2,7 @@
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Builder.Builders
 {
@@ -12,7 +13,6 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         public PlayerBuilder()
         {
             player = new GameObject();
-            player.AddComponent<PlayerComponent>();
         }
 
         public IGameObjectBuilder SetPosition(Vector2 position)
@@ -21,9 +21,16 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
             return this;
         }
 
+        public IGameObjectBuilder SetTag(string tag)
+        {
+            player.Tag = tag;
+            return this;
+        }
+
         public IGameObjectBuilder AddSpriteRenderer()
         {
-            player.AddComponent<SpriteRenderer>();
+            var spriteRenderer = player.AddComponent<SpriteRenderer>();
+            spriteRenderer.SetSprite("MainCharacter/Idle/Idle01");
             return this;
         }
 
@@ -39,10 +46,9 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
             return this;
         }
 
-        public IGameObjectBuilder SetTag(string tag)
+        public Component AddScriptComponent<T>() where T : Component
         {
-            player.Tag = tag;
-            return this;
+            return player.AddComponent<T>();
         }
 
         public GameObject GetResult()

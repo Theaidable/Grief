@@ -1,6 +1,6 @@
 ﻿namespace Grief.Classes.Quests
 {
-    public class FetchQuest
+    public class FetchQuest : Quest
     {
     }
 }

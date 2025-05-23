@@ -1,10 +1,13 @@
 ﻿using Greif;
+using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -22,12 +25,24 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool isAttacking = false;
 
         //Walk animation frames
-        private Texture2D[] walkLeftFrames;
-        private Texture2D[] walkRightFrames;
+        private Texture2D[] idleFrames;
+        private Texture2D[] walkFrames;
+        private Texture2D[] runFrames;
 
         //Jump animation frames
         private Texture2D[] jumpFrames;
         private Texture2D[] fallFrames;
+
+        //Combat animation frames
+        private Texture2D[] attackFrames;
+        private Texture2D[] blinkFrames;
+
+        //Death animation frames
+        private Texture2D[] deathFrames;
+        private Texture2D[] dieFrames;
+
+        //Sit animation frames when saving the game
+        private Texture2D[] sitFrames;
 
         //Public properties
         public float MovementSpeed { get; private set; }
@@ -35,16 +50,17 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
-            MovementSpeed = 200f;
+            MovementSpeed = 100f;
             moveDirection = Vector2.One;
         }
 
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
+
             AddAnimations();
             BindCommands();
-            animator.PlayAnimation("IdleRight");
+            animator.PlayAnimation("Idle");
         }
 
         /*
@@ -68,6 +84,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             if (velocity.Y > 0)
             {
+                Debug.WriteLine($"{moveDirection}");
                 PlayFallAnimation();
             }
         }
@@ -77,6 +94,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             moveDirection = direction;
             GameObject.Transform.Translate(direction * MovementSpeed * GameWorld.Instance.DeltaTime);
+            Debug.WriteLine($"{moveDirection}");
             PlayMoveAnimation(direction);
         }
 
@@ -121,33 +139,29 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void AddAnimations()
         {
-            /*
-             * WalkFrames
-             * walkLeftFrames = LoadFrames("stien for at finde den sprite som er walkingLeft", antal frames);
-             * walkRightFrames = LoadFrames("stien for at finde den sprite som er walkingRight", antal frames);
-             * 
-             * IdleFrames
-             * idleLeftFrames = LoadFrames("stien for at finde den sprite som er idleLeft", antal frames);
-             * idleRightFrames = LoadFrames("stien for at finde den sprite som er idleRight", antal frames);
-             * 
-             * Jump and Fall Frames
-             * jumpFrames = LoadFrames("stien for at finde den sprite som er jump", antal frames);
-             * fallFrames = LoadFrames("stien for at finde den sprite som er fall", antal frames);
-             * 
-             * AttackFrames
-             * attackLeftFrames = LoadFrames("stien for at finde den sprite som er attackLeft", antal frames);
-             * attackRightFrames = LoadFrames("stien for at finde den sprite som er attackRight", antal frames);
-             * 
-             * AddAnimations
-             * animator.AddAnimation(new Animation("WalkLeft", 2.5f, true, walkLeftFrames));
-             * animator.AddAnimation(new Animation("WalkRight", 2.5f, true, walkRightFrames));
-             * animator.AddAnimation(new Animation("IdleLeft", 2.5f, true, idleLeftFrames));
-             * animator.AddAnimation(new Animation("IdleRight", 2.5f, true, idleRightFrames));
-             * animator.AddAnimation(new Animation("Jump", 2.5f, false, jumpFrames));
-             * animator.AddAnimation(new Animation("Fall", 2.5f, false, fallFrames));
-             * animator.AddAnimation(new Animation("AttackLeft", 2.5f, false, attackLeftFrames));
-             * animator.AddAnimation(new Animation("AttackRight", 2.5f, false, attackRightFrames));
-             */
+            //Load Frames
+            idleFrames = LoadFrames("MainCharacter/Idle/Idle",2);
+            walkFrames = LoadFrames("MainCharacter/Walk/Walk",4);
+            runFrames = LoadFrames("MainCharacter/Run/Run",8);
+            jumpFrames = LoadFrames("MainCharacter/Jump/Jump",3);
+            fallFrames = LoadFrames("MainCharacter/Fall/Fall",5);
+            attackFrames = LoadFrames("MainCharacter/Attack/Attack",8);
+            blinkFrames = LoadFrames("MainCharacter/Blink/Blink",2);
+            deathFrames = LoadFrames("MainCharacter/Death/Death",4);
+            dieFrames = LoadFrames("MainCharacter/Die/Die",8);
+            sitFrames = LoadFrames("MainCharacter/Sit/Sit",6);
+
+            //Add animations
+            animator.AddAnimation(new Animation("Idle", 3f, true, idleFrames));
+            animator.AddAnimation(new Animation("Walk", 2.5f, true, walkFrames));
+            animator.AddAnimation(new Animation("Run", 10f, true, runFrames));
+            animator.AddAnimation(new Animation("Jump", 2.5f, false, jumpFrames));
+            animator.AddAnimation(new Animation("Fall", 2.5f, false, fallFrames));
+            animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
+            animator.AddAnimation(new Animation("Blink", 2.5f, false, blinkFrames));
+            animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
+            animator.AddAnimation(new Animation("Die", 2.5f, false, dieFrames));
+            animator.AddAnimation(new Animation("Sit", 2.5f, true, sitFrames));
         }
 
         private Texture2D[] LoadFrames(string basePath, int frameCount)
@@ -155,20 +169,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Texture2D[] frames = new Texture2D[frameCount];
             for (int i = 0; i < frameCount; i++)
             {
-                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}_00{i}"); //Sørg for at dette svare korrekt til stinavn
+                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}");
             }
             return frames;
         }
 
+        
         private void PlayMoveAnimation(Vector2 direction)
         {
             if (direction.X < 0)
             {
-                animator.PlayAnimation("WalkLeft");
+                animator.PlayAnimation("Run");
             }
             else if (direction.X > 0)
             {
-                animator.PlayAnimation("WalkRight");
+                animator.PlayAnimation("Run");
             }
         }
 
@@ -176,11 +191,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             if (direction.X < 0)
             {
-                animator.PlayAnimation("IdleLeft");
+                animator.PlayAnimation("Idle");
             }
             else if (direction.X > 0)
             {
-                animator.PlayAnimation("IdleRight");
+                animator.PlayAnimation("Idle");
             }
         }
 
@@ -210,15 +225,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             if (moveDirection.X < 0)
             {
-                animator.PlayAnimation("AttackLeft");
+                animator.PlayAnimation("Attack");
             }
             else if (moveDirection.X > 0)
             {
-                animator.PlayAnimation("AttackRight");
+                animator.PlayAnimation("Attack");
             }
 
             //Hvis vi vil tilføje angreb op og ned, så skal det være i forhold til moveDirection.Y større eller mindre end 0
         }
+        
 
         private void BindCommands()
         {

@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite
 {
@@ -41,6 +42,7 @@ namespace Grief.Classes.DesignPatterns.Composite
         {
             foreach (var component in components)
             {
+                Debug.WriteLine($"{component.GetType().Name}");
                 component.Start();
             }
         }

@@ -1,19 +1,21 @@
-﻿using Grief.Classes.DesignPatterns.Builder.Builders;
+﻿using Greif;
+using Greif.Classes.Cameras;
 using Grief.Classes.DesignPatterns.Builder;
+using Grief.Classes.DesignPatterns.Builder.Builders;
+using Grief.Classes.DesignPatterns.Command;
+using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
-using Grief.Classes.DesignPatterns.Command.Commands;
-using Grief.Classes.DesignPatterns.Command;
-using Microsoft.Xna.Framework.Input;
-using Grief.Classes.Quests;
-using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
-using Greif;
 using System.Linq;
-using Greif.Classes.Cameras;
 
 namespace Grief.Classes.Levels
 {
@@ -36,18 +38,17 @@ namespace Grief.Classes.Levels
                     //Her kan vi lave koden til en main menu
                     break;
                 case "GriefMap1":
-
-                    //Tilføj player
-                    GameObjects.Add(CreatePlayer(new Vector2(100,100))); //Sæt positionen for spilleren her
                     
+                    AddGameObject(CreatePlayer(new Vector2(250,205)));
+
                     /*
                     //Tilføj enemy
                     GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(300, 400));
                     GameObjects.Add(enemyObject);
                     */
-                    
+
                     //Tilføj en NPC i spillet
-                    GameObjects.Add(CreateNPC(
+                    /*AddGameObject(CreateNPC(
                         new Vector2(200, 400),
                         "Mor",
                         new List<string>
@@ -57,6 +58,7 @@ namespace Grief.Classes.Levels
                             "Can you help me find her?"
                         },
                         new Quest()));
+                    */
 
                     //Vi kan tilføje flere GameObjects i Level 1 her
                     break;
@@ -68,6 +70,7 @@ namespace Grief.Classes.Levels
             PlayerBuilder playerBuilder = new PlayerBuilder();
             GameObjectDirector director = new GameObjectDirector(playerBuilder);
             var player = director.Construct("Player");
+            playerBuilder.AddScriptComponent<PlayerComponent>();
             playerBuilder.SetPosition(position);
             return player;
         }

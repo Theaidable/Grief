@@ -5,11 +5,12 @@ namespace Grief.Classes.DesignPatterns.Builder
 {
     public interface IGameObjectBuilder
     {
+        public IGameObjectBuilder SetTag(string tag);
         public IGameObjectBuilder SetPosition(Vector2 position);
         public IGameObjectBuilder AddSpriteRenderer();
         public IGameObjectBuilder AddAnimator();
         public IGameObjectBuilder AddCollider();
-        public IGameObjectBuilder SetTag(string tag);
+        public Component AddScriptComponent<T>() where T : Component;
         public GameObject GetResult();
 
 
