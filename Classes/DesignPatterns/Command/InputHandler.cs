@@ -54,7 +54,6 @@ namespace Grief.Classes.DesignPatterns.Command
             mouseButtonDownBinds[button] = command;
         }
 
-
         public void Execute()
         {
             KeyboardState keyState = Keyboard.GetState();
@@ -65,7 +64,7 @@ namespace Grief.Classes.DesignPatterns.Command
                 if (keyState.IsKeyDown(key))
                 {
                     keybindsUpdate[key].Execute();
-                    break;
+                    //break;
                 }
             }
 
@@ -76,7 +75,7 @@ namespace Grief.Classes.DesignPatterns.Command
                     keybindsButtonDown[key].Execute();
                 }
             }
-
+              
             foreach (var key in keybindsButtonUp.Keys)
             {
                 if (previousKeyState.IsKeyDown(key) && !keyState.IsKeyDown(key))

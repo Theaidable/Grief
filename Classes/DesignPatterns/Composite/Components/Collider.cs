@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
@@ -22,8 +23,8 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public override void Start()
         {
             spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
-            spriteRenderer.OnSpriteChanged += RebuildCollider;
             pixelPerfectRectangles = new Lazy<List<RectangleData>>(() => CreateRectangles());
+            spriteRenderer.OnSpriteChanged += RebuildCollider;
             UpdatePixelCollider();
         }
 

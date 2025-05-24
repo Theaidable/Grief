@@ -14,7 +14,7 @@ namespace Grief.Classes.DesignPatterns.Builder
 
         public GameObject Construct(string tag)
         {
-            return builder.AddSpriteRenderer().AddAnimator().AddCollider().SetTag(tag).GetResult();
+            return builder.SetTag(tag).AddSpriteRenderer().AddAnimator().AddCollider().GetResult();
         }
     }
 }

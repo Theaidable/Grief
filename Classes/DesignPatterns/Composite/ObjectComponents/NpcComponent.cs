@@ -1,4 +1,5 @@
-﻿using Grief.Classes.DesignPatterns.Composite.Components;
+﻿using Greif;
+using Grief.Classes.DesignPatterns.Composite.Components;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -19,13 +20,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void AddAnimations()
         {
-            /*
-             * IdleFrames
-             * idleFrames = LoadFrames("stien for at finde den sprite som er idleLeft", antal frames);
-             * 
-             * AddAnimationen
-             * animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
-             */
+            //Load Frames
+            idleFrames = LoadFrames("MainCharacter/Idle/Idle", 2);
+
+            //Add animations
+            animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
+        }
+
+        private Texture2D[] LoadFrames(string basePath, int frameCount)
+        {
+            Texture2D[] frames = new Texture2D[frameCount];
+            for (int i = 0; i < frameCount; i++)
+            {
+                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}");
+            }
+            return frames;
         }
     }
 }

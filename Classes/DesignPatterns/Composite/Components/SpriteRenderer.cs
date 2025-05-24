@@ -17,11 +17,13 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public Texture2D Sprite { get; set; }
         public Color Color { get; set; }
         public Rectangle? SourceRectangle { get; set; }
+        public SpriteEffects Effects { get; set; }
         public event Action OnSpriteChanged;
 
         public SpriteRenderer(GameObject gameObject) : base(gameObject)
         {
             Color = Color.White;
+            Effects = SpriteEffects.None;
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
                 return;
             }
 
-            spriteBatch.Draw(Sprite, GameObject.Transform.Position, SourceRectangle, Color, GameObject.Transform.Rotation, Origin, GameObject.Transform.Scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(Sprite, GameObject.Transform.Position, SourceRectangle, Color, GameObject.Transform.Rotation, Origin, GameObject.Transform.Scale, Effects, 0);
         }
     }
 }

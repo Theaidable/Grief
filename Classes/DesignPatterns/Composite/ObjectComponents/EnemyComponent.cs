@@ -1,9 +1,11 @@
 ﻿using Greif;
+using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
 using System.Collections.Generic;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -12,17 +14,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     {
         private Animator animator;
 
-        private Texture2D[] walkLeftFrames;
-        private Texture2D[] walkRightFrames;
+        private Texture2D[] idleFrames;
+        private Texture2D[] walkFrames;
 
-        private Texture2D[] pursueLeftFrames;
-        private Texture2D[] pursueRightFrames;
+        private Texture2D[] attackFrames;
 
-        private Texture2D[] jumpFrames;
-        private Texture2D[] fallFrames;
-
-        private Texture2D[] attackLeftFrames;
-        private Texture2D[] attackRightFrames;
+        private Texture2D[] hurtFrames;
+        private Texture2D[] deathFrames;
 
         public int EnemyHealth { get; private set; }
         public int EnemyDamage { get; private set; }
@@ -37,6 +35,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             animator = GameObject.GetComponent<Animator>();
             AddAnimations();
+            animator.PlayAnimation("Idle");
         }
 
         public override void Update()
@@ -77,33 +76,19 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void AddAnimations()
         {
-            /*
-             * WalkFrames
-             * walkLeftFrames = LoadFrames("stien for at finde den sprite som er walkingLeft", antal frames);
-             * walkRightFrames = LoadFrames("stien for at finde den sprite som er walkingRight", antal frames);
-             * 
-             * pursueFrames
-             * pursueLeftFrames = LoadFrames("stien for at finde den sprite som er pursueLeft", antal frames);
-             * pursueRightFrames = LoadFrames("stien for at finde den sprite som er pursueRight", antal frames);
-             * 
-             * attackFrames
-             * attackLeftFrames = LoadFrames("stien for at finde den sprite som er attackLeft", antal frames);
-             * attackRightFrames = LoadFrames("stien for at finde den sprite som er attackRight", antal frames);
-             * 
-             * Jump and Fall Frames
-             * jumpFrames = LoadFrames("stien for at finde den sprite som er jump", antal frames);
-             * fallFrames = LoadFrames("stien for at finde den sprite som er fall", antal frames);
-             * 
-             * AddAnimations
-             * animator.AddAnimation(new Animation("WalkLeft", 2.5f, true, walkLeftFrames));
-             * animator.AddAnimation(new Animation("WalkRight", 2.5f, true, walkRightFrames));
-             * animator.AddAnimation(new Animation("PursueLeft", 2.5f, true, idleLeftFrames));
-             * animator.AddAnimation(new Animation("PursueRight", 2.5f, true, idleRightFrames));
-             * animator.AddAnimation(new Animation("Jump", 2.5f, false, jumpFrames));
-             * animator.AddAnimation(new Animation("Fall", 2.5f, false, fallFrames));
-             * animator.AddAnimation(new Animation("AttackLeft", 2.5f, false, jumpFrames));
-             * animator.AddAnimation(new Animation("AttackRight", 2.5f, false, fallFrames));
-             */
+            idleFrames = LoadFrames("Enemies/Skeleton/Idle/Idle", 4);
+            walkFrames = LoadFrames("Enemies/Skeleton/Walk/Walk", 4);
+
+            attackFrames = LoadFrames("Enemies/Skeleton/Attack/Attack", 4);
+
+            hurtFrames = LoadFrames("Enemies/Skeleton/Hurt/Hurt", 4);
+            deathFrames = LoadFrames("Enemies/Skeleton/Death/Death", 4);
+
+            animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
+            animator.AddAnimation(new Animation("Walk", 2.5f, true, walkFrames));
+            animator.AddAnimation(new Animation("Attack", 2.5f, false, attackFrames));
+            animator.AddAnimation(new Animation("Hurt", 2.5f, false, hurtFrames));
+            animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
         }
 
         private Texture2D[] LoadFrames(string basePath, int frameCount)
@@ -111,7 +96,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Texture2D[] frames = new Texture2D[frameCount];
             for (int i = 0; i < frameCount; i++)
             {
-                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}_00{i}"); //Sørg for at dette svare korrekt til stinavn
+                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}"); //Sørg for at dette svare korrekt til stinavn
             }
             return frames;
         }
@@ -119,11 +104,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private void PlayPatrolAnimation()
         {
             //Her skal vi afspille walkanimation baseret på hvilken retning fjenden går, om det er til venstre eller højre
-        }
-
-        private void PlayPursueAnimation()
-        {
-            //Her skal vi afspille pursueAnimation når fjenden jagter spilleren, og der skal køres om det er til højre eller venstre
         }
 
         private void PlayJumpAnimation()
