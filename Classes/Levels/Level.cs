@@ -56,7 +56,7 @@ namespace Grief.Classes.Levels
                     break;
                 case "GriefMap1":
 
-                    AddGameObject(CreatePlayer(new Vector2(250,207)));
+                    AddGameObject(CreatePlayer(new Vector2(100,175)));
 
                     /*
                     //Tilføj enemy
