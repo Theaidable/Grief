@@ -206,8 +206,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Run", 10f, true, runFrames));
             animator.AddAnimation(new Animation("Jump", 5f, false, jumpFrames));
-            animator.AddAnimation(new Animation("Fall", 15f, false, fallFrames));
-            animator.AddAnimation(new Animation("Attack", 12f, false, attackFrames));
+            animator.AddAnimation(new Animation("Fall", 10f, false, fallFrames));
+            animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
             animator.AddAnimation(new Animation("Blink", 5f, false, blinkFrames));
             animator.AddAnimation(new Animation("Death", 5f, false, deathFrames));
             animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
