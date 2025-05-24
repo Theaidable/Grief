@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Grief.Classes.DesignPatterns.Composite;
+using Microsoft.Xna.Framework;
 
 namespace Greif.Classes.Cameras
 {
@@ -12,7 +13,7 @@ namespace Greif.Classes.Cameras
         {
             get
             {
-                return Matrix.CreateTranslation(new Vector3(-position, 0)) *
+                return Matrix.CreateTranslation(new Vector3(-position.X, -position.Y, 0)) *
                        Matrix.CreateRotationZ(rotation) *
                        Matrix.CreateScale(zoom, zoom, 1f) *
                        Matrix.CreateTranslation(new Vector3(GameWorld.Instance.GraphicsDevice.Viewport.Width / 2f, GameWorld.Instance.GraphicsDevice.Viewport.Height / 2f, 0));
@@ -26,9 +27,9 @@ namespace Greif.Classes.Cameras
             position = Vector2.Zero;
         }
 
-        public void Follow(Vector2 target)
+        public void Follow(GameObject target)
         {
-            position = target;
+            position = target.Transform.Position;
         }
 
         public void SetZoom(float newZoom)

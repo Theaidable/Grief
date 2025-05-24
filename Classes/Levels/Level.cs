@@ -33,6 +33,18 @@ namespace Grief.Classes.Levels
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, map);
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
+            /*
+             * var objectLayer = map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
+             * foreach (var rectangleObject in objectLayer.Objects.OfType<TiledMapRectangleObject>())
+             * {
+             *      CollisionRectangles.Add(new Rectangle(
+             *      (int)rectangleObject.Position.X,
+             *      (int)rectangleObject.Position.Y,
+             *      (int)rectangleObject.Size.Width,
+             *      (int)rectangleObject.Size.Height));
+             * }
+             */
+
             switch (levelName)
             {
                 case "Level0":
@@ -40,41 +52,15 @@ namespace Grief.Classes.Levels
                     break;
                 case "GriefMap2":
 
-
-                    /* Forsøg på at instansiere tiles fra tmx filen til at finde deres collider
-                    TiledMapTileLayer collisionLayer = map.GetLayer<TiledMapTileLayer>("Ground");
-                    for (int x = 0; x < collisionLayer.Width; x++)
-                    {
-                        for (int y = 0; y < collisionLayer.Height; y++)
-                        {
-                            TiledMapTile? tile;
-                            
-                            if(collisionLayer.TryGetTile((ushort)x, (ushort)y, out tile) && tile.HasValue)
-                            {
-                                var tileset = map.GetTilesetByTileGlobalIdentifier(tile.Value.GlobalIdentifier);
-                                var tileId = tile.Value.GlobalIdentifier - map.GetTilesetFirstGlobalIdentifier(tileset);
-                                var tileProperties = tileset.Tiles.FirstOrDefault(t => t.LocalTileIdentifier == tileId);
-
-                                if (tileProperties.Properties.ContainsKey("collidable") && tileProperties.Properties["collidable"] == "true")
-                                {
-                                    var tileRectangle = new Rectangle(x * map.TileWidth, y * map.TileHeight, map.TileWidth, map.TileHeight);
-                                    CollisionRectangles.Add(tileRectangle);
-                                }
-                            }
-                        }
-                    }
-                    */
-
                     AddGameObject(CreatePlayer(new Vector2(250,207)));
 
                     /*
                     //Tilføj enemy
                     GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(300, 400));
                     GameObjects.Add(enemyObject);
-                    */
 
                     //Tilføj en NPC i spillet
-                    /*AddGameObject(CreateNPC(
+                    AddGameObject(CreateNPC(
                         new Vector2(200, 400),
                         "Mor",
                         new List<string>
@@ -138,7 +124,7 @@ namespace Grief.Classes.Levels
 
             if (player != null)
             {
-                GameWorld.Instance.Camera.Follow(player.Transform.Position);
+                GameWorld.Instance.Camera.Follow(player);
             }
         }
 
