@@ -24,6 +24,8 @@ namespace Grief.Classes.Levels
         private TiledMap map;
         private TiledMapRenderer mapRenderer;
 
+        public int MapWidth { get; private set; }
+        public int MapHeight { get; private set; }
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
 
@@ -31,6 +33,10 @@ namespace Grief.Classes.Levels
         {
             map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, map);
+
+            MapWidth = map.WidthInPixels;
+            MapHeight = map.HeightInPixels;
+
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
             var objectLayer = map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
@@ -122,7 +128,7 @@ namespace Grief.Classes.Levels
 
             if (player != null)
             {
-                GameWorld.Instance.Camera.Follow(player);
+                GameWorld.Instance.Camera.Follow(player, MapWidth, MapHeight);
             }
         }
 

@@ -26,8 +26,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private float cooldownTimer = 0f;
         private bool isAttacking = false;
 
-        private float groundLevelY; //Skal fjernes
-
         //Walk animation frames
         private Texture2D[] idleFrames;
         private Texture2D[] walkFrames;
@@ -61,8 +59,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             animator = GameObject.GetComponent<Animator>();
 
-            groundLevelY = GameObject.Transform.Position.Y;
-
             AddAnimations();
             BindCommands();
             animator.PlayAnimation("Idle");
@@ -84,38 +80,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Bevæg spilleren baseret på velocity
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
 
-            /*
-            //Dette skal fjernes når groundlevelY fjernes
-            if (GameObject.Transform.Position.Y >= groundLevelY)
-            {
-                GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, groundLevelY);
-                velocity.Y = 0f;
-
-                if (Grounded == false)
-                {
-                    Grounded = true;
-                    animator.PlayAnimation("Idle");
-                }
-            }
-            else
-            {
-                Grounded = false;
-            }
-
-            if (Grounded == false)
-            {
-                if (velocity.Y < 0)
-                {
-                    animator.PlayAnimation("Jump");
-                }
-                else
-                {
-                    animator.PlayAnimation("Fall");
-                }
-            }
-            */
-
-            //Dette skal tilføjes når groundLevelY fjernes
             Grounded = CheckGrounded();
             
             if (Grounded == true && velocity.Y > 0)
@@ -137,7 +101,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-        //Når groundLevelY fjernes, så skal vi tilføje følgende metode
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
@@ -163,11 +126,24 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 spriteRenderer.Effects = SpriteEffects.None;
             }
 
-            GameObject.Transform.Translate(direction * MovementSpeed * GameWorld.Instance.DeltaTime);
+            Vector2 movement = direction * MovementSpeed * GameWorld.Instance.DeltaTime;
+            Vector2 originalPosition = GameObject.Transform.Position;
+            GameObject.Transform.Translate(movement);
 
-            if(isAttacking == false && Grounded == true)
+            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
+
+            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(rect => rect.Intersects(playerCollider));
+
+            if(collision == true)
             {
-                PlayMoveAnimation(direction);
+                GameObject.Transform.Position = originalPosition;
+            }
+            else
+            {
+                if (isAttacking == false && Grounded == true)
+                {
+                    PlayMoveAnimation(direction);
+                }
             }
         }
 
