@@ -55,7 +55,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
             MovementSpeed = 100f;
-            moveDirection = Vector2.One;
         }
 
         public override void Start()
@@ -85,7 +84,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Bevæg spilleren baseret på velocity
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
 
-
+            /*
             //Dette skal fjernes når groundlevelY fjernes
             if (GameObject.Transform.Position.Y >= groundLevelY)
             {
@@ -114,8 +113,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     animator.PlayAnimation("Fall");
                 }
             }
+            */
 
-            /* Dette skal tilføjes når groundLevelY fjernes
+            //Dette skal tilføjes når groundLevelY fjernes
             Grounded = CheckGrounded();
             
             if (Grounded == true && velocity.Y > 0)
@@ -135,12 +135,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     animator.PlayAnimation("Fall");
                 }
             }
-            */
         }
 
-        /*
-         Når groundLevelY fjernes, så skal vi tilføje følgende metode
-
+        //Når groundLevelY fjernes, så skal vi tilføje følgende metode
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
@@ -148,8 +145,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
             .Any(r => r.Left < collider.Right && r.Right > collider.Left
             && Math.Abs(collider.Bottom - r.Top) < 3);
+        }
 
-        */
 
         public void Move(Vector2 direction)
         {

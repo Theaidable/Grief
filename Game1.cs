@@ -50,7 +50,7 @@ namespace Greif
         {
             //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
             LevelManager = new LevelManager();
-            LevelManager.LoadLevel("GriefMap2"); //Skal ændres til Level0 når vi laver mainmenu
+            LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
             Camera = new Camera();
 
             base.Initialize();

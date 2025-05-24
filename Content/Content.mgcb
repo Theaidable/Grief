@@ -1196,8 +1196,3 @@
 /processor:TiledMapProcessor
 /build:TileMaps/GriefMap1.tmx
 
-#begin TileMaps/GriefMap2.tmx
-/importer:TiledMapImporter
-/processor:TiledMapProcessor
-/build:TileMaps/GriefMap2.tmx
-
