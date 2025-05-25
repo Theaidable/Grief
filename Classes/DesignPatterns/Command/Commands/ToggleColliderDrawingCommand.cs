@@ -20,7 +20,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
             List<Collider> colliders = new List<Collider>();
             foreach (GameObject gameObject in gameObjects)
             {
-                Collider collider = gameObject.GetComponent<Collider>() as Collider;
+                Collider collider = gameObject.GetComponent<Collider>();
                 if (collider != null)
                 {
                     collider.ToggleDrawing(shouldDraw);

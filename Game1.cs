@@ -53,6 +53,8 @@ namespace Greif
             LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
             Camera = new Camera();
 
+            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(LevelManager.CurrentLevel.GameObjects));
+
             base.Initialize();
         }
 

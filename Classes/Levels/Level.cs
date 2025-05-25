@@ -1,5 +1,6 @@
 ﻿using Greif;
 using Greif.Classes.Cameras;
+using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Builder;
 using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
@@ -21,25 +22,27 @@ namespace Grief.Classes.Levels
 {
     public class Level
     {
-        private TiledMap map;
         private TiledMapRenderer mapRenderer;
+
+        public TiledMap Map { get; private set; }
+        public Dictionary<Point,Tile> TileDictionary { get; private set; }
+        public AStar PathFinder { get; private set; }
 
         public int MapWidth { get; private set; }
         public int MapHeight { get; private set; }
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
+        private List<GameObject> objectsToRemove = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
 
         public void Load(string levelName)
         {
-            map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
-            mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, map);
+            Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
+            mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, Map);
 
-            MapWidth = map.WidthInPixels;
-            MapHeight = map.HeightInPixels;
+            MapWidth = Map.WidthInPixels;
+            MapHeight = Map.HeightInPixels;
 
-            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
-
-            var objectLayer = map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
+            var objectLayer = Map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
             foreach (var rectangleObject in objectLayer.Objects.OfType<TiledMapRectangleObject>())
             {
                 CollisionRectangles.Add(new Rectangle(
@@ -48,6 +51,21 @@ namespace Grief.Classes.Levels
                 (int)rectangleObject.Size.Width,
                 (int)rectangleObject.Size.Height));
             }
+
+            Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
+            for (int y = 0; y < Map.Height; y++)
+            {
+                for (int x = 0; x < Map.Width; x++)
+                {
+                    Point gridPosition = new Point(x, y);
+                    Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth + 10, Map.TileHeight + 10);
+                    bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
+                    tiles[gridPosition] = new Tile(gridPosition,walkable);
+                }
+            }
+
+            TileDictionary = tiles;
+            PathFinder = new AStar(tiles);
 
             switch (levelName)
             {
@@ -58,11 +76,18 @@ namespace Grief.Classes.Levels
 
                     AddGameObject(CreatePlayer(new Vector2(100,175)));
 
-                    /*
                     //Tilføj enemy
-                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(300, 400));
-                    GameObjects.Add(enemyObject);
-
+                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 165), EnemyType.Enemy1);
+                    EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
+                    enemyComp.PatrolPoints = new List<Vector2>()
+                    {
+                        new Vector2(550,165),
+                        new Vector2(450,165)
+                    };
+                    AddGameObject(enemyObject);
+                    
+                    
+                    /*
                     //Tilføj en NPC i spillet
                     AddGameObject(CreateNPC(
                         new Vector2(200, 400),
@@ -110,9 +135,9 @@ namespace Grief.Classes.Levels
             gameObject.Start();
         }
 
-        public void RemoveGameObject(GameObject gameObject)
+        public void QueueRemove(GameObject gameObject)
         {
-            GameObjects.Remove(gameObject);
+            objectsToRemove.Add(gameObject);
         }
 
         public void Update(GameTime gameTime)
@@ -123,6 +148,13 @@ namespace Grief.Classes.Levels
             {
                 gameObject.Update();
             }
+
+            foreach (GameObject gameObject in objectsToRemove)
+            {
+                GameObjects.Remove(gameObject);
+            }
+            objectsToRemove.Clear();
+
 
             var player = GameObjects.FirstOrDefault(g => g.Tag == "Player");
 

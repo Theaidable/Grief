@@ -1,18 +1,35 @@
 ﻿using Greif;
 using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct3D9;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
     public class EnemyComponent : Component
     {
+        private bool isHurt;
+        private float attackCooldown = 0.1f;
+        private float cooldownTimer = 0f;
+        private bool isAttacking = false;
+        private Vector2 velocity;
+        private float gravity = 600f;
+        private bool grounded;
+
+        private int currentPatrolIndex = 0;
+        private bool patrolForward;
+
         private Animator animator;
+        private Collider Collider;
+        private AStar astar;
 
         private Texture2D[] idleFrames;
         private Texture2D[] walkFrames;
@@ -22,10 +39,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] hurtFrames;
         private Texture2D[] deathFrames;
 
+        private List<Vector2> path = new List<Vector2>();
+        private readonly object pathLock = new object();
+        private float RecalculatePathTimer = 0f;
+
         public int EnemyHealth { get; private set; }
         public int EnemyDamage { get; private set; }
         public float EnemySpeed { get; private set; }
-        public int EnemyDetectionRange { get; private set; } //Skal muligivis være en rectangle eller en cirkel, sådan eller bruge detectionrange som radius.
+        public int EnemyDetectionRange { get; private set; }
+        public int EnemyAttackRange { get; private set; }
+        public Point EnemyColliderSize { get; private set; }
         
         public List<Vector2> PatrolPoints { get; set; }
 
@@ -34,13 +57,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
+            astar = GameWorld.Instance.LevelManager.CurrentLevel.PathFinder;
             AddAnimations();
             animator.PlayAnimation("Idle");
-        }
-
-        public override void Update()
-        {
-            //Her skal vi lave physics for at sørge for at når velocity er over 0, så skal FallAnimation afspilles
         }
 
         public void SetStats(EnemyStats stats)
@@ -49,29 +68,297 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             EnemyDamage = stats.Damage;
             EnemySpeed = stats.Speed;
             EnemyDetectionRange = stats.DetectionRange;
+            EnemyAttackRange = stats.AttackRange;
+            EnemyColliderSize = stats.ColliderSize;
+
+        }
+
+        public override void Update()
+        {
+            if (cooldownTimer > 0)
+            {
+                cooldownTimer -= GameWorld.Instance.DeltaTime;
+            }
+
+            if (grounded == false)
+            {
+                velocity.Y += gravity * GameWorld.Instance.DeltaTime;
+            }
+
+            if(isAttacking == true)
+            {
+                return;
+            }
+
+            //Vector2 originalPosition = GameObject.Transform.Position;
+            GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
+
+            var box = GameObject.GetComponent<Collider>().CollisionBox;
+            var floor = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
+                .Where(r => r.Left < box.Right && r.Right > box.Left && box.Bottom >= r.Top - 3 && box.Bottom <= r.Top + 3)
+                .OrderBy(r => r.Top).FirstOrDefault();
+
+            grounded = CheckGrounded();
+
+            if (grounded == true && velocity.Y > 0)
+            {
+                velocity.Y = 0;
+            }
+
+            if (EnemyHealth > 0 && isHurt == false && grounded == true)
+            {
+                if (PlayerIsWithInDetectionRange() == false)
+                {
+                    path.Clear();
+                    Patrol();
+                }
+                else
+                {
+                    Pursue();
+                    if (PlayerIsWithInAttackRange() == true)
+                    {
+                        Attack();
+                    }
+                }
+            }
+        }
+
+        private bool CheckGrounded()
+        {
+            var collider = GameObject.GetComponent<Collider>().CollisionBox;
+
+            return GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
+            .Any(r => r.Left < collider.Right && r.Right > collider.Left
+            && Math.Abs(collider.Bottom - r.Top) < 3);
         }
 
         public void Patrol()
         {
-            //Logik for at patrole mellem to punkter eller flere
+            //Fejl kontrol
+            if (PatrolPoints == null || PatrolPoints.Count < 2)
+            {
+                animator.PlayAnimation("Idle");
+                return;
+            }
 
-            //PlayWalkAnimation mens man patroljere
+            Vector2 target = PatrolPoints[currentPatrolIndex];
+            Vector2 position = GameObject.Transform.Position;
+            Vector2 direction = target - position;
+
+            if(direction.Length() < 4f)
+            {
+                if(patrolForward == true)
+                {
+                    currentPatrolIndex++;
+                    if(currentPatrolIndex >= PatrolPoints.Count)
+                    {
+                        currentPatrolIndex = 0;
+                        patrolForward = false;
+                    }
+                }
+                else
+                {
+                    currentPatrolIndex--;
+                    if(currentPatrolIndex < 0)
+                    {
+                        currentPatrolIndex = 1;
+                        patrolForward = true;
+                    }
+                }
+
+                target = PatrolPoints[currentPatrolIndex];
+                direction = target - position;
+            }
+
+            direction.Normalize();
+            Move(direction);
         }
 
         public void Pursue()
         {
-            //Hvis player kommer ind for detectionrange (insection mellem playerCollider og EnemyDectionRange?) så skal A* køres
-            //Hvis der findes en sti, så skal enemy jagte spilleren og PlayPursueAnimation
+            var level = GameWorld.Instance.LevelManager.CurrentLevel;
+            var player = level.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+
+            if(player == null)
+            {
+                return;
+            }
+
+            Point start = new Point((int)(GameObject.Transform.Position.X / level.Map.TileWidth), (int)(GameObject.Transform.Position.Y / level.Map.TileHeight));
+            Point goal = new Point((int)(player.Transform.Position.X / level.Map.TileWidth), (int)(player.Transform.Position.Y / level.Map.TileHeight));
+
+            if (path == null || path.Count == 0 || RecalculatePathTimer <= 0f)
+            {
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    var newPath = astar.FindPath(start, goal);
+
+                    lock (pathLock)
+                    {
+                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, t.Position.Y * level.Map.TileHeight + level.Map.TileHeight/2)).ToList();
+                    }
+                });
+
+                RecalculatePathTimer = 1f;
+            }
+
+            lock (pathLock)
+            {
+                if (path != null && path.Count > 0)
+                {
+                    Vector2 next = path[0];
+                    Vector2 direction = next - GameObject.Transform.Position;
+
+                    if (direction.Length() < 4f)
+                    {
+                        path.RemoveAt(0);
+                    }
+                    else
+                    {
+                        direction.Normalize();
+                        Move(direction);
+                    }
+                }
+            }
+
+            RecalculatePathTimer -= GameWorld.Instance.DeltaTime;
         }
 
-        public void Jump()
+        private void Move(Vector2 direction)
         {
-            //Her skal vi lave logikken for enemies jumps
+            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
+            Vector2 originalPosition = GameObject.Transform.Position;
+            GameObject.Transform.Translate(movement);
+            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
+
+            //Flip sprite baseret på direction
+            if (direction.X < 0)
+            {
+                spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
+            }
+            else if (direction.X > 0)
+            {
+                spriteRenderer.Effects = SpriteEffects.None;
+            }
+
+            var enemyCollider = GameObject.GetComponent<Collider>().PixelPerfectRectangles.Select(rect => rect.Rectangle);
+            bool collision = enemyCollider.Any(ec => GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(ec)));
+
+            if (collision == true)
+            {
+                GameObject.Transform.Position = originalPosition;
+            }
+            else
+            {
+                if (isAttacking == false && grounded == true)
+                {
+                    animator.PlayAnimation("Walk");
+                }
+            }
+        }
+
+        private bool PlayerIsWithInDetectionRange()
+        {
+            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+
+            if(player == null)
+            {
+                return false;
+            }
+
+
+            var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
+            return distance <= EnemyDetectionRange;
         }
 
         public void Attack()
         {
-            //Her skal vi lave logikken for enemies attack metode
+            if(isAttacking == true)
+            {
+                return;
+            }
+
+            if(cooldownTimer <= 0f)
+            {
+                isAttacking = true;
+
+                animator.PlayAnimation("Attack");
+                animator.ClearOnAnimationComplete();
+
+                animator.OnAnimationComplete = () =>
+                {
+                    var enemyCollider = GameObject.GetComponent<Collider>();
+                    var level = GameWorld.Instance.LevelManager.CurrentLevel;
+
+                    foreach (GameObject gameObjects in level.GameObjects)
+                    {
+                        var player = gameObjects.GetComponent<PlayerComponent>();
+                        Collider playerCollider = gameObjects.GetComponent<Collider>();
+
+                        if (player == null || playerCollider == null)
+                        {
+                            continue;
+                        }
+
+                        if (enemyCollider.CollisionBox.Intersects(playerCollider.CollisionBox) == false)
+                        {
+                            continue;
+                        }
+
+                        bool hit = enemyCollider.PixelPerfectRectangles
+                        .Any(pr => playerCollider.PixelPerfectRectangles
+                        .Any(er => pr.Rectangle.Intersects(er.Rectangle)));
+
+                        if (hit == true)
+                        {
+                            player.TakeDamage(EnemyDamage);
+                            break;
+                        }
+                    }
+
+                    isAttacking = false;
+                    animator.PlayAnimation("Idle");
+                };
+                
+                cooldownTimer = attackCooldown;
+            }
+        }
+
+        private bool PlayerIsWithInAttackRange()
+        {
+            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+
+            if (player == null)
+            {
+                return false;
+            }
+
+
+            var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
+            return distance <= EnemyAttackRange;
+        }
+
+        public void TakeDamage(int amount)
+        {
+            EnemyHealth -= amount;
+
+            if(EnemyHealth > 0)
+            {
+                isHurt = true;
+                animator.PlayAnimation("Hurt");
+                animator.ClearOnAnimationComplete();
+                animator.OnAnimationComplete = () =>
+                {
+                    isHurt = false;
+                    isAttacking = false;
+                    animator.PlayAnimation("Idle");
+                };
+            }
+            else
+            {
+                animator.PlayAnimation("Death");
+                animator.OnAnimationComplete = () => GameWorld.Instance.LevelManager.CurrentLevel.QueueRemove(GameObject);
+            }
         }
 
         private void AddAnimations()
@@ -79,15 +366,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             idleFrames = LoadFrames("Enemies/Skeleton/Idle/Idle", 4);
             walkFrames = LoadFrames("Enemies/Skeleton/Walk/Walk", 4);
 
-            attackFrames = LoadFrames("Enemies/Skeleton/Attack/Attack", 4);
+            attackFrames = LoadFrames("Enemies/Skeleton/Attack/Attack", 8);
 
             hurtFrames = LoadFrames("Enemies/Skeleton/Hurt/Hurt", 4);
             deathFrames = LoadFrames("Enemies/Skeleton/Death/Death", 4);
 
             animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
-            animator.AddAnimation(new Animation("Walk", 2.5f, true, walkFrames));
-            animator.AddAnimation(new Animation("Attack", 2.5f, false, attackFrames));
-            animator.AddAnimation(new Animation("Hurt", 2.5f, false, hurtFrames));
+            animator.AddAnimation(new Animation("Walk", 4f, true, walkFrames));
+            animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
+            animator.AddAnimation(new Animation("Hurt", 10f, false, hurtFrames));
             animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
         }
 
@@ -96,29 +383,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Texture2D[] frames = new Texture2D[frameCount];
             for (int i = 0; i < frameCount; i++)
             {
-                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}"); //Sørg for at dette svare korrekt til stinavn
+                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}");
             }
             return frames;
-        }
-
-        private void PlayPatrolAnimation()
-        {
-            //Her skal vi afspille walkanimation baseret på hvilken retning fjenden går, om det er til venstre eller højre
-        }
-
-        private void PlayJumpAnimation()
-        {
-            //Her skal vi afspille jumpAnimation hvis fjenden har brug for at hoppe for at patroljere eller jagte spilleren
-        }
-
-        private void PlayFallAnimation()
-        {
-            //Her skal vi afspille fallAnimation hvis fjenden falder fra et sted for at patroljere eller jagte spilleren
-        }
-
-        private void PlayAttackAnimation()
-        {
-            //Her skal vi afspille fjenders attackAnimation når fjenden prøver at angribe spilleren
         }
     }
 }

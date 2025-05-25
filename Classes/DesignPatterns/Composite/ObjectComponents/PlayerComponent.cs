@@ -1,16 +1,12 @@
 ﻿using Greif;
-using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -47,11 +43,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] sitFrames;
 
         //Public properties
+        public int Damage { get; private set; }
+        public float Health { get; private set; }
         public float MovementSpeed { get; private set; }
         public bool Grounded { get; private set; }
 
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
+            Damage = 25;
+            Health = 100;
             MovementSpeed = 100f;
         }
 
@@ -130,9 +130,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Vector2 originalPosition = GameObject.Transform.Position;
             GameObject.Transform.Translate(movement);
 
-            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-
-            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(rect => rect.Intersects(playerCollider));
+            var playerCollider = GameObject.GetComponent<Collider>().PixelPerfectRectangles.Select(rect => rect.Rectangle);
+            bool collision = playerCollider.Any(pc => GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(pc)));
 
             if(collision == true)
             {
@@ -142,7 +141,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 if (isAttacking == false && Grounded == true)
                 {
-                    PlayMoveAnimation(direction);
+                    animator.PlayAnimation("Run");
                 }
             }
         }
@@ -151,7 +150,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             if(isAttacking == false && Grounded == true)
             {
-                PlayStopAnimation(moveDirection);
+                animator.PlayAnimation("Idle");
             }
         }
 
@@ -169,11 +168,40 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             if (cooldownTimer <= 0f)
             {
                 isAttacking = true;
-                PlayAttackAnimation();
+                animator.PlayAnimation("Attack");
                 animator.ClearOnAnimationComplete();
 
                 animator.OnAnimationComplete = () =>
                 {
+                    var playerCollider = GameObject.GetComponent<Collider>();
+                    var level = GameWorld.Instance.LevelManager.CurrentLevel;
+
+                    foreach (GameObject gameObjects in level.GameObjects)
+                    {
+                        var enemy = gameObjects.GetComponent<EnemyComponent>();
+                        Collider enemyCollider = gameObjects.GetComponent<Collider>();
+
+                        if(enemy == null || enemyCollider == null)
+                        {
+                            continue;
+                        }
+
+                        if(playerCollider.CollisionBox.Intersects(enemyCollider.CollisionBox) == false)
+                        {
+                            continue;
+                        }
+
+                        bool hit = playerCollider.PixelPerfectRectangles
+                        .Any(pr => enemyCollider.PixelPerfectRectangles
+                        .Any(er => pr.Rectangle.Intersects(er.Rectangle)));
+
+                        if(hit == true)
+                        {
+                            enemy.TakeDamage(Damage);
+                            break;
+                        }
+                    }
+
                     isAttacking = false;
                     animator.PlayAnimation(Grounded ? "Idle" : "Fall");
                 };
@@ -185,6 +213,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public bool CanUseAttack()
         {
             return cooldownTimer <= 0f;
+        }
+
+        public void TakeDamage(int amount)
+        {
+            Health -= amount;
+
         }
 
         private void AddAnimations()
@@ -207,7 +241,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Run", 10f, true, runFrames));
             animator.AddAnimation(new Animation("Jump", 5f, false, jumpFrames));
             animator.AddAnimation(new Animation("Fall", 10f, false, fallFrames));
-            animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
+            animator.AddAnimation(new Animation("Attack", 15f, false, attackFrames));
             animator.AddAnimation(new Animation("Blink", 5f, false, blinkFrames));
             animator.AddAnimation(new Animation("Death", 5f, false, deathFrames));
             animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
@@ -223,46 +257,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
             return frames;
         }
-
-        
-        private void PlayMoveAnimation(Vector2 direction)
-        {
-            if (direction.X < 0)
-            {
-                animator.PlayAnimation("Run");
-            }
-            else if (direction.X > 0)
-            {
-                animator.PlayAnimation("Run");
-            }
-        }
-
-        private void PlayStopAnimation(Vector2 direction)
-        {
-            if (direction.X < 0)
-            {
-                animator.PlayAnimation("Idle");
-            }
-            else if (direction.X > 0)
-            {
-                animator.PlayAnimation("Idle");
-            }
-        }
-
-        private void PlayAttackAnimation()
-        {
-            animator.ClearOnAnimationComplete();
-
-            if (moveDirection.X < 0)
-            {
-                animator.PlayAnimation("Attack");
-            }
-            else if (moveDirection.X > 0)
-            {
-                animator.PlayAnimation("Attack");
-            }
-        }
-        
 
         private void BindCommands()
         {

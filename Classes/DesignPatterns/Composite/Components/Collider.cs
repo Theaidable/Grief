@@ -14,6 +14,24 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         private Lazy<List<RectangleData>> pixelPerfectRectangles;
 
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles.Value; }
+        public Point ColliderSize { get; set; } = Point.Zero;
+
+        /// <summary>
+        /// CollisonBox for object
+        /// </summary>
+        public Rectangle CollisionBox
+        {
+            get
+            {
+                int width = ColliderSize.X > 0 ? ColliderSize.X : spriteRenderer.SourceRectangle?.Width ?? spriteRenderer.Sprite.Width;
+                int height = ColliderSize.Y > 0 ? ColliderSize.Y : spriteRenderer.SourceRectangle?.Height ?? spriteRenderer.Sprite.Height;
+                return new Rectangle(
+                    (int)(GameObject.Transform.Position.X - width / 2),
+                    (int)(GameObject.Transform.Position.Y - height / 2),
+                    width,
+                    height);
+            }
+        }
 
         public Collider(GameObject gameObject) : base(gameObject) { }
 
@@ -23,26 +41,10 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public override void Start()
         {
             spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
-            pixelPerfectRectangles = new Lazy<List<RectangleData>>(() => CreateRectangles());
             spriteRenderer.OnSpriteChanged += RebuildCollider;
+            //spriteRenderer.OnEffectsChanged += RebuildCollider();
+            pixelPerfectRectangles = new Lazy<List<RectangleData>>(() => CreateRectangles());
             UpdatePixelCollider();
-        }
-
-        /// <summary>
-        /// CollisonBox for object
-        /// </summary>
-        public Rectangle CollisionBox
-        {
-            get
-            {
-                int width = spriteRenderer.SourceRectangle?.Width ?? spriteRenderer.Sprite.Width;
-                int height = spriteRenderer.SourceRectangle?.Height ?? spriteRenderer.Sprite.Height;
-                return new Rectangle(
-                    (int)(GameObject.Transform.Position.X - width / 2),
-                    (int)(GameObject.Transform.Position.Y - height / 2),
-                    width,
-                    height);
-            }
         }
 
         /// <summary>
@@ -65,7 +67,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         /// <summary>
         /// Hjælpemetode til at opdatere vores pixelcollider
         /// </summary>
-        private void UpdatePixelCollider()
+        public void UpdatePixelCollider()
         {
             int width = spriteRenderer.SourceRectangle?.Width ?? spriteRenderer.Sprite.Width;
             int height = spriteRenderer.SourceRectangle?.Height ?? spriteRenderer.Sprite.Height;

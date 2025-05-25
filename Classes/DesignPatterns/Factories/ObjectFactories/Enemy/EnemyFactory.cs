@@ -17,14 +17,14 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
     {
         private static readonly Dictionary<EnemyType, string> enemySpriteNames = new Dictionary<EnemyType, string>()
         {
-            { EnemyType.Enemy1, "Enemy/Walk" },
-            { EnemyType.Enemy2, "Enemy/Walk" },
+            { EnemyType.Enemy1, "Enemies/Skeleton/Idle/Idle01" },
+            { EnemyType.Enemy2, "Enemies/Skeleton/Idle/Idle01" },
         };
 
         private static readonly Dictionary<EnemyType, EnemyStats> enemyStats = new Dictionary<EnemyType, EnemyStats>()
         {
-            {EnemyType.Enemy1, new EnemyStats(100,20,200,400)},
-            {EnemyType.Enemy2, new EnemyStats(100,20,200,400)},
+            {EnemyType.Enemy1, new EnemyStats(100,20,50,150,10, new Point(65,50))},
+            {EnemyType.Enemy2, new EnemyStats(100,20,50,150,10, Point.Zero)},
         };
 
         //Oprettelse af Singleton af EnemyFactory
@@ -54,6 +54,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             SpriteRenderer spriteRenderer = enemyObject.AddComponent<SpriteRenderer>();
             Animator animator = enemyObject.AddComponent<Animator>();
             Collider collider = enemyObject.AddComponent<Collider>();
+            collider.ColliderSize = new Point(65, 55);
             var enemy = enemyObject.AddComponent<EnemyComponent>();
 
             enemyObject.Transform.Position = position;
@@ -62,6 +63,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             if(enemySpriteNames.TryGetValue(enemyType, out var spriteName))
             {
                 spriteRenderer.SetSprite(spriteName);
+                spriteRenderer.Origin = new Vector2(spriteRenderer.Sprite.Width / 2f, spriteRenderer.Sprite.Height / 1f);
             }
 
             //Sæt stats
