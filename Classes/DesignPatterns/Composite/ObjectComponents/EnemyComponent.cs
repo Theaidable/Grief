@@ -115,7 +115,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     path.Clear();
                     Patrol();
                 }
-                else
+                else if(PlayerIsWithInDetectionRange() == true)
                 {
                     Pursue();
                 }
@@ -278,7 +278,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 return false;
             }
-
 
             var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
             return distance <= EnemyDetectionRange;
