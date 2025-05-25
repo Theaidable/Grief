@@ -58,7 +58,7 @@ namespace Grief.Classes.Levels
                 for (int x = 0; x < Map.Width; x++)
                 {
                     Point gridPosition = new Point(x, y);
-                    Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth + 10, Map.TileHeight + 10);
+                    Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth, Map.TileHeight);
                     bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
                     tiles[gridPosition] = new Tile(gridPosition,walkable);
                 }
@@ -77,7 +77,7 @@ namespace Grief.Classes.Levels
                     AddGameObject(CreatePlayer(new Vector2(100,175)));
 
                     //Tilføj enemy
-                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 165), EnemyType.Enemy1);
+                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 160), EnemyType.Enemy1);
                     EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
                     enemyComp.PatrolPoints = new List<Vector2>()
                     {

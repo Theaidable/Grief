@@ -23,14 +23,14 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 
         private static readonly Dictionary<EnemyType, EnemyStats> enemyStats = new Dictionary<EnemyType, EnemyStats>()
         {
-            {EnemyType.Enemy1, new EnemyStats(100,20,50,150,10, new Point(65,50))},
+            {EnemyType.Enemy1, new EnemyStats(100,40,50,150,40, new Point(65,55))},
             {EnemyType.Enemy2, new EnemyStats(100,20,50,150,10, Point.Zero)},
         };
 
         //Oprettelse af Singleton af EnemyFactory
         private static EnemyFactory instance;
         public static EnemyFactory Instance
-        {
+        { 
             get
             {
                 if (instance == null)
@@ -54,16 +54,14 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             SpriteRenderer spriteRenderer = enemyObject.AddComponent<SpriteRenderer>();
             Animator animator = enemyObject.AddComponent<Animator>();
             Collider collider = enemyObject.AddComponent<Collider>();
-            collider.ColliderSize = new Point(65, 55);
             var enemy = enemyObject.AddComponent<EnemyComponent>();
-
+            
             enemyObject.Transform.Position = position;
 
             //Sæt sprite
             if(enemySpriteNames.TryGetValue(enemyType, out var spriteName))
             {
                 spriteRenderer.SetSprite(spriteName);
-                spriteRenderer.Origin = new Vector2(spriteRenderer.Sprite.Width / 2f, spriteRenderer.Sprite.Height / 1f);
             }
 
             //Sæt stats

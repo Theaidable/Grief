@@ -78,14 +78,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
 
             //Bevæg spilleren baseret på velocity
-            GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
-
+            Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 movement = new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime);
+            GameObject.Transform.Translate(movement);
             Grounded = CheckGrounded();
             
             if (Grounded == true && velocity.Y > 0)
             {
                 velocity.Y = 0;
-                
                 animator.PlayAnimation("Idle");
             }
             else if (Grounded == false)
@@ -104,10 +104,22 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
+            var tiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
 
-            return GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
-            .Any(r => r.Left < collider.Right && r.Right > collider.Left
-            && Math.Abs(collider.Bottom - r.Top) < 3);
+            foreach (var tile in tiles)
+            {
+                bool isAbove = collider.Bottom <= tile.Top + 5;
+                bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
+                bool horizontalOverlap = collider.Right > tile.Left && collider.Left < tile.Right;
+
+                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
+                {
+                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 
@@ -126,12 +138,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 spriteRenderer.Effects = SpriteEffects.None;
             }
 
-            Vector2 movement = direction * MovementSpeed * GameWorld.Instance.DeltaTime;
             Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 movement = direction * MovementSpeed * GameWorld.Instance.DeltaTime;
             GameObject.Transform.Translate(movement);
 
-            var playerCollider = GameObject.GetComponent<Collider>().PixelPerfectRectangles.Select(rect => rect.Rectangle);
-            bool collision = playerCollider.Any(pc => GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(pc)));
+            //AABB
+            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
+            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
 
             if(collision == true)
             {

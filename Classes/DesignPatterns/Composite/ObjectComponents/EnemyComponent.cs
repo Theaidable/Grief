@@ -19,7 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool isHurt;
         private float attackCooldown = 0.1f;
         private float cooldownTimer = 0f;
-        private bool isAttacking = false;
+        private bool isAttacking;
         private Vector2 velocity;
         private float gravity = 600f;
         private bool grounded;
@@ -71,6 +71,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             EnemyAttackRange = stats.AttackRange;
             EnemyColliderSize = stats.ColliderSize;
 
+            var collider = GameObject.GetComponent<Collider>();
+            if(collider != null)
+            {
+                collider.ColliderSize = EnemyColliderSize;
+            }
         }
 
         public override void Update()
@@ -92,12 +97,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //Vector2 originalPosition = GameObject.Transform.Position;
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
-
-            var box = GameObject.GetComponent<Collider>().CollisionBox;
-            var floor = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
-                .Where(r => r.Left < box.Right && r.Right > box.Left && box.Bottom >= r.Top - 3 && box.Bottom <= r.Top + 3)
-                .OrderBy(r => r.Top).FirstOrDefault();
-
             grounded = CheckGrounded();
 
             if (grounded == true && velocity.Y > 0)
@@ -107,7 +106,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
-                if (PlayerIsWithInDetectionRange() == false)
+                if (PlayerIsWithInAttackRange() == true)
+                {
+                    Attack();
+                }
+                else if (PlayerIsWithInDetectionRange() == false)
                 {
                     path.Clear();
                     Patrol();
@@ -115,10 +118,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 else
                 {
                     Pursue();
-                    if (PlayerIsWithInAttackRange() == true)
-                    {
-                        Attack();
-                    }
                 }
             }
         }
@@ -126,10 +125,22 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
+            var tiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
 
-            return GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles
-            .Any(r => r.Left < collider.Right && r.Right > collider.Left
-            && Math.Abs(collider.Bottom - r.Top) < 3);
+            foreach (var tile in tiles)
+            {
+                bool isAbove = collider.Bottom <= tile.Top + 5;
+                bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
+                bool horizontalOverlap = collider.Right > tile.Left && collider.Left < tile.Right;
+
+                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
+                {
+                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void Patrol()
@@ -226,9 +237,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void Move(Vector2 direction)
         {
-            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
-            Vector2 originalPosition = GameObject.Transform.Position;
-            GameObject.Transform.Translate(movement);
             SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
 
             //Flip sprite baseret på direction
@@ -241,8 +249,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 spriteRenderer.Effects = SpriteEffects.None;
             }
 
-            var enemyCollider = GameObject.GetComponent<Collider>().PixelPerfectRectangles.Select(rect => rect.Rectangle);
-            bool collision = enemyCollider.Any(ec => GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(ec)));
+            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
+            Vector2 originalPosition = GameObject.Transform.Position;
+            GameObject.Transform.Translate(movement);
+
+            //AABB
+            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
+            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
 
             if (collision == true)
             {
