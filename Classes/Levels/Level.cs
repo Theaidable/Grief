@@ -77,7 +77,7 @@ namespace Grief.Classes.Levels
                     AddGameObject(CreatePlayer(new Vector2(100,175)));
 
                     //Tilføj enemy
-                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 160), EnemyType.Enemy1);
+                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1);
                     EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
                     enemyComp.PatrolPoints = new List<Vector2>()
                     {

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -104,6 +105,26 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 velocity.Y = 0;
             }
 
+            if(EnemyHealth > 0)
+            {
+
+                if(PlayerIsWithInDetectionRange() == true)
+                {
+                    Pursue();
+                }
+                else
+                {
+                    path.Clear();
+                    Patrol();
+                }
+
+                if (PlayerIsWithInAttackRange() == true)
+                {
+                    Attack();
+                }
+            }
+
+            /*
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
                 if (PlayerIsWithInAttackRange() == true)
@@ -120,6 +141,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     Pursue();
                 }
             }
+            */
         }
 
         private bool CheckGrounded()
@@ -220,26 +242,34 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     Vector2 next = path[0];
                     Vector2 direction = next - GameObject.Transform.Position;
 
+                    Debug.WriteLine($"Next point: {next}");
+                    Debug.WriteLine($"Current position: {GameObject.Transform.Position}");
+                    Debug.WriteLine($"Direction: {direction} (Length: {direction.Length()})");
+
                     if (direction.Length() < 4f)
                     {
+                        Debug.WriteLine("Too close to next point, removing from path.");
                         path.RemoveAt(0);
                     }
                     else
                     {
+                        Debug.WriteLine("Moving towards next point.");
                         direction.Normalize();
                         Move(direction);
                     }
+                }
+                else
+                {
+                    Debug.WriteLine("No valid path.");
                 }
             }
 
             RecalculatePathTimer -= GameWorld.Instance.DeltaTime;
         }
-
         private void Move(Vector2 direction)
         {
-            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
-
             //Flip sprite baseret på direction
+            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             if (direction.X < 0)
             {
                 spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
@@ -249,16 +279,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 spriteRenderer.Effects = SpriteEffects.None;
             }
 
-            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
             Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
             GameObject.Transform.Translate(movement);
 
+            Debug.WriteLine($"Trying to move: {movement}, from {originalPosition} to {GameObject.Transform.Position}");
+
             //AABB
-            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            var enemyCollider = GameObject.GetComponent<Collider>().CollisionBox;
+            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
+
+            Debug.WriteLine($"Collision detected? {collision}");
 
             if (collision == true)
             {
+                Debug.WriteLine("Collision — reverting to original position.");
                 GameObject.Transform.Position = originalPosition;
             }
             else
