@@ -22,7 +22,7 @@ namespace Greif.Classes.Cameras
 
         public Camera()
         {
-            zoom = 1.8f;
+            zoom = 2.7f;
             rotation = 0f;
             position = Vector2.Zero;
         }
