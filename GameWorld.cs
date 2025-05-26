@@ -86,7 +86,16 @@ namespace Greif
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(transformMatrix: Camera.ViewMatrix);
+            _spriteBatch.Begin(
+                sortMode: SpriteSortMode.Deferred,
+                blendState: BlendState.AlphaBlend,
+                samplerState: SamplerState.PointClamp,
+                depthStencilState: null,
+                rasterizerState: null, 
+                effect: null,
+                transformMatrix: Camera.ViewMatrix
+                );
+
 
             LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
 
