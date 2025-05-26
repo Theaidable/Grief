@@ -23,7 +23,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 
         private static readonly Dictionary<EnemyType, EnemyStats> enemyStats = new Dictionary<EnemyType, EnemyStats>()
         {
-            {EnemyType.Enemy1, new EnemyStats(100,40,50,150,40, new Point(30,52))},
+            {EnemyType.Enemy1, new EnemyStats(100,40,50,150,15, new Point(15,52))},
             {EnemyType.Enemy2, new EnemyStats(100,20,50,150,10, Point.Zero)},
         };
 

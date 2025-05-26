@@ -13,6 +13,7 @@ using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Shapes;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace Grief.Classes.Levels
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
         private List<GameObject> objectsToRemove = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
+        public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
 
         public void Load(string levelName)
         {
@@ -54,19 +56,9 @@ namespace Grief.Classes.Levels
 
             foreach(var polygonObject in objectLayer.Objects.OfType<TiledMapPolygonObject>())
             {
-                var absolutePoints = polygonObject.Points.Select(p => new Vector2(polygonObject.Position.X + p.X, polygonObject.Position.Y + p.Y)).ToList();
+                var points = polygonObject.Points.Select(p => new Vector2(polygonObject.Position.X + p.X, polygonObject.Position.Y + p.Y)).ToArray();
 
-                //Bregning af boundingbox
-                float minX = absolutePoints.Min(p => p.X);
-                float maxX = absolutePoints.Max(p => p.X);
-                float minY = absolutePoints.Min(p => p.Y);
-                float maxY = absolutePoints.Max(p => p.Y);
-
-                var boundingBox = new Rectangle(
-                    (int)minX,
-                    (int)minY,
-                    (int)maxX,
-                    (int)maxY
+                CollisionPolygons.Add(new Polygon(points));
             }
 
             Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
