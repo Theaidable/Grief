@@ -16,16 +16,16 @@
   <image source="Assets/Ruins/RuinsTileset.png" width="128" height="120"/>
  </tileset>
  <group id="3" name="Background">
-  <imagelayer id="2" name="BG 1 Gradient" repeatx="1">
+  <imagelayer id="2" name="BG 1 Gradient" repeatx="1" repeaty="1">
    <image source="Assets/ParallaxBackground/ParallaxBackground_BackgroundColor.png" width="288" height="272"/>
   </imagelayer>
-  <imagelayer id="4" name="BG 2 Clouds 1" parallaxx="1.2" parallaxy="0.98" repeatx="1">
+  <imagelayer id="4" name="BG 2 Clouds 1" parallaxx="1.2" parallaxy="0.98" repeatx="1" repeaty="1">
    <image source="Assets/ParallaxBackground/ParallaxBackground_Fog1.png" width="288" height="272"/>
   </imagelayer>
-  <imagelayer id="5" name="BG 3 Clouds 2" parallaxx="1.1" parallaxy="1.06" repeatx="1">
+  <imagelayer id="5" name="BG 3 Clouds 2" parallaxx="1.1" parallaxy="1.06" repeatx="1" repeaty="1">
    <image source="Assets/ParallaxBackground/ParallaxBackground_Fog2.png" width="288" height="272"/>
   </imagelayer>
-  <imagelayer id="6" name="BG 4 Stars" parallaxx="0.15" parallaxy="1.05" repeatx="1">
+  <imagelayer id="6" name="BG 4 Stars" parallaxx="0.15" parallaxy="1.05" repeatx="1" repeaty="1">
    <image source="Assets/ParallaxBackground/ParallaxBackground_Stars.png" width="288" height="272"/>
   </imagelayer>
   <imagelayer id="7" name="BG 5 Moon" parallaxx="0.1" parallaxy="0.9">
@@ -119,7 +119,7 @@
 2147483675,2147483674,25,26,27,24,27,40,49,0,0,0,0,0,22,23,24,25,2147483676,2147483675,2147483674,2147483673,24,25,26,27,2147483675,2147483674,2147483673,2147483675,2147483674,2147483673,2147483672,2147483673,2147483672,2147483675,2147483674,23,24,25,26,27,28,27,2147483676,2147483675,2147483674,2147483673,2147483672,2147483671,25,2147483676,2147483675,2147483674,2147483673,2147483676,2147483675,2147483674,2147483673,2147483672,2147483671,2147483676,24,23,2147483675,23,24,25,26,27,28,26,27,28,23,24,25,26,27,28,23,24,25,26,27,28,23,24,25,26,27,23,24,2684354588,26,27
 </data>
  </layer>
- <objectgroup id="16" name="CollisionObjects">
+ <objectgroup id="16" name="CollisionObjects" visible="0">
   <object id="59" x="0.666667" y="193.667" width="186.333" height="44.3333"/>
   <object id="60" x="228" y="224.333" width="375.333" height="49.6667"/>
   <object id="62" x="400.667" y="193.333" width="175.667" height="38.3333"/>
