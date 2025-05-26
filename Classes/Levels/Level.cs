@@ -52,6 +52,23 @@ namespace Grief.Classes.Levels
                 (int)rectangleObject.Size.Height));
             }
 
+            foreach(var polygonObject in objectLayer.Objects.OfType<TiledMapPolygonObject>())
+            {
+                var absolutePoints = polygonObject.Points.Select(p => new Vector2(polygonObject.Position.X + p.X, polygonObject.Position.Y + p.Y)).ToList();
+
+                //Bregning af boundingbox
+                float minX = absolutePoints.Min(p => p.X);
+                float maxX = absolutePoints.Max(p => p.X);
+                float minY = absolutePoints.Min(p => p.Y);
+                float maxY = absolutePoints.Max(p => p.Y);
+
+                var boundingBox = new Rectangle(
+                    (int)minX,
+                    (int)minY,
+                    (int)maxX,
+                    (int)maxY
+            }
+
             Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
             for (int y = 0; y < Map.Height; y++)
             {
@@ -81,8 +98,8 @@ namespace Grief.Classes.Levels
                     EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
                     enemyComp.PatrolPoints = new List<Vector2>()
                     {
-                        new Vector2(550,165),
-                        new Vector2(450,165)
+                        new Vector2(550,167),
+                        new Vector2(450,167)
                     };
                     AddGameObject(enemyObject);
                     

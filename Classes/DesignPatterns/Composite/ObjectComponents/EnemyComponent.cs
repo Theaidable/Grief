@@ -18,7 +18,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     public class EnemyComponent : Component
     {
         private bool isHurt;
-        private float attackCooldown = 0.1f;
+        private float attackCooldown = 1f;
         private float cooldownTimer = 0f;
         private bool isAttacking;
         private Vector2 velocity;
@@ -29,7 +29,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool patrolForward;
 
         private Animator animator;
-        private Collider Collider;
         private AStar astar;
 
         private Texture2D[] idleFrames;
@@ -105,43 +104,28 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 velocity.Y = 0;
             }
 
-            if(EnemyHealth > 0)
+            if(EnemyHealth > 0 && isHurt == false && grounded == true)
             {
 
                 if(PlayerIsWithInDetectionRange() == true)
                 {
                     Pursue();
+                    Debug.WriteLine("Pursue has started");
+
+
+                    if (PlayerIsWithInAttackRange() == true)
+                    {
+                        Attack();
+                        Debug.WriteLine("Attack");
+                    }
                 }
                 else
                 {
                     path.Clear();
                     Patrol();
-                }
-
-                if (PlayerIsWithInAttackRange() == true)
-                {
-                    Attack();
+                    Debug.WriteLine("Patrol");
                 }
             }
-
-            /*
-            if (EnemyHealth > 0 && isHurt == false && grounded == true)
-            {
-                if (PlayerIsWithInAttackRange() == true)
-                {
-                    Attack();
-                }
-                else if (PlayerIsWithInDetectionRange() == false)
-                {
-                    path.Clear();
-                    Patrol();
-                }
-                else if(PlayerIsWithInDetectionRange() == true)
-                {
-                    Pursue();
-                }
-            }
-            */
         }
 
         private bool CheckGrounded()
@@ -228,10 +212,18 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                     lock (pathLock)
                     {
-                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, t.Position.Y * level.Map.TileHeight + level.Map.TileHeight/2)).ToList();
+                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, GameObject.Transform.Position.Y)).ToList();
+
+                        foreach (var t in newPath)
+                        {
+                            var worldX = t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2;
+                            var worldY = GameObject.Transform.Position.Y;
+
+                            Debug.WriteLine($"Tile {t.Position} → World ({worldX}, {worldY})");
+                        }
                     }
                 });
-
+                 
                 RecalculatePathTimer = 1f;
             }
 

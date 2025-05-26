@@ -131,11 +131,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Flip sprite baseret på direction
             if(direction.X < 0)
             {
-                spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
+                spriteRenderer.SetEffects(SpriteEffects.FlipHorizontally);
             } 
             else if(direction.X > 0)
             {
-                spriteRenderer.Effects = SpriteEffects.None;
+                spriteRenderer.SetEffects(SpriteEffects.None);
             }
 
             Vector2 originalPosition = GameObject.Transform.Position;

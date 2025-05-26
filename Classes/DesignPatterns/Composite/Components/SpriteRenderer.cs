@@ -19,6 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public Rectangle? SourceRectangle { get; set; }
         public SpriteEffects Effects { get; set; }
         public event Action OnSpriteChanged;
+        public event Action OnEffectsChanged;
 
         public SpriteRenderer(GameObject gameObject) : base(gameObject)
         {
@@ -37,6 +38,12 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             OnSpriteChanged?.Invoke();
         }
 
+        public void SetEffects(SpriteEffects name)
+        {
+            Effects = name;
+            OnEffectsChanged?.Invoke();
+        }
+         
         /// <summary>
         /// Sæt origin til midten af valgt sprite
         /// </summary>
@@ -55,6 +62,11 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public void InvokeOnSpriteChanged()
         {
             OnSpriteChanged?.Invoke();
+        }
+
+        public void InvokeOnEffectsChanged()
+        {
+            OnEffectsChanged?.Invoke();
         }
 
         /// <summary>
