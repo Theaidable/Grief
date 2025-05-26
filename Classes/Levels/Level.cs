@@ -1,0 +1,177 @@
+﻿using Greif;
+using Greif.Classes.Cameras;
+using Grief.Classes.Algorithms;
+using Grief.Classes.DesignPatterns.Builder;
+using Grief.Classes.DesignPatterns.Builder.Builders;
+using Grief.Classes.DesignPatterns.Command;
+using Grief.Classes.DesignPatterns.Command.Commands;
+using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.Quests;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Grief.Classes.Levels
+{
+    public class Level
+    {
+        private TiledMapRenderer mapRenderer;
+
+        public TiledMap Map { get; private set; }
+        public Dictionary<Point,Tile> TileDictionary { get; private set; }
+        public AStar PathFinder { get; private set; }
+
+        public int MapWidth { get; private set; }
+        public int MapHeight { get; private set; }
+        public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
+        private List<GameObject> objectsToRemove = new List<GameObject>();
+        public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
+
+        public void Load(string levelName)
+        {
+            Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
+            mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, Map);
+
+            MapWidth = Map.WidthInPixels;
+            MapHeight = Map.HeightInPixels;
+
+            var objectLayer = Map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
+            foreach (var rectangleObject in objectLayer.Objects.OfType<TiledMapRectangleObject>())
+            {
+                CollisionRectangles.Add(new Rectangle(
+                (int)rectangleObject.Position.X,
+                (int)rectangleObject.Position.Y,
+                (int)rectangleObject.Size.Width,
+                (int)rectangleObject.Size.Height));
+            }
+
+            Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
+            for (int y = 0; y < Map.Height; y++)
+            {
+                for (int x = 0; x < Map.Width; x++)
+                {
+                    Point gridPosition = new Point(x, y);
+                    Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth, Map.TileHeight);
+                    bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
+                    tiles[gridPosition] = new Tile(gridPosition,walkable);
+                }
+            }
+
+            TileDictionary = tiles;
+            PathFinder = new AStar(tiles);
+
+            switch (levelName)
+            {
+                case "Level0":
+                    //Her kan vi lave koden til en main menu
+                    break;
+                case "GriefMap1":
+
+                    AddGameObject(CreatePlayer(new Vector2(100,175)));
+
+                    //Tilføj enemy
+                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 160), EnemyType.Enemy1);
+                    EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
+                    enemyComp.PatrolPoints = new List<Vector2>()
+                    {
+                        new Vector2(550,165),
+                        new Vector2(450,165)
+                    };
+                    AddGameObject(enemyObject);
+                    
+                    
+                    /*
+                    //Tilføj en NPC i spillet
+                    AddGameObject(CreateNPC(
+                        new Vector2(200, 400),
+                        "Mor",
+                        new List<string>
+                        {
+                            "Have you seen my daughter?",
+                            "I know she is somewhere around here...",
+                            "Can you help me find her?"
+                        },
+                        new Quest()));
+                    */
+
+                    //Vi kan tilføje flere GameObjects i Level 1 her
+                    break;
+            }
+        }
+
+        private GameObject CreatePlayer(Vector2 position)
+        {
+            PlayerBuilder playerBuilder = new PlayerBuilder();
+            GameObjectDirector director = new GameObjectDirector(playerBuilder);
+            var player = director.Construct("Player");
+            playerBuilder.AddScriptComponent<PlayerComponent>();
+            playerBuilder.SetPosition(position);
+            return player;
+        }
+
+        private GameObject CreateNPC(Vector2 position, string name, List<string> dialog, Quest quest = null)
+        {
+            NpcBuilder npcBuilder = new NpcBuilder();
+            GameObjectDirector director = new GameObjectDirector(npcBuilder);
+            var npc = director.Construct($"{name}");
+            npcBuilder.SetPosition(position);
+            npcBuilder.SetName(name);
+            npcBuilder.SetDialog(dialog);
+            npcBuilder.SetQuest(quest);
+            return npc;
+        }
+
+        public void AddGameObject(GameObject gameObject)
+        {
+            GameObjects.Add(gameObject);
+            gameObject.Awake();
+            gameObject.Start();
+        }
+
+        public void QueueRemove(GameObject gameObject)
+        {
+            objectsToRemove.Add(gameObject);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            mapRenderer.Update(gameTime);
+
+            foreach (GameObject gameObject in GameObjects)
+            {
+                gameObject.Update();
+            }
+
+            foreach (GameObject gameObject in objectsToRemove)
+            {
+                GameObjects.Remove(gameObject);
+            }
+            objectsToRemove.Clear();
+
+
+            var player = GameObjects.FirstOrDefault(g => g.Tag == "Player");
+
+            if (player != null)
+            {
+                GameWorld.Instance.Camera.Follow(player, MapWidth, MapHeight);
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Matrix viewMatrix)
+        {
+            mapRenderer.Draw(viewMatrix);
+
+            foreach (GameObject gameObject in GameObjects)
+            {
+                gameObject.Draw(spriteBatch);
+            }
+        }
+    }
+}
