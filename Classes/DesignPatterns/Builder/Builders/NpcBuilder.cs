@@ -57,7 +57,7 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         public IGameObjectBuilder AddSpriteRenderer()
         {
             var spriteRenderer = npc.AddComponent<SpriteRenderer>();
-            spriteRenderer.SetSprite("MainCharacter/Idle/Idle01");
+            spriteRenderer.SetSprite("NPCs//Dad/Idle/Idle01");
             return this;
         }
 

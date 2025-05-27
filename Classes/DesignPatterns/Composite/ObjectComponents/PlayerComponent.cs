@@ -2,6 +2,7 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.Items.Items;
 using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     {
         //Private fields
         private Animator animator;
+        private InventoryComponent inventory;
         private Vector2 moveDirection;
         private Vector2 velocity;
         private float gravity = 600f;
@@ -64,7 +66,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
-
+            inventory = GameObject.GetComponent<InventoryComponent>();
             AddAnimations();
             BindCommands();
             animator.PlayAnimation("Idle");
@@ -169,6 +171,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Move(Vector2 direction)
         {
+            if(inventory.ShowInventory == true)
+            {
+                return;
+            }
+
             SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             moveDirection = direction;
             
@@ -184,6 +191,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = direction * MovementSpeed * GameWorld.Instance.DeltaTime;
+            
             GameObject.Transform.Translate(movement);
 
             //AABB
@@ -261,7 +269,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Jump()
         {
-            if (grounded == true)
+            if (grounded == true && inventory.ShowInventory == false)
             {
                 velocity.Y = jumpForce;
                 grounded = false;
@@ -270,7 +278,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Attack()
         {
-            if (cooldownTimer <= 0f)
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false)
             {
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
@@ -324,7 +332,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             //Her skal vi skrive vores interaction kode med NPC og Items
 
-            if(cooldownTimer <= 0f)
+            if(cooldownTimer <= 0f && inventory.ShowInventory == false)
             {
                 isInteracting = true;
 
@@ -403,6 +411,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //ButtonDown Commands
             InputHandler.Instance.AddButtonDownCommand(Keys.Space, new JumpCommand(this));
             InputHandler.Instance.AddButtonDownCommand(Keys.E, new InteractionCommand(this));
+            InputHandler.Instance.AddButtonDownCommand(Keys.I, new OpenInventoryCommand(inventory));
 
             //ButtonUp Commands
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));

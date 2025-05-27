@@ -4,6 +4,7 @@ using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.Dialog;
 using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;

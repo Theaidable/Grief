@@ -1,7 +1,9 @@
 ﻿using Greif;
 using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
@@ -25,6 +27,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Vector2 velocity;
         private float gravity = 600f;
         private bool grounded;
+        private Item droppedItem;
 
         private int currentPatrolIndex = 0;
         private bool patrolForward;
@@ -494,7 +497,39 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 animator.PlayAnimation("Death");
                 animator.OnAnimationComplete = () => GameWorld.Instance.LevelManager.CurrentLevel.QueueRemove(GameObject);
+                
+                if(droppedItem != null)
+                {
+                    DropItem(droppedItem);
+                    //Tilføj denne linje når der findes en sprite for item i verdenen
+                    //GameWorld.Instance.LevelManager.CurrentLevel.AddGameObject(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position));
+                }
             }
+        }
+
+        public void SetDropItem(Item item)
+        {
+            droppedItem = item;
+        }
+
+        //Denne metode skal fjernes hvis man gerne vil spawne items i verdenen
+        private void DropItem(Item item)
+        {
+            GameObject playerObject = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.GetComponent<PlayerComponent>() != null);
+
+            if (playerObject == null)
+            {
+                return;
+            }
+
+            InventoryComponent inventory = playerObject.GetComponent<InventoryComponent>();
+
+            if (inventory == null)
+            {
+                return;
+            }
+
+            inventory.AddItemToInventory(item);
         }
 
         private void AddAnimations()

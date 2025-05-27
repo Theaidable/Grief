@@ -1,9 +1,14 @@
-﻿using Grief.Classes.DesignPatterns.Composite;
+﻿using Greif;
+using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
+using Grief.Classes.Items;
+using Grief.Classes.Items.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 {
@@ -48,14 +53,14 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             return Create(position, EnemyType.Enemy1);
         }
 
-        public GameObject Create(Vector2 position, EnemyType enemyType)
+        public GameObject Create(Vector2 position, EnemyType enemyType, List<Vector2> patrolPoints = null, Item item = null)
         {
             GameObject enemyObject = new GameObject();
             SpriteRenderer spriteRenderer = enemyObject.AddComponent<SpriteRenderer>();
             Animator animator = enemyObject.AddComponent<Animator>();
             Collider collider = enemyObject.AddComponent<Collider>();
             var enemy = enemyObject.AddComponent<EnemyComponent>();
-            
+            enemy.PatrolPoints = patrolPoints;
             enemyObject.Transform.Position = position;
 
             //Sæt sprite
@@ -68,6 +73,11 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             if(enemyStats.TryGetValue(enemyType, out var stats))
             {
                 enemy.SetStats(stats);
+            }
+
+            if(item != null)
+            {
+                enemy.SetDropItem(item);
             }
 
             return enemyObject;

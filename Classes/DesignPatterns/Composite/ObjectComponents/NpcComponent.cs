@@ -14,10 +14,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     public class NpcComponent : Component
     {
         private Animator animator;
-        private Texture2D[] idleFrames;
         private Vector2 velocity;
         private float gravity = 600f;
         private bool grounded;
+
+        //DadFrames
+        private Texture2D[] idleDadFrames;
+        private Texture2D[] happyDadFrames;
 
         public string Name { get; set; }
         public List<string> DialogLines { get; set; }
@@ -30,7 +33,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             animator = GameObject.GetComponent<Animator>();
             AddAnimations();
-            animator.PlayAnimation("Idle");
+            animator.PlayAnimation($"Idle{Name}");
         }
 
         public override void Update()
@@ -49,7 +52,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             if (grounded == true && velocity.Y > 0)
             {
                 velocity.Y = 0;
-                animator.PlayAnimation("Idle");
+                animator.PlayAnimation($"Idle{Name}");
             }
         }
 
@@ -130,10 +133,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private void AddAnimations()
         {
             //Load Frames
-            idleFrames = LoadFrames("MainCharacter/Idle/Idle", 2);
+            idleDadFrames = LoadFrames("NPCs/Dad/Idle/Idle", 2);
+            happyDadFrames = LoadFrames("NPCs/Dad/Happy/Happy", 2);
 
             //Add animations
-            animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
+            animator.AddAnimation(new Animation("IdleDad", 2.5f, true, idleDadFrames));
+            animator.AddAnimation(new Animation("HappyDad", 2.5f, true, happyDadFrames));
         }
 
         private Texture2D[] LoadFrames(string basePath, int frameCount)

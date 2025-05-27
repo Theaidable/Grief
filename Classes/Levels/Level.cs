@@ -9,6 +9,7 @@ using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.Items.Items;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,7 @@ namespace Grief.Classes.Levels
     public class Level
     {
         private TiledMapRenderer mapRenderer;
+        private List<GameObject> enemies = new List<GameObject>();
 
         public TiledMap Map { get; private set; }
         public Dictionary<Point,Tile> TileDictionary { get; private set; }
@@ -83,25 +85,24 @@ namespace Grief.Classes.Levels
                     break;
                 case "GriefMap1":
                     //Tilføj enemy
-                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1);
-                    EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
-                    enemyComp.PatrolPoints = new List<Vector2>()
+
+                    enemies.Add(EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1, new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) }));
+                    enemies.Add(EnemyFactory.Instance.Create(new Vector2(1325, 150), EnemyType.Enemy1, null, new QuestItem("Doll")));
+
+                    foreach (var enemy in enemies)
                     {
-                        new Vector2(550,167),
-                        new Vector2(450,167)
-                    };
-                    AddGameObject(enemyObject);
-                    
+                        AddGameObject(enemy);
+                    }
                     
                     //Tilføj en NPC i spillet
                     AddGameObject(CreateNPC(
                         new Vector2(80, 175),
-                        "Mom",
+                        "Dad",
                         new List<string>
                         {
-                            "Have you seen my granddaughter?",
+                            "Have you seen my daughter?",
                             "She should be around here...",
-                            "NAME!!!", 
+                            "   NAME!!!", 
                             "Could you help me find her?"
                         },
                         new Quest()));
@@ -118,9 +119,10 @@ namespace Grief.Classes.Levels
         {
             PlayerBuilder playerBuilder = new PlayerBuilder();
             GameObjectDirector director = new GameObjectDirector(playerBuilder);
-            var player = director.Construct("Player");
-            playerBuilder.AddScriptComponent<PlayerComponent>();
             playerBuilder.SetPosition(position);
+            playerBuilder.AddScriptComponent<InventoryComponent>();
+            playerBuilder.AddScriptComponent<PlayerComponent>();
+            var player = director.Construct("Player");
             return player;
         }
 
@@ -180,6 +182,12 @@ namespace Grief.Classes.Levels
             foreach (GameObject gameObject in GameObjects)
             {
                 gameObject.Draw(spriteBatch);
+
+                var inventory = gameObject.GetComponent<InventoryComponent>();
+                if (inventory != null && inventory.ShowInventory)
+                {
+                    inventory.Draw(spriteBatch);
+                }
             }
         }
     }

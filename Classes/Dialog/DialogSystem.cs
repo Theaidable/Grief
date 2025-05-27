@@ -17,6 +17,7 @@ namespace Grief.Classes.Dialog
         private string currentLine;
         private Action<bool> onDialogFinished;
         private bool wasEnterPressed;
+        private bool awaitingResponse;
 
         public bool IsActive { get; private set; }
 
@@ -66,14 +67,19 @@ namespace Grief.Classes.Dialog
 
         private void ShowChoice()
         {
-            //Dette er midlertidig måde at accepetere eller benægte quests
-            if (Keyboard.GetState().IsKeyDown(Keys.Y))
+            if(awaitingResponse == true)
             {
-                onDialogFinished?.Invoke(true);
-            }
-            else if (Keyboard.GetState().IsKeyDown(Keys.N))
-            {
-                onDialogFinished?.Invoke(false);
+                //Dette er midlertidig måde at accepetere eller benægte quests
+                if (Keyboard.GetState().IsKeyDown(Keys.Y))
+                {
+                    awaitingResponse = false;
+                    onDialogFinished?.Invoke(true);
+                }
+                else if (Keyboard.GetState().IsKeyDown(Keys.N))
+                {
+                    awaitingResponse = false;
+                    onDialogFinished?.Invoke(false);
+                }
             }
 
             IsActive = false;
