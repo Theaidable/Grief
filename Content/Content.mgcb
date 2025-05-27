@@ -937,7 +937,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:TileMaps/Assets/Ground/GroundTileset.png
+/build:TileMaps/Assets/Ground/GroundTileset.png;TileMaps/Assets/Ground/GroundTileset
 
 #begin TileMaps/Assets/Ground/Tileset_Ground.png
 /importer:TextureImporter

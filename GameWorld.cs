@@ -44,6 +44,10 @@ namespace Greif
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _graphics.PreferredBackBufferWidth = 1280;
+            _graphics.PreferredBackBufferHeight = 720;
+            _graphics.ApplyChanges();
         }
 
         protected override void Initialize()
@@ -86,7 +90,16 @@ namespace Greif
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            _spriteBatch.Begin(transformMatrix: Camera.ViewMatrix);
+            _spriteBatch.Begin(
+                sortMode: SpriteSortMode.Deferred,
+                blendState: BlendState.AlphaBlend,
+                samplerState: SamplerState.PointClamp,
+                depthStencilState: null,
+                rasterizerState: null, 
+                effect: null,
+                transformMatrix: Camera.ViewMatrix
+                );
+
 
             LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
 
