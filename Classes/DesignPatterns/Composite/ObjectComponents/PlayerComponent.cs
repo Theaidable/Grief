@@ -23,8 +23,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private float gravity = 600f;
         private float jumpForce = -200f;
         private float attackCooldown = 0.1f;
+        private float interactionCooldown = 0.1f;
         private float cooldownTimer = 0f;
         private bool isAttacking = false;
+        private bool isInteracting = false;
+        private bool grounded;
 
         //Walk animation frames
         private Texture2D[] idleFrames;
@@ -50,7 +53,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public int Damage { get; private set; }
         public float Health { get; private set; }
         public float MovementSpeed { get; private set; }
-        public bool Grounded { get; private set; }
 
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
@@ -76,7 +78,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 cooldownTimer -= GameWorld.Instance.DeltaTime;
             }
 
-            if (Grounded == false)
+            if (grounded == false)
             {
                 velocity.Y += gravity * GameWorld.Instance.DeltaTime;
             }
@@ -85,14 +87,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime);
             GameObject.Transform.Translate(movement);
-            Grounded = CheckGrounded();
+            grounded = CheckGrounded();
             
-            if (Grounded == true && velocity.Y > 0)
+            if (grounded == true && velocity.Y > 0)
             {
                 velocity.Y = 0;
                 animator.PlayAnimation("Idle");
             }
-            else if (Grounded == false)
+            else if (grounded == false)
             {
                 if (velocity.Y < 0)
                 {
@@ -243,7 +245,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 }
             }
 
-            if (isAttacking == false && Grounded == true)
+            if (isAttacking == false && grounded == true)
             {
                 animator.PlayAnimation("Run");
             }
@@ -251,7 +253,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Stop()
         {
-            if(isAttacking == false && Grounded == true)
+            if(isAttacking == false && grounded == true)
             {
                 animator.PlayAnimation("Idle");
             }
@@ -259,10 +261,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Jump()
         {
-            if (Grounded == true)
+            if (grounded == true)
             {
                 velocity.Y = jumpForce;
-                Grounded = false;
+                grounded = false;
             }
         }
 
@@ -306,7 +308,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     }
 
                     isAttacking = false;
-                    animator.PlayAnimation(Grounded ? "Idle" : "Fall");
+                    animator.PlayAnimation(grounded ? "Idle" : "Fall");
                 };
 
                 cooldownTimer = attackCooldown;
@@ -314,6 +316,37 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         }
 
         public bool CanUseAttack()
+        {
+            return cooldownTimer <= 0f;
+        }
+
+        public void Interact()
+        {
+            //Her skal vi skrive vores interaction kode med NPC og Items
+
+            if(cooldownTimer <= 0f)
+            {
+                isInteracting = true;
+
+                var nearbyNpc = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                    .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
+                    && gameObject.GetComponent<NpcComponent>() != null);
+
+                if (nearbyNpc != null)
+                {
+                    Debug.WriteLine("Calling interaction on NPC...");
+                    nearbyNpc.GetComponent<NpcComponent>().Interaction();
+                }
+                else
+                {
+                    Debug.WriteLine("No nearby NPC found!");
+                }
+
+                cooldownTimer = interactionCooldown;
+            }
+        }
+
+        public bool CanInteract()
         {
             return cooldownTimer <= 0f;
         }
@@ -363,18 +396,19 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private void BindCommands()
         {
-            //Move on A and D
+            //UpdateCommands
             InputHandler.Instance.AddUpdateCommand(Keys.A, new MoveCommand(new Vector2(-1, 0), this));
             InputHandler.Instance.AddUpdateCommand(Keys.D, new MoveCommand(new Vector2(1, 0), this));
 
-            //Jump on Spacebar
+            //ButtonDown Commands
             InputHandler.Instance.AddButtonDownCommand(Keys.Space, new JumpCommand(this));
+            InputHandler.Instance.AddButtonDownCommand(Keys.E, new InteractionCommand(this));
 
-            //Idle hvis man stopper med at gå eller man begynder at falde
+            //ButtonUp Commands
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));
             InputHandler.Instance.AddButtonUpCommand(Keys.D, new StopCommand(this));
 
-            //Attack med musen
+            //MouseCommands
             InputHandler.Instance.AddMouseButtonDownCommand(MouseButton.Left, new AttackCommand(this));
         }
     }

@@ -1,9 +1,12 @@
-﻿using Grief.Classes.DesignPatterns.Composite;
+﻿using Greif;
+using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Grief.Classes.DesignPatterns.Builder.Builders
 {
@@ -77,6 +80,16 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
 
         public GameObject GetResult()
         {
+            var npcComponent = npc.GetComponent<NpcComponent>();
+
+            if(npcComponent != null)
+            {
+                npcComponent.Name = Name;
+                npcComponent.DialogLines = Dialog;
+                npcComponent.QuestToGive = Quest;
+                npcComponent.Portrait = GameWorld.Instance.Content.Load<Texture2D>($"NPCs/Portraits/Portrait{Name}");
+            }
+
             return npc;
         }
     }

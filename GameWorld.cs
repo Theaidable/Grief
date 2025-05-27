@@ -4,12 +4,14 @@ using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
+using Grief.Classes.Dialog;
 using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Greif
 {
@@ -22,7 +24,9 @@ namespace Greif
         //Public properties
         public float DeltaTime { get; private set; }
         public Texture2D Pixel { get; private set; }
+        public SpriteFont DefaultFont { get; private set; }
         public Camera Camera { get; private set; }
+        public DialogSystem Dialog { get; private set; }
         public LevelManager LevelManager { get; private set; }
 
         //Oprettelse af Singleton af GameWorld
@@ -56,6 +60,7 @@ namespace Greif
             LevelManager = new LevelManager();
             LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
             Camera = new Camera();
+            Dialog = new DialogSystem();
 
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(LevelManager.CurrentLevel.GameObjects));
 
@@ -68,6 +73,7 @@ namespace Greif
             Pixel = new Texture2D(GraphicsDevice, 1, 1);
             Pixel.SetData(new[] { Color.White });
 
+            DefaultFont = Content.Load<SpriteFont>("Fonts/Default");
         }
 
         protected override void Update(GameTime gameTime)
@@ -82,6 +88,7 @@ namespace Greif
             InputHandler.Instance.Execute();
 
             LevelManager.Update(gameTime);
+            Dialog.Update();
 
             base.Update(gameTime);
         }
@@ -102,6 +109,8 @@ namespace Greif
 
 
             LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
+            
+            Dialog.Draw(_spriteBatch);
 
             _spriteBatch.End();
 

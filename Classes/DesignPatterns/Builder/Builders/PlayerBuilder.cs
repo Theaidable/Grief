@@ -15,15 +15,15 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
             player = new GameObject();
         }
 
-        public IGameObjectBuilder SetPosition(Vector2 position)
-        {
-            player.Transform.Position = position;
-            return this;
-        }
-
         public IGameObjectBuilder SetTag(string tag)
         {
             player.Tag = tag;
+            return this;
+        }
+
+        public IGameObjectBuilder SetPosition(Vector2 position)
+        {
+            player.Transform.Position = position;
             return this;
         }
 
