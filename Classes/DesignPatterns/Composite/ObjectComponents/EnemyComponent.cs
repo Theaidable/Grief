@@ -327,13 +327,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //AABB
             var enemyCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
+            bool rectCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
             bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
             bool snappedToSlope = false;
 
             //Debug.WriteLine($"Collision detected? {collision}");
 
-            if (collision == true && polygonCollision == false)
+            if (rectCollision == true && polygonCollision == false)
             {
                 //Debug.WriteLine("Collision — reverting to original position.");
                 GameObject.Transform.Position = originalPosition;
