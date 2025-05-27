@@ -96,10 +96,9 @@ namespace Grief.Classes.Levels
                     AddGameObject(enemyObject);
                     
                     
-                    /*
                     //Tilføj en NPC i spillet
                     AddGameObject(CreateNPC(
-                        new Vector2(200, 400),
+                        new Vector2(80, 175),
                         "Mor",
                         new List<string>
                         {
@@ -108,7 +107,6 @@ namespace Grief.Classes.Levels
                             "Can you help me find her?"
                         },
                         new Quest()));
-                    */
 
                     //Vi kan tilføje flere GameObjects i Level 1 her
                     break;
@@ -134,6 +132,7 @@ namespace Grief.Classes.Levels
             npcBuilder.SetName(name);
             npcBuilder.SetDialog(dialog);
             npcBuilder.SetQuest(quest);
+            npcBuilder.AddScriptComponent<NpcComponent>();
             return npc;
         }
 
