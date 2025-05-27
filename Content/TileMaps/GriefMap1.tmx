@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="left-up" width="96" height="17" tilewidth="16" tileheight="16" infinite="0" nextlayerid="22" nextobjectid="95">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="left-up" width="96" height="17" tilewidth="16" tileheight="16" infinite="0" nextlayerid="22" nextobjectid="97">
  <editorsettings>
   <export target="GriefMap1.tmx" format="tmx"/>
  </editorsettings>
@@ -94,7 +94,7 @@
 54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,55,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,55,56,57,57,0
 </data>
   </layer>
-  <layer id="21" name="Tile Stars" width="96" height="17" offsetx="-250" offsety="0" parallaxx="0.15" parallaxy="1.05">
+  <layer id="21" name="Tile Stars" width="96" height="17" visible="0" offsetx="-250" offsety="0" parallaxx="0.15" parallaxy="1.05">
    <data encoding="csv">
 177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 54,55,56,57,0,0,0,0,0,0,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,54,55,56,54,54,54,54,54,54,54,54,54,54,54,55,56,57,0,0,0,0,0,0,0,0,0,54,55,56,57,0,0,0,0,0,0,0,0,0,0,0,0,0,0,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -207,22 +207,22 @@
 </data>
  </layer>
  <objectgroup id="16" name="CollisionObjects">
-  <object id="59" x="0.666667" y="193.667" width="186.333" height="44.3333"/>
-  <object id="60" x="228" y="224.333" width="346.333" height="49.6667"/>
-  <object id="62" x="400.667" y="193.333" width="175.667" height="30.8333"/>
-  <object id="66" x="571.5" y="240.5" width="931.5" height="30.5"/>
-  <object id="67" x="976.125" y="224.375" width="47.875" height="18.125"/>
-  <object id="72" x="1248.06" y="224.5" width="175.938" height="20.25"/>
-  <object id="73" x="1476.67" y="121" width="58.3333" height="150.667"/>
-  <object id="81" x="1103.83" y="96.0833" width="432.833" height="37.5833"/>
-  <object id="83" x="1039.88" y="128.625" width="41.125" height="13.25"/>
-  <object id="84" x="993" y="160" width="64" height="21.125"/>
+  <object id="59" x="0.666667" y="193.667" width="186.333" height="37.2424"/>
+  <object id="60" x="228" y="224.333" width="140.878" height="49.6667"/>
+  <object id="62" x="402.212" y="193.333" width="172.122" height="30.8333"/>
+  <object id="66" x="620.955" y="240.5" width="854.92" height="30.5"/>
+  <object id="67" x="976.125" y="224.375" width="47.875" height="13.2159"/>
+  <object id="72" x="1248.06" y="224.5" width="175.938" height="7.75"/>
+  <object id="73" x="1476.67" y="134.625" width="58.3333" height="137.042"/>
+  <object id="81" x="1103.83" y="96.0833" width="431.208" height="37.5833"/>
+  <object id="83" x="1039.88" y="128.625" width="35.5795" height="13.25"/>
+  <object id="84" x="997.182" y="160" width="59.8182" height="14.0341"/>
   <object id="85" x="1071.75" y="148.25" width="48.375" height="17.25"/>
-  <object id="89" x="368.818" y="224.364">
-   <polygon points="0,0 31.9091,-31.0909 31.9091,-0.272727"/>
+  <object id="89" x="368.84" y="224.489">
+   <polygon points="0,0 33.439,-31.1425 33.439,-0.27318"/>
   </object>
-  <object id="90" x="621" y="240.545">
-   <polygon points="0,0 -44.6364,-47.1818 -44.7273,0"/>
+  <object id="90" x="620.966" y="240.482">
+   <polygon points="0,0 -46.5756,-47.0398 -46.6705,0"/>
   </object>
   <object id="91" x="961.969" y="240.469">
    <polygon points="0,0 14.1563,-16.0625 14.125,0"/>
@@ -235,6 +235,12 @@
   </object>
   <object id="94" x="1437.65" y="240.652">
    <polygon points="0,0 -13.6087,-16.1304 -13.6087,-0.217391"/>
+  </object>
+  <object id="95" x="1011.73" y="160">
+   <polygon points="0,0 28.2472,-31.2443 28.1848,0"/>
+  </object>
+  <object id="96" x="1075.64" y="128.455">
+   <polygon points="0,0 28.429,-32.1534 28.3662,0"/>
   </object>
  </objectgroup>
 </map>
