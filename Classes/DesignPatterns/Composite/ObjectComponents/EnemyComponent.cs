@@ -4,9 +4,11 @@ using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Shapes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,7 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     public class EnemyComponent : Component
     {
         private bool isHurt;
-        private float attackCooldown = 0.1f;
+        private float attackCooldown = 1f;
         private float cooldownTimer = 0f;
         private bool isAttacking;
         private Vector2 velocity;
@@ -28,7 +30,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool patrolForward;
 
         private Animator animator;
-        private Collider Collider;
         private AStar astar;
 
         private Texture2D[] idleFrames;
@@ -95,7 +96,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 return;
             }
 
-            //Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 originalPosition = GameObject.Transform.Position;
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
             grounded = CheckGrounded();
 
@@ -103,21 +104,31 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 velocity.Y = 0;
             }
+            else if (grounded == false)
+            {
+                animator.PlayAnimation("Idle"); //Her kunn man lave en jump/fall animation
+            }
 
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
-                if (PlayerIsWithInAttackRange() == true)
+
+                if (PlayerIsWithInDetectionRange() == true)
                 {
-                    Attack();
+                    Pursue();
+                    //Debug.WriteLine("Pursue has started");
+
+
+                    if (PlayerIsWithInAttackRange() == true)
+                    {
+                        Attack();
+                        //Debug.WriteLine("Attack");
+                    }
                 }
-                else if (PlayerIsWithInDetectionRange() == false)
+                else
                 {
                     path.Clear();
                     Patrol();
-                }
-                else if(PlayerIsWithInDetectionRange() == true)
-                {
-                    Pursue();
+                    //Debug.WriteLine("Patrol");
                 }
             }
         }
@@ -125,9 +136,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var tiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
+            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
 
-            foreach (var tile in tiles)
+            foreach (var tile in rectTiles)
             {
                 bool isAbove = collider.Bottom <= tile.Top + 5;
                 bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
@@ -137,6 +149,44 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 {
                     GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
                     return true;
+                }
+            }
+
+            foreach (var tile in polyTiles)
+            {
+                var points = tile.Vertices;
+
+                for (int i = 0; i < points.Length - 1; i++)
+                {
+                    Vector2 p1 = points[i];
+                    Vector2 p2 = points[(i + 1) % points.Length];
+
+                    if (Math.Abs(p1.X - p2.X) < 1f)
+                    {
+                        continue;
+                    }
+
+                    if (p1.X > p2.X)
+                    {
+                        var temp = p1;
+                        p1 = p2;
+                        p2 = temp;
+                    }
+
+                    float enemyX = collider.Center.X;
+
+                    if (enemyX >= p1.X && enemyX <= p2.X)
+                    {
+                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                        float yOnSlope = p1.Y + slope * (enemyX - p1.X);
+
+                        float enemyBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
+
+                        if (enemyBottom >= yOnSlope - 10 && enemyBottom <= yOnSlope + 10)
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
 
@@ -181,6 +231,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 direction = target - position;
             }
 
+            EnemySpeed = 40;
             direction.Normalize();
             Move(direction);
         }
@@ -206,10 +257,20 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                     lock (pathLock)
                     {
-                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, t.Position.Y * level.Map.TileHeight + level.Map.TileHeight/2)).ToList();
+                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, GameObject.Transform.Position.Y)).ToList();
+
+                        /*
+                        foreach (var t in newPath)
+                        {
+                            var worldX = t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2;
+                            var worldY = GameObject.Transform.Position.Y;
+
+                            Debug.WriteLine($"Tile {t.Position} → World ({worldX}, {worldY})");
+                        }
+                        */
                     }
                 });
-
+                 
                 RecalculatePathTimer = 1f;
             }
 
@@ -220,54 +281,117 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     Vector2 next = path[0];
                     Vector2 direction = next - GameObject.Transform.Position;
 
+                    //Debug.WriteLine($"Next point: {next}");
+                    //Debug.WriteLine($"Current position: {GameObject.Transform.Position}");
+                    //Debug.WriteLine($"Direction: {direction} (Length: {direction.Length()})");
+
                     if (direction.Length() < 4f)
                     {
+                        //Debug.WriteLine("Too close to next point, removing from path.");
                         path.RemoveAt(0);
                     }
                     else
                     {
+                        //Debug.WriteLine("Moving towards next point.");
+                        EnemySpeed = 60;
                         direction.Normalize();
                         Move(direction);
                     }
+                }
+                else
+                {
+                    //Debug.WriteLine("No valid path.");
                 }
             }
 
             RecalculatePathTimer -= GameWorld.Instance.DeltaTime;
         }
-
         private void Move(Vector2 direction)
         {
-            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
-
             //Flip sprite baseret på direction
+            SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             if (direction.X < 0)
             {
-                spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
+                spriteRenderer.SetEffects(SpriteEffects.FlipHorizontally);
             }
             else if (direction.X > 0)
             {
-                spriteRenderer.Effects = SpriteEffects.None;
+                spriteRenderer.SetEffects(SpriteEffects.None);
             }
 
-            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
             Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
             GameObject.Transform.Translate(movement);
 
-            //AABB
-            var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            //Debug.WriteLine($"Trying to move: {movement}, from {originalPosition} to {GameObject.Transform.Position}");
 
-            if (collision == true)
+            //AABB
+            var enemyCollider = GameObject.GetComponent<Collider>().CollisionBox;
+            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
+            bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
+            bool snappedToSlope = false;
+
+            //Debug.WriteLine($"Collision detected? {collision}");
+
+            if (collision == true && polygonCollision == false)
             {
+                //Debug.WriteLine("Collision — reverting to original position.");
                 GameObject.Transform.Position = originalPosition;
             }
-            else
+
+            if (polygonCollision == true)
             {
-                if (isAttacking == false && grounded == true)
+                foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
                 {
-                    animator.PlayAnimation("Walk");
+                    var points = polygon.Vertices;
+
+                    for (int i = 0; i < points.Length - 1; i++)
+                    {
+                        Vector2 p1 = points[i];
+                        Vector2 p2 = points[(i + 1) % points.Length];
+
+                        if (Math.Abs(p1.X - p2.X) < 1f)
+                        {
+                            continue;
+                        }
+
+                        if (p1.X > p2.X)
+                        {
+                            var temp = p1;
+                            p1 = p2;
+                            p2 = temp;
+                        }
+
+                        float enemyX = enemyCollider.Center.X;
+
+                        if (enemyX >= p1.X && enemyX <= p2.X)
+                        {
+                            float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                            float yOnSlope = p1.Y + slope * (enemyX - p1.X);
+
+                            float enemyBottom = GameObject.Transform.Position.Y + enemyCollider.Height / 2f;
+
+                            if (enemyBottom >= yOnSlope - 15 && enemyBottom <= yOnSlope + 15)
+                            {
+                                GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, yOnSlope - enemyCollider.Height / 2f);
+                                snappedToSlope = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (snappedToSlope == true)
+                    {
+                        break;
+                    }
                 }
             }
+
+            if (isAttacking == false && grounded == true)
+            {
+                animator.PlayAnimation("Walk");
+            }
+
         }
 
         private bool PlayerIsWithInDetectionRange()
@@ -384,7 +508,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             deathFrames = LoadFrames("Enemies/Skeleton/Death/Death", 4);
 
             animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
-            animator.AddAnimation(new Animation("Walk", 4f, true, walkFrames));
+            animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
             animator.AddAnimation(new Animation("Hurt", 10f, false, hurtFrames));
             animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));

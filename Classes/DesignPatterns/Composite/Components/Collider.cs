@@ -42,7 +42,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         {
             spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             spriteRenderer.OnSpriteChanged += RebuildCollider;
-            //spriteRenderer.OnEffectsChanged += RebuildCollider();
+            spriteRenderer.OnEffectsChanged += RebuildCollider;
             pixelPerfectRectangles = new Lazy<List<RectangleData>>(() => CreateRectangles());
             UpdatePixelCollider();
         }
@@ -190,9 +190,12 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
 
         public void UpdatePosition(GameObject gameObject, int width, int height)
         {
-            var origin = gameObject.GetComponent<SpriteRenderer>()?.Origin ?? Vector2.Zero;
+            var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            var origin = spriteRenderer?.Origin ?? Vector2.Zero;
 
-            Rectangle = new Rectangle((int)(gameObject.Transform.Position.X - origin.X + X), (int)(gameObject.Transform.Position.Y - origin.Y + Y), 1, 1);
+            int newX = spriteRenderer.Effects == SpriteEffects.FlipHorizontally ? (width - 1 - X) : X;
+
+            Rectangle = new Rectangle((int)(gameObject.Transform.Position.X - origin.X + newX), (int)(gameObject.Transform.Position.Y - origin.Y + Y), 1, 1);
         }
     }
 }

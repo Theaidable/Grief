@@ -13,6 +13,7 @@ using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Shapes;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace Grief.Classes.Levels
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
         private List<GameObject> objectsToRemove = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
+        public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
 
         public void Load(string levelName)
         {
@@ -50,6 +52,13 @@ namespace Grief.Classes.Levels
                 (int)rectangleObject.Position.Y,
                 (int)rectangleObject.Size.Width,
                 (int)rectangleObject.Size.Height));
+            }
+
+            foreach(var polygonObject in objectLayer.Objects.OfType<TiledMapPolygonObject>())
+            {
+                var points = polygonObject.Points.Select(p => new Vector2(polygonObject.Position.X + p.X, polygonObject.Position.Y + p.Y)).ToArray();
+
+                CollisionPolygons.Add(new Polygon(points));
             }
 
             Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
@@ -77,12 +86,12 @@ namespace Grief.Classes.Levels
                     AddGameObject(CreatePlayer(new Vector2(100,175)));
 
                     //Tilføj enemy
-                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 160), EnemyType.Enemy1);
+                    GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1);
                     EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
                     enemyComp.PatrolPoints = new List<Vector2>()
                     {
-                        new Vector2(550,165),
-                        new Vector2(450,165)
+                        new Vector2(550,167),
+                        new Vector2(450,167)
                     };
                     AddGameObject(enemyObject);
                     

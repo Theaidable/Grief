@@ -42,7 +42,8 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
 
         public IGameObjectBuilder AddCollider()
         {
-            player.AddComponent<Collider>();
+            var collider = player.AddComponent<Collider>();
+            collider.ColliderSize = new Point(20, 30);
             return this;
         }
 

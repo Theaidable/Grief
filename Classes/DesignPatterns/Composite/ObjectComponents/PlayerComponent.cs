@@ -2,10 +2,14 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -104,9 +108,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var tiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
+            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
 
-            foreach (var tile in tiles)
+            foreach (var tile in rectTiles)
             {
                 bool isAbove = collider.Bottom <= tile.Top + 5;
                 bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
@@ -119,9 +124,46 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 }
             }
 
+            foreach (var tile in polyTiles)
+            {
+                var points = tile.Vertices;
+
+                for (int i = 0; i < points.Length - 1; i++)
+                {
+                    Vector2 p1 = points[i];
+                    Vector2 p2 = points[(i + 1) % points.Length];
+
+                    if (Math.Abs(p1.X - p2.X) < 1f)
+                    {
+                        continue;
+                    }
+
+                    if (p1.X > p2.X)
+                    {
+                        var temp = p1;
+                        p1 = p2;
+                        p2 = temp;
+                    }
+
+                    float playerX = collider.Center.X;
+
+                    if (playerX >= p1.X && playerX <= p2.X)
+                    {
+                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                        float yOnSlope = p1.Y + slope * (playerX - p1.X);
+
+                        float playerBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
+
+                        if (playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             return false;
         }
-
 
         public void Move(Vector2 direction)
         {
@@ -131,11 +173,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Flip sprite baseret på direction
             if(direction.X < 0)
             {
-                spriteRenderer.Effects = SpriteEffects.FlipHorizontally;
+                spriteRenderer.SetEffects(SpriteEffects.FlipHorizontally);
             } 
             else if(direction.X > 0)
             {
-                spriteRenderer.Effects = SpriteEffects.None;
+                spriteRenderer.SetEffects(SpriteEffects.None);
             }
 
             Vector2 originalPosition = GameObject.Transform.Position;
@@ -144,18 +186,66 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //AABB
             var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool collision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            bool rectangleCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
+            bool snappedToSlope = false;
 
-            if(collision == true)
+            if(rectangleCollision == true && polygonCollision == false)
             {
                 GameObject.Transform.Position = originalPosition;
             }
-            else
+            
+            if(polygonCollision == true)
             {
-                if (isAttacking == false && Grounded == true)
+                foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
                 {
-                    animator.PlayAnimation("Run");
+                    var points = polygon.Vertices;
+
+                    for (int i = 0; i < points.Length - 1; i++)
+                    {
+                        Vector2 p1 = points[i];
+                        Vector2 p2 = points[(i + 1) % points.Length];
+
+                        if(Math.Abs(p1.X - p2.X) < 1f)
+                        {
+                            continue;
+                        }
+
+                        if (p1.X > p2.X)
+                        {
+                            var temp = p1;
+                            p1 = p2;
+                            p2 = temp;
+                        }
+
+                        float playerX = playerCollider.Center.X;
+
+                        if(playerX >= p1.X && playerX <= p2.X)
+                        {
+                            float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                            float yOnSlope = p1.Y + slope * (playerX - p1.X);
+
+                            float playerBottom = GameObject.Transform.Position.Y + playerCollider.Height / 2f;
+
+                            if(playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
+                            {
+                                GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, yOnSlope - playerCollider.Height / 2f);
+                                snappedToSlope = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(snappedToSlope == true)
+                    {
+                        break;
+                    }
                 }
+            }
+
+            if (isAttacking == false && Grounded == true)
+            {
+                animator.PlayAnimation("Run");
             }
         }
 
