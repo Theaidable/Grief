@@ -303,6 +303,13 @@
 /processorParam:TextureFormat=Color
 /build:Enemies/Skeleton/Walk/Walk04.png
 
+#begin Fonts/Default.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Default.spritefont
+
 #begin MainCharacter/Attack/Attack01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -902,6 +909,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:MainCharacter/Walk/Walk04.png
+
+#begin NPCs/Portraits/PortraitMom.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:NPCs/Portraits/PortraitMom.png
 
 #begin TileMaps/Assets/Character/Character_Sheet.png
 /importer:TextureImporter

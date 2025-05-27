@@ -328,8 +328,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 isInteracting = true;
 
-                //hvis det er en NPC
-                //kald npc.Interaction
+                var nearbyNpc = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                    .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
+                    && gameObject.GetComponent<NpcComponent>() != null);
+
+                if (nearbyNpc != null)
+                {
+                    Debug.WriteLine("Calling interaction on NPC...");
+                    nearbyNpc.GetComponent<NpcComponent>().Interaction();
+                }
+                else
+                {
+                    Debug.WriteLine("No nearby NPC found!");
+                }
+
+                cooldownTimer = interactionCooldown;
             }
         }
 

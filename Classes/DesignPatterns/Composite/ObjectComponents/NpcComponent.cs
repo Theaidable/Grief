@@ -1,9 +1,13 @@
 ﻿using Greif;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.Dialog;
+using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -14,6 +18,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Vector2 velocity;
         private float gravity = 600f;
         private bool grounded;
+
+        public string Name { get; set; }
+        public List<string> DialogLines { get; set; }
+        public Quest QuestToGive { get; set; }
+        public Texture2D Portrait { get; set; }
 
         public NpcComponent(GameObject gameObject) : base(gameObject) { }
 
@@ -106,9 +115,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Interaction()
         {
-            //Her kan vi skrive koden for hvad der skal ske når spilleren interacter med en NPC
+            Debug.WriteLine($"Interacting with {Name}. Dialog count: {DialogLines?.Count}");
 
-            //Vis dialog
+            DialogSystem dialog = GameWorld.Instance.Dialog;
+            dialog.StartDialog(DialogLines, Portrait, accepted =>
+            {
+                if (accepted == true)
+                {
+                    //Giv quest
+                }
+            });
         }
 
         private void AddAnimations()

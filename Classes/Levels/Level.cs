@@ -82,9 +82,6 @@ namespace Grief.Classes.Levels
                     //Her kan vi lave koden til en main menu
                     break;
                 case "GriefMap1":
-
-                    AddGameObject(CreatePlayer(new Vector2(100,175)));
-
                     //Tilføj enemy
                     GameObject enemyObject = EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1);
                     EnemyComponent enemyComp = enemyObject.GetComponent<EnemyComponent>();
@@ -99,14 +96,18 @@ namespace Grief.Classes.Levels
                     //Tilføj en NPC i spillet
                     AddGameObject(CreateNPC(
                         new Vector2(80, 175),
-                        "Mor",
+                        "Mom",
                         new List<string>
                         {
-                            "Have you seen my daughter?",
-                            "I know she is somewhere around here...",
-                            "Can you help me find her?"
+                            "Have you seen my granddaughter?",
+                            "She should be around here...",
+                            "NAME!!!", 
+                            "Could you help me find her?"
                         },
                         new Quest()));
+
+
+                    AddGameObject(CreatePlayer(new Vector2(100, 175)));
 
                     //Vi kan tilføje flere GameObjects i Level 1 her
                     break;
@@ -127,12 +128,12 @@ namespace Grief.Classes.Levels
         {
             NpcBuilder npcBuilder = new NpcBuilder();
             GameObjectDirector director = new GameObjectDirector(npcBuilder);
-            var npc = director.Construct($"{name}");
             npcBuilder.SetPosition(position);
             npcBuilder.SetName(name);
             npcBuilder.SetDialog(dialog);
             npcBuilder.SetQuest(quest);
             npcBuilder.AddScriptComponent<NpcComponent>();
+            var npc = director.Construct($"{name}");
             return npc;
         }
 
