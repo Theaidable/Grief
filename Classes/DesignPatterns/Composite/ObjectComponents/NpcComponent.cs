@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -24,6 +25,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public string Name { get; set; }
         public List<string> DialogLines { get; set; }
+
         public Quest QuestToGive { get; set; }
         public Texture2D Portrait { get; set; }
 
@@ -121,13 +123,44 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Debug.WriteLine($"Interacting with {Name}. Dialog count: {DialogLines?.Count}");
 
             DialogSystem dialog = GameWorld.Instance.Dialog;
-            dialog.StartDialog(DialogLines, Portrait, accepted =>
+            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
+            var inventory = player?.GetComponent<InventoryComponent>();
+
+            if(QuestToGive != null)
             {
-                if (accepted == true)
+                if (QuestToGive.IsCompleted)
                 {
-                    //Giv quest
+                    dialog.StartDialog(new List<string> { "Thank you for your help!"}, Portrait);
+                    return;
                 }
-            });
+
+                if (QuestToGive.IsAccepted)
+                {
+                    if (QuestToGive.CanComplete(inventory))
+                    {
+                        QuestToGive.GrantReward(inventory);
+                        QuestToGive.Complete();
+
+                        dialog.StartDialog(new List<string> { "Thank you so much!"}, Portrait);
+                        return;
+                    }
+
+                    dialog.StartDialog(new List<string> { "Please find it and brint it to me"}, Portrait);
+                    return;
+                }
+
+                dialog.StartDialog(DialogLines, Portrait, accepted =>
+                {
+                    if (accepted == true)
+                    {
+                        QuestToGive.Accept();
+                    }
+                });
+
+                return;
+            }
+
+            dialog.StartDialog(new List<string> { "Hello" }, Portrait);
         }
 
         private void AddAnimations()

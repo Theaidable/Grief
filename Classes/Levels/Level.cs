@@ -93,7 +93,7 @@ namespace Grief.Classes.Levels
                     {
                         AddGameObject(enemy);
                     }
-                    
+
                     //Tilføj en NPC i spillet
                     AddGameObject(CreateNPC(
                         new Vector2(80, 175),
@@ -102,10 +102,17 @@ namespace Grief.Classes.Levels
                         {
                             "Have you seen my daughter?",
                             "She should be around here...",
-                            "   NAME!!!", 
+                            "   NAME!!!",
                             "Could you help me find her?"
                         },
-                        new Quest()));
+                        new FetchQuest
+                        (
+                            "Look for his Daughter",
+                            "Look for my daughter and bring her back to me",
+                            "Doll",
+                            new StoryItem("DiaryPage #1")
+                        )
+                        ));
 
 
                     AddGameObject(CreatePlayer(new Vector2(100, 175)));

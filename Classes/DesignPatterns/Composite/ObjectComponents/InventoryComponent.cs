@@ -42,6 +42,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             items.Add(item);
         }
 
+        public bool HasItemByName(string name)
+        {
+            return items.Any(i => i.DisplayName == name);
+        }
+
+        public void RemoveItemByName(string name)
+        {
+            var item = items.FirstOrDefault(i => i.DisplayName == name);
+
+            if(item != null)
+            {
+                items.Remove(item);
+            }
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             //Desired størrelse af baggrunden for Inventory
