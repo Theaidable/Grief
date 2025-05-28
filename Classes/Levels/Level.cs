@@ -105,6 +105,18 @@ namespace Grief.Classes.Levels
                             "   NAME!!!",
                             "Could you help me find her?"
                         },
+                        new List<string>
+                        {
+                            "Please find her"
+                        },
+                        new List<string>
+                        {
+                            "Thank you so much"
+                        },
+                        new List<string>
+                        {
+                            "There, there, pappa is here now"
+                        },
                         new FetchQuest
                         (
                             "Look for his Daughter",
@@ -133,13 +145,13 @@ namespace Grief.Classes.Levels
             return player;
         }
 
-        private GameObject CreateNPC(Vector2 position, string name, List<string> dialog, Quest quest = null)
+        private GameObject CreateNPC(Vector2 position, string name, List<string> dialogBeforeAccept, List<string> dialogAfterAcceptNotCompleted, List<string> dialogOnCompleted, List<string> dialogAlreadyCompleted, Quest quest = null)
         {
             NpcBuilder npcBuilder = new NpcBuilder();
             GameObjectDirector director = new GameObjectDirector(npcBuilder);
             npcBuilder.SetPosition(position);
             npcBuilder.SetName(name);
-            npcBuilder.SetDialog(dialog);
+            npcBuilder.SetDialog(dialogBeforeAccept,dialogAfterAcceptNotCompleted,dialogOnCompleted, dialogAlreadyCompleted);
             npcBuilder.SetQuest(quest);
             npcBuilder.AddScriptComponent<NpcComponent>();
             var npc = director.Construct($"{name}");

@@ -24,7 +24,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] happyDadFrames;
 
         public string Name { get; set; }
-        public List<string> DialogLines { get; set; }
+        public List<string> DialogLinesBeforeAccept { get; set; }
+        public List<string> DialogLinesAcceptedNotCompleted { get; set; }
+        public List<string> DialogLinesOnCompleted { get; set; }
+        public List<string> DialogLinesAlreadyCompleted { get; set; }
 
         public Quest QuestToGive { get; set; }
         public Texture2D Portrait { get; set; }
@@ -120,7 +123,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Interaction()
         {
-            Debug.WriteLine($"Interacting with {Name}. Dialog count: {DialogLines?.Count}");
+            Debug.WriteLine($"Interacting with {Name}. Dialog count: {DialogLinesBeforeAccept?.Count}");
 
             DialogSystem dialog = GameWorld.Instance.Dialog;
             var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
@@ -130,7 +133,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 if (QuestToGive.IsCompleted)
                 {
-                    dialog.StartDialog(new List<string> { "Thank you for your help!"}, Portrait);
+                    dialog.StartDialog(DialogLinesAlreadyCompleted, Portrait);
                     return;
                 }
 
@@ -141,15 +144,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         QuestToGive.GrantReward(inventory);
                         QuestToGive.Complete();
 
-                        dialog.StartDialog(new List<string> { "Thank you so much!"}, Portrait);
+                        dialog.StartDialog(DialogLinesOnCompleted, Portrait);
                         return;
                     }
 
-                    dialog.StartDialog(new List<string> { "Please find it and brint it to me"}, Portrait);
+                    dialog.StartDialog(DialogLinesAcceptedNotCompleted, Portrait);
                     return;
                 }
 
-                dialog.StartDialog(DialogLines, Portrait, accepted =>
+                dialog.StartDialog(DialogLinesBeforeAccept, Portrait, accepted =>
                 {
                     if (accepted == true)
                     {
@@ -159,8 +162,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                 return;
             }
-
-            dialog.StartDialog(new List<string> { "Hello" }, Portrait);
         }
 
         private void AddAnimations()
