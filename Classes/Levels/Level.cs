@@ -145,7 +145,7 @@ namespace Grief.Classes.Levels
             return player;
         }
 
-        private GameObject CreateNPC(Vector2 position, string name, List<string> dialogBeforeAccept, List<string> dialogAfterAcceptNotCompleted, List<string> dialogOnCompleted, List<string> dialogAlreadyCompleted, Quest quest = null)
+        private GameObject CreateNPC(Vector2 position, string name, List<string> dialogBeforeAccept = null, List<string> dialogAfterAcceptNotCompleted = null, List<string> dialogOnCompleted = null, List<string> dialogAlreadyCompleted = null, Quest quest = null)
         {
             NpcBuilder npcBuilder = new NpcBuilder();
             GameObjectDirector director = new GameObjectDirector(npcBuilder);
