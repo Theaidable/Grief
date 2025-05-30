@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Grief.Classes.DesignPatterns.Command
 {
+    /// <summary>
+    /// Enumaration til de forskellige knapper på musen
+    /// </summary>
     public enum MouseButton
     {
         Left,
@@ -10,11 +13,15 @@ namespace Grief.Classes.DesignPatterns.Command
         Middle
     }
 
+    /// <summary>
+    /// Styrecenter for spillerens inputs
+    /// </summary>
     public class InputHandler
     {
+        /// <summary>
+        /// Singleton
+        /// </summary>
         private static InputHandler instance;
-
-
         public static InputHandler Instance
         {
             get
@@ -26,34 +33,65 @@ namespace Grief.Classes.DesignPatterns.Command
                 return instance;
             }
         }
+
+        /// <summary>
+        /// private constructor
+        /// </summary>
         private InputHandler() { }
 
+        //Dictionaries
         private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
         private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
         private Dictionary<Keys, ICommand> keybindsButtonUp = new Dictionary<Keys, ICommand>();
-        private KeyboardState previousKeyState;
         private Dictionary<MouseButton, ICommand> mouseButtonDownBinds = new();
+        
+        //Previousstates
+        private KeyboardState previousKeyState;
         private MouseState previousMouseState;
 
+        /// <summary>
+        /// Tilføje en update command - Handling som køres kontinuert mens knap holdes nede
+        /// </summary>
+        /// <param name="inputKey"></param>
+        /// <param name="command"></param>
         public void AddUpdateCommand(Keys inputKey, ICommand command)
         {
             keybindsUpdate.Add(inputKey, command);
         }
+
+        /// <summary>
+        /// Tilføje en buttondown command - Handling som udføres 1 gang når man klikker på en knap
+        /// </summary>
+        /// <param name="inputKey"></param>
+        /// <param name="command"></param>
         public void AddButtonDownCommand(Keys inputKey, ICommand command)
         {
             keybindsButtonDown.Add(inputKey, command);
         }
 
+        /// <summary>
+        /// Tilføje en buttonup command - Handling som udføres 1 gang når man slipper en knap
+        /// </summary>
+        /// <param name="inputKey"></param>
+        /// <param name="command"></param>
         public void AddButtonUpCommand(Keys inputKey, ICommand command)
         {
             keybindsButtonUp.Add(inputKey, command);
         }
 
+        /// <summary>
+        /// Tilføj en mouseclick command - Handling som udføres når man klikker med musen
+        /// </summary>
+        /// <param name="button"></param>
+        /// <param name="command"></param>
         public void AddMouseButtonDownCommand(MouseButton button, ICommand command)
         {
             mouseButtonDownBinds[button] = command;
         }
 
+        /// <summary>
+        /// Eksekvere commanden
+        /// </summary>
         public void Execute()
         {
             KeyboardState keyState = Keyboard.GetState();

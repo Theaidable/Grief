@@ -1,18 +1,11 @@
 ﻿using Greif.Classes.Cameras;
-using Grief.Classes.DesignPatterns.Builder;
-using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
-using Grief.Classes.DesignPatterns.Composite;
-using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.Dialog;
 using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Greif
 {
@@ -44,17 +37,24 @@ namespace Greif
             }
         }
 
+        /// <summary>
+        /// Private constructor
+        /// </summary>
         private GameWorld()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
+            //Sæt vinduestørrelse
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;
             _graphics.ApplyChanges();
         }
 
+        /// <summary>
+        /// Initaliaze
+        /// </summary>
         protected override void Initialize()
         {
             //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
@@ -68,6 +68,9 @@ namespace Greif
             base.Initialize();
         }
 
+        /// <summary>
+        /// Load
+        /// </summary>
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -77,6 +80,10 @@ namespace Greif
             DefaultFont = Content.Load<SpriteFont>("Fonts/Default");
         }
 
+        /// <summary>
+        /// Opdatering af GameWorld
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -94,6 +101,10 @@ namespace Greif
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// Draw alt i GameWorld
+        /// </summary>
+        /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);

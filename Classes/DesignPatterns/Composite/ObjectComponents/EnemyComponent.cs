@@ -1,7 +1,7 @@
-﻿using Greif;
+﻿using Autofac.Core.Activators.Reflection;
+using Greif;
 using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
@@ -9,17 +9,14 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
     public class EnemyComponent : Component
     {
+        //Fields
         private bool isHurt;
         private float attackCooldown = 1f;
         private float cooldownTimer = 0f;
@@ -47,6 +44,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private readonly object pathLock = new object();
         private float RecalculatePathTimer = 0f;
 
+        //Properties
         public int EnemyHealth { get; private set; }
         public int EnemyDamage { get; private set; }
         public float EnemySpeed { get; private set; }
@@ -56,8 +54,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         
         public List<Vector2> PatrolPoints { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public EnemyComponent(GameObject gameObject) : base(gameObject) { }
 
+        /// <summary>
+        /// Tilføj vigtige elementer når spillet startes
+        /// </summary>
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
@@ -66,6 +71,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.PlayAnimation("Idle");
         }
 
+        /// <summary>
+        /// Sæt en enemies stats
+        /// </summary>
+        /// <param name="stats"></param>
         public void SetStats(EnemyStats stats)
         {
             EnemyHealth = stats.Health;
@@ -82,60 +91,75 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Styrer in-game logik
+        /// </summary>
         public override void Update()
         {
+            //Opdatere cooldownTimeren
             if (cooldownTimer > 0)
             {
                 cooldownTimer -= GameWorld.Instance.DeltaTime;
             }
 
+            //Hvis man ikke er på jorden, så tilføjes gravity
             if (grounded == false)
             {
                 velocity.Y += gravity * GameWorld.Instance.DeltaTime;
             }
 
+            //Hvis enemy angriber, så stopper den sine andre handlinger
             if(isAttacking == true)
             {
                 return;
             }
 
+            //Sæt positionen / opdatere positionen
             Vector2 originalPosition = GameObject.Transform.Position;
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
+
+            //Sæt grounded
             grounded = CheckGrounded();
 
+            //Hvis man rammer jorden, så resettes ens velocity på y-aksen - Man stopper med at falde
             if (grounded == true && velocity.Y > 0)
             {
                 velocity.Y = 0;
             }
+            //Hvis den ikke står på jorden, så afspilles en animation
             else if (grounded == false)
             {
-                animator.PlayAnimation("Idle"); //Her kunn man lave en jump/fall animation
+                animator.PlayAnimation("Idle"); //Her kunn man lave en jump/fall animation - dog har vi ikke sprites til det
             }
 
+            //Kør enemys logik så længe de er på jorden, ikke tager skade og har mere end 0 liv
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
 
+                //Hvis player er inde for detection range, så begynder fjenden at jagte spilleren
                 if (PlayerIsWithInDetectionRange() == true)
                 {
                     Pursue();
-                    //Debug.WriteLine("Pursue has started");
 
-
+                    //Hvis spilleren kommer inden for attack range, så angriber fjenden
                     if (PlayerIsWithInAttackRange() == true)
                     {
                         Attack();
-                        //Debug.WriteLine("Attack");
                     }
                 }
-                else
+                //Ellers patroljere fjenden
+                else 
                 {
                     path.Clear();
                     Patrol();
-                    //Debug.WriteLine("Patrol");
                 }
             }
         }
 
+        /// <summary>
+        /// Hjælpe metode som bruges til at finde ud af om enemies er på jorden
+        /// </summary>
+        /// <returns></returns>
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
@@ -196,19 +220,24 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return false;
         }
 
+        /// <summary>
+        /// Metode til at patroljere mellem to punkter
+        /// </summary>
         public void Patrol()
         {
-            //Fejl kontrol
+            //Hvis ikke der er nogen punkter, så står den idle
             if (PatrolPoints == null || PatrolPoints.Count < 2)
             {
                 animator.PlayAnimation("Idle");
                 return;
             }
 
+            //Finde punkt man skal gå hen til, ens position og udregne retningen
             Vector2 target = PatrolPoints[currentPatrolIndex];
             Vector2 position = GameObject.Transform.Position;
             Vector2 direction = target - position;
 
+            //Hvis man kommer tæt på punktet, så fortsætter man videre til næste pinkt
             if(direction.Length() < 4f)
             {
                 if(patrolForward == true)
@@ -234,26 +263,41 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 direction = target - position;
             }
 
+            //Sæt dens speed til 40
             EnemySpeed = 40;
+
+            //Bevæg fjenden
             direction.Normalize();
             Move(direction);
         }
 
+        /// <summary>
+        /// Metode til at jagte spilleren
+        /// </summary>
         public void Pursue()
         {
+            //Level
             var level = GameWorld.Instance.LevelManager.CurrentLevel;
+
+            //Find spilleren
             var player = level.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
+            //Hvis ikke der er nogen player, så skal man ikke kunne jagte
             if(player == null)
             {
                 return;
             }
 
+            //Start position
             Point start = new Point((int)(GameObject.Transform.Position.X / level.Map.TileWidth), (int)(GameObject.Transform.Position.Y / level.Map.TileHeight));
+
+            //Goal position
             Point goal = new Point((int)(player.Transform.Position.X / level.Map.TileWidth), (int)(player.Transform.Position.Y / level.Map.TileHeight));
 
+            //Find en sti
             if (path == null || path.Count == 0 || RecalculatePathTimer <= 0f)
             {
+                //Udregn stien i en baggrundstråd
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
                     var newPath = astar.FindPath(start, goal);
@@ -261,22 +305,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     lock (pathLock)
                     {
                         path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth/2, GameObject.Transform.Position.Y)).ToList();
-
-                        /*
-                        foreach (var t in newPath)
-                        {
-                            var worldX = t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2;
-                            var worldY = GameObject.Transform.Position.Y;
-
-                            Debug.WriteLine($"Tile {t.Position} → World ({worldX}, {worldY})");
-                        }
-                        */
                     }
                 });
                  
                 RecalculatePathTimer = 1f;
             }
 
+            //Gå hen ad stien
             lock (pathLock)
             {
                 if (path != null && path.Count > 0)
@@ -284,31 +319,26 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     Vector2 next = path[0];
                     Vector2 direction = next - GameObject.Transform.Position;
 
-                    //Debug.WriteLine($"Next point: {next}");
-                    //Debug.WriteLine($"Current position: {GameObject.Transform.Position}");
-                    //Debug.WriteLine($"Direction: {direction} (Length: {direction.Length()})");
-
                     if (direction.Length() < 4f)
                     {
-                        //Debug.WriteLine("Too close to next point, removing from path.");
                         path.RemoveAt(0);
                     }
                     else
                     {
-                        //Debug.WriteLine("Moving towards next point.");
                         EnemySpeed = 60;
                         direction.Normalize();
                         Move(direction);
                     }
                 }
-                else
-                {
-                    //Debug.WriteLine("No valid path.");
-                }
             }
 
             RecalculatePathTimer -= GameWorld.Instance.DeltaTime;
         }
+
+        /// <summary>
+        /// Metode til at bevæge fjenden
+        /// </summary>
+        /// <param name="direction"></param>
         private void Move(Vector2 direction)
         {
             //Flip sprite baseret på direction
@@ -326,19 +356,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
             GameObject.Transform.Translate(movement);
 
-            //Debug.WriteLine($"Trying to move: {movement}, from {originalPosition} to {GameObject.Transform.Position}");
-
             //AABB
             var enemyCollider = GameObject.GetComponent<Collider>().CollisionBox;
             bool rectCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
             bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
             bool snappedToSlope = false;
 
-            //Debug.WriteLine($"Collision detected? {collision}");
-
             if (rectCollision == true && polygonCollision == false)
             {
-                //Debug.WriteLine("Collision — reverting to original position.");
                 GameObject.Transform.Position = originalPosition;
             }
 
@@ -397,6 +422,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         }
 
+        /// <summary>
+        /// Hjælpemetode til at beregne om spilleren er inde for detection range
+        /// </summary>
+        /// <returns></returns>
         private bool PlayerIsWithInDetectionRange()
         {
             var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
@@ -410,20 +439,28 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return distance <= EnemyDetectionRange;
         }
 
+        /// <summary>
+        /// Metode til at angribe
+        /// </summary>
         public void Attack()
         {
+            //Man kan ikke angribe mens man er igang med at angribe
             if(isAttacking == true)
             {
                 return;
             }
 
+            //Udfør et angreb
             if(cooldownTimer <= 0f)
             {
+                //Sæt attacking til true
                 isAttacking = true;
 
+                //Afspil animation
                 animator.PlayAnimation("Attack");
                 animator.ClearOnAnimationComplete();
 
+                //Når animationen er færdig, tjek om angreb rammer spilleren
                 animator.OnAnimationComplete = () =>
                 {
                     var enemyCollider = GameObject.GetComponent<Collider>();
@@ -448,6 +485,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         .Any(pr => playerCollider.PixelPerfectRectangles
                         .Any(er => pr.Rectangle.Intersects(er.Rectangle)));
 
+                        //Hvis man rammer spilleren, så tager spilleren skade
                         if (hit == true)
                         {
                             player.TakeDamage(EnemyDamage);
@@ -463,6 +501,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Hjælpemetode til at finde ud af om spilleren er inde for attacking range
+        /// </summary>
+        /// <returns></returns>
         private bool PlayerIsWithInAttackRange()
         {
             var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
@@ -472,11 +514,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 return false;
             }
 
-
             var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
             return distance <= EnemyAttackRange;
         }
 
+        /// <summary>
+        /// Metode til at tage skade
+        /// </summary>
+        /// <param name="amount"></param>
         public void TakeDamage(int amount)
         {
             EnemyHealth -= amount;
@@ -500,19 +545,28 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 
                 if(droppedItem != null)
                 {
+                    //Midligertidig måde for at tilføje en item til inventory
                     DropItem(droppedItem);
+
                     //Tilføj denne linje når der findes en sprite for item i verdenen
                     //GameWorld.Instance.LevelManager.CurrentLevel.AddGameObject(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position));
                 }
             }
         }
 
+        /// <summary>
+        /// Hjælpemetode til at sætte sætte hvilket item der skal droppes
+        /// </summary>
+        /// <param name="item"></param>
         public void SetDropItem(Item item)
         {
             droppedItem = item;
         }
 
-        //Denne metode skal fjernes hvis man gerne vil spawne items i verdenen
+        /// <summary>
+        /// Tilføjer direkte et item til spillerens inventory (spawner det ikke i verdenen)
+        /// </summary>
+        /// <param name="item"></param>
         private void DropItem(Item item)
         {
             GameObject playerObject = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.GetComponent<PlayerComponent>() != null);
@@ -532,6 +586,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             inventory.AddItemToInventory(item);
         }
 
+        /// <summary>
+        /// Tilføj animationer til enemy
+        /// </summary>
         private void AddAnimations()
         {
             idleFrames = LoadFrames("Enemies/Skeleton/Idle/Idle", 4);
@@ -549,6 +606,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
         }
 
+        /// <summary>
+        /// Hjælpemetode til at indlæse Texture2D arrays
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
         private Texture2D[] LoadFrames(string basePath, int frameCount)
         {
             Texture2D[] frames = new Texture2D[frameCount];

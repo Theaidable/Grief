@@ -9,8 +9,12 @@ using System.Diagnostics;
 
 namespace Grief.Classes.Dialog
 {
+    /// <summary>
+    /// System for dialog
+    /// </summary>
     public class DialogSystem
     {
+        //Fields
         private Queue<string> currentLines;
         private Texture2D npcPortrait;
         private string currentLine;
@@ -18,16 +22,22 @@ namespace Grief.Classes.Dialog
         private bool wasEnterPressed;
         private bool awaitingResponse;
 
+        //Properties
         public bool IsActive { get; private set; }
 
+        /// <summary>
+        /// Start dialog
+        /// </summary>
+        /// <param name="lines"></param> Linjer
+        /// <param name="portrait"></param> Billede
+        /// <param name="onFinished"></param> Hvad der sker når man er færdig
         public void StartDialog(List<string> lines, Texture2D portrait, Action<bool> onFinished = null)
         {
+            //His ikke der er nogle dialog lines, så sker der ingenting
             if(lines == null || lines.Count == 0)
             {
                 return;
             }
-
-            Debug.WriteLine($"Starting dialog with {lines.Count} lines.");
 
             currentLines = new Queue<string>(lines);
             npcPortrait = portrait;
@@ -36,23 +46,29 @@ namespace Grief.Classes.Dialog
             NextLine();
         }
 
+        /// <summary>
+        /// Logikken for dialog
+        /// </summary>
         public void Update()
         {
 
             if(IsActive == true)
             {
+                //Hvis der ventes på svar
                 if (awaitingResponse == true)
                 {
                     if (Keyboard.GetState().IsKeyDown(Keys.Y))
                     {
                         awaitingResponse = false;
                         IsActive = false;
+                        //Quest accepteres
                         onDialogFinished?.Invoke(true);
                     }
                     else if (Keyboard.GetState().IsKeyDown(Keys.N))
                     {
                         awaitingResponse = false;
                         IsActive = false;
+                        //Quests declines
                         onDialogFinished?.Invoke(false);
                     }
                 }
@@ -84,11 +100,18 @@ namespace Grief.Classes.Dialog
             }
         }
 
+        /// <summary>
+        /// Hjælpemetode til at køre næste linje
+        /// </summary>
         private void NextLine()
         {
             currentLine = currentLines.Dequeue();
         }
 
+        /// <summary>
+        /// Tegn dialogboks, portræt af den som snakker samt dialog
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             if(IsActive == true)

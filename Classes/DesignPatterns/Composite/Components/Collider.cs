@@ -7,12 +7,15 @@ using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
+    /// <summary>
+    /// Collider component
+    /// </summary>
     public class Collider : Component
     {
+        //Fields
         private SpriteRenderer spriteRenderer;
         private bool shouldDraw;
         private Lazy<List<RectangleData>> pixelPerfectRectangles;
-
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles.Value; }
         public Point ColliderSize { get; set; } = Point.Zero;
 
@@ -33,6 +36,10 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             }
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public Collider(GameObject gameObject) : base(gameObject) { }
 
         /// <summary>

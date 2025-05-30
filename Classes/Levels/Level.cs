@@ -22,11 +22,16 @@ using System.Linq;
 
 namespace Grief.Classes.Levels
 {
+    /// <summary>
+    /// Oprettelse af spillets levels
+    /// </summary>
     public class Level
     {
+        //Fields
         private TiledMapRenderer mapRenderer;
         private List<GameObject> enemies = new List<GameObject>();
 
+        //Properties
         public TiledMap Map { get; private set; }
         public Dictionary<Point,Tile> TileDictionary { get; private set; }
         public AStar PathFinder { get; private set; }
@@ -38,6 +43,10 @@ namespace Grief.Classes.Levels
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
         public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
 
+        /// <summary>
+        /// Metode til at indlæse et bestemt level gennem en switch case
+        /// </summary>
+        /// <param name="levelName"></param>
         public void Load(string levelName)
         {
             Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
@@ -46,7 +55,10 @@ namespace Grief.Classes.Levels
             MapWidth = Map.WidthInPixels;
             MapHeight = Map.HeightInPixels;
 
+            //Layer for collisions
             var objectLayer = Map.GetLayer<TiledMapObjectLayer>("CollisionObjects");
+
+            //Rectangle collision objects
             foreach (var rectangleObject in objectLayer.Objects.OfType<TiledMapRectangleObject>())
             {
                 CollisionRectangles.Add(new Rectangle(
@@ -56,6 +68,7 @@ namespace Grief.Classes.Levels
                 (int)rectangleObject.Size.Height));
             }
 
+            //Polygon collision objects for slopes
             foreach(var polygonObject in objectLayer.Objects.OfType<TiledMapPolygonObject>())
             {
                 var points = polygonObject.Points.Select(p => new Vector2(polygonObject.Position.X + p.X, polygonObject.Position.Y + p.Y)).ToArray();
@@ -63,6 +76,7 @@ namespace Grief.Classes.Levels
                 CollisionPolygons.Add(new Polygon(points));
             }
 
+            //Oprettelse af walkable tiles til algoritmen
             Dictionary<Point, Tile> tiles = new Dictionary<Point, Tile>();
             for (int y = 0; y < Map.Height; y++)
             {
@@ -78,14 +92,15 @@ namespace Grief.Classes.Levels
             TileDictionary = tiles;
             PathFinder = new AStar(tiles);
 
+            //Switch case som opretter det bestemte level
             switch (levelName)
             {
                 case "Level0":
                     //Her kan vi lave koden til en main menu
                     break;
                 case "GriefMap1":
-                    //Tilføj enemy
-
+                    
+                    //Tilføj enemies
                     enemies.Add(EnemyFactory.Instance.Create(new Vector2(500, 150), EnemyType.Enemy1, new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) }));
                     enemies.Add(EnemyFactory.Instance.Create(new Vector2(1325, 150), EnemyType.Enemy1, null, new QuestItem("Doll")));
 
@@ -126,14 +141,17 @@ namespace Grief.Classes.Levels
                         )
                         ));
 
-
+                    //Tilføj player
                     AddGameObject(CreatePlayer(new Vector2(100, 175)));
-
-                    //Vi kan tilføje flere GameObjects i Level 1 her
                     break;
             }
         }
 
+        /// <summary>
+        /// Hjælpe metode til oprettelse af player
+        /// </summary>
+        /// <param name="position"></param> Position
+        /// <returns></returns>
         private GameObject CreatePlayer(Vector2 position)
         {
             PlayerBuilder playerBuilder = new PlayerBuilder();
@@ -145,6 +163,17 @@ namespace Grief.Classes.Levels
             return player;
         }
 
+        /// <summary>
+        /// Hjælpemetode til oprettelse af NPC
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="name"></param>
+        /// <param name="dialogBeforeAccept"></param> 
+        /// <param name="dialogAfterAcceptNotCompleted"></param>
+        /// <param name="dialogOnCompleted"></param>
+        /// <param name="dialogAlreadyCompleted"></param>
+        /// <param name="quest"></param>
+        /// <returns></returns>
         private GameObject CreateNPC(Vector2 position, string name, List<string> dialogBeforeAccept = null, List<string> dialogAfterAcceptNotCompleted = null, List<string> dialogOnCompleted = null, List<string> dialogAlreadyCompleted = null, Quest quest = null)
         {
             NpcBuilder npcBuilder = new NpcBuilder();
@@ -158,6 +187,10 @@ namespace Grief.Classes.Levels
             return npc;
         }
 
+        /// <summary>
+        /// Hjælpemetode til at tilføje et objekt i levelet
+        /// </summary>
+        /// <param name="gameObject"></param>
         public void AddGameObject(GameObject gameObject)
         {
             GameObjects.Add(gameObject);
@@ -165,11 +198,19 @@ namespace Grief.Classes.Levels
             gameObject.Start();
         }
 
+        /// <summary>
+        /// Hjælpemetode til at fjerne et objekt i spillet
+        /// </summary>
+        /// <param name="gameObject"></param>
         public void QueueRemove(GameObject gameObject)
         {
             objectsToRemove.Add(gameObject);
         }
 
+        /// <summary>
+        /// Opdatere alle objekter i spillet, og sørg for at objekter fjernes korrekt
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             mapRenderer.Update(gameTime);
@@ -186,14 +227,21 @@ namespace Grief.Classes.Levels
             objectsToRemove.Clear();
 
 
+            //Find player
             var player = GameObjects.FirstOrDefault(g => g.Tag == "Player");
 
+            //Follow player med camera
             if (player != null)
             {
                 GameWorld.Instance.Camera.Follow(player, MapWidth, MapHeight);
             }
         }
 
+        /// <summary>
+        /// Tegn alle objekter i spillet, og tegn inventory til sidst
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="viewMatrix"></param>
         public void Draw(SpriteBatch spriteBatch, Matrix viewMatrix)
         {
             mapRenderer.Draw(viewMatrix);

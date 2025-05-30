@@ -4,17 +4,30 @@ using System.Collections.Generic;
 
 namespace Grief.Classes.Algorithms
 {
+    /// <summary>
+    /// AStar algoritme for Pathfinding (bruges til enemies)
+    /// </summary>
     public class AStar
     {
         private Dictionary<Point, Tile> tiles;
         private readonly int[] directionsX = { 0, 1, 0, -1 };
         private readonly int[] directionsY = { -1, 0, 1, 0 };
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="tiles"></param>
         public AStar(Dictionary<Point, Tile> tiles)
         {
             this.tiles = tiles;
         }
 
+        /// <summary>
+        /// Beregner stien
+        /// </summary>
+        /// <param name="startPosition"></param>
+        /// <param name="goalPosition"></param>
+        /// <returns></returns>
         public List<Tile> FindPath(Point startPosition, Point goalPosition)
         {
             //Tjek om start/goal findes i dictionary
@@ -94,7 +107,12 @@ namespace Grief.Classes.Algorithms
             return new List<Tile>();
         }
 
-        //Heuriostic afstand mellem to tiles
+        /// <summary>
+        /// Hjælpemetode til at beregne Heuriostic afstand mellem to tiles
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private float Heuristic(Tile a, Tile b)
         {
             var distanceX = Math.Abs(a.Position.X - b.Position.X);
@@ -102,6 +120,12 @@ namespace Grief.Classes.Algorithms
             return distanceX + distanceY;
         }
 
+        /// <summary>
+        /// Hjælpemetode til finde cellen med den laveste F værdi
+        /// </summary>
+        /// <param name="openList"></param>
+        /// <param name="fCost"></param>
+        /// <returns></returns>
         private Tile GetCellWithLowestF(List<Tile> openList, Dictionary<Tile, float> fCost)
         {
             Tile best = openList[0];
@@ -121,6 +145,11 @@ namespace Grief.Classes.Algorithms
             return best;
         }
 
+        /// <summary>
+        /// Hjælpe metode til at finde cellens naboer
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <returns></returns>
         private List<Tile> GetNeighbors(Tile tile)
         {
             var result = new List<Tile>();
@@ -143,6 +172,12 @@ namespace Grief.Classes.Algorithms
             return result;
         }
 
+        /// <summary>
+        /// Metode rekonsturere stien, hvis man når sit mål
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="goal"></param>
+        /// <returns></returns>
         private List<Tile> ReconstructPath(Dictionary<Tile, Tile> parent, Tile goal)
         {
             var path = new List<Tile>();

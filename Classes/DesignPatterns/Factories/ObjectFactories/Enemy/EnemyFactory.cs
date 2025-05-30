@@ -1,31 +1,35 @@
-﻿using Greif;
-using Grief.Classes.DesignPatterns.Composite;
+﻿using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.Items;
-using Grief.Classes.Items.Items;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 
 namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 {
+    /// <summary>
+    /// Enumaration for de forskellige typer af enemies som skal eksistere i spillet
+    /// Navne lige nu er midlertidig og skal ændres til de rigtige typer
+    /// </summary>
     public enum EnemyType
     {
         Enemy1,
         Enemy2
     }
 
+    /// <summary>
+    /// EnemyFactory som bruges til oprettelse af enemies
+    /// </summary>
     public class EnemyFactory : Factory
     {
+        //Dicitionary til at sætte sprite til den bestemte type af enemy
         private static readonly Dictionary<EnemyType, string> enemySpriteNames = new Dictionary<EnemyType, string>()
         {
             { EnemyType.Enemy1, "Enemies/Skeleton/Idle/Idle01" },
             { EnemyType.Enemy2, "Enemies/Skeleton/Idle/Idle01" },
         };
 
+        //Dictionary til at sætte stats for enemies
         private static readonly Dictionary<EnemyType, EnemyStats> enemyStats = new Dictionary<EnemyType, EnemyStats>()
         {
             {EnemyType.Enemy1, new EnemyStats(100,40,50,150,15, new Point(15,49))},
@@ -46,13 +50,29 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             }
         }
 
+        /// <summary>
+        /// Private constructor
+        /// </summary>
         private EnemyFactory() { }
 
+        /// <summary>
+        /// Override metode til standard oprettelse af en fjende
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public override GameObject Create(Vector2 position)
         {
             return Create(position, EnemyType.Enemy1);
         }
 
+        /// <summary>
+        /// Metode til oprettelse af en enemy
+        /// </summary>
+        /// <param name="position"></param> Dens position
+        /// <param name="enemyType"></param> Type af enemy
+        /// <param name="patrolPoints"></param> om den skal have nogle punkter at patroljere mellem
+        /// <param name="item"></param> Om den skal kunne droppe et item
+        /// <returns></returns>
         public GameObject Create(Vector2 position, EnemyType enemyType, List<Vector2> patrolPoints = null, Item item = null)
         {
             GameObject enemyObject = new GameObject();

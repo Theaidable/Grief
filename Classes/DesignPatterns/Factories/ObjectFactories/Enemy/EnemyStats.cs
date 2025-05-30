@@ -2,6 +2,9 @@
 
 namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 {
+    /// <summary>
+    /// Hjælpe klasse til at give enemies forskellige stats
+    /// </summary>
     public class EnemyStats
     {
         public int Health { get; set; }
@@ -11,6 +14,15 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
         public int AttackRange { get; set; }
         public Point ColliderSize { get; set; }
 
+        /// <summary>
+        /// Construcotr
+        /// </summary>
+        /// <param name="health"></param> dens liv
+        /// <param name="damage"></param> dens skade
+        /// <param name="speed"></param> dens bevægelseshastighed
+        /// <param name="detectionRange"></param> detection range
+        /// <param name="attackRange"></param> attack range
+        /// <param name="colliderSize"></param> størrelsen på dens collider
         public EnemyStats(int health, int damage, float speed, int detectionRange, int attackRange, Point colliderSize)
         {
             Health = health;

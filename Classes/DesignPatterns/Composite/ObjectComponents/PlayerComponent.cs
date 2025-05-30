@@ -15,6 +15,9 @@ using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
+    /// <summary>
+    /// Player component
+    /// </summary>
     public class PlayerComponent : Component
     {
         //Private fields
@@ -56,6 +59,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public float Health { get; private set; }
         public float MovementSpeed { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
             Damage = 25;
@@ -63,6 +70,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             MovementSpeed = 100f;
         }
 
+        /// <summary>
+        /// Find komponenter og bind commands
+        /// </summary>
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
@@ -72,7 +82,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.PlayAnimation("Idle");
         }
 
-        
+        /// <summary>
+        /// Physics udregninger, som gør at spilleren kan falde
+        /// </summary>
         public override void Update()
         {
             if (cooldownTimer > 0)
@@ -109,6 +121,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Hjælpemetode til at tjekke om spilleren er på jorden
+        /// </summary>
+        /// <returns></returns>
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
@@ -169,6 +185,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return false;
         }
 
+        /// <summary>
+        /// Metode til at bevæge spilleren
+        /// </summary>
+        /// <param name="direction"></param>
         public void Move(Vector2 direction)
         {
             if(inventory.ShowInventory == true)
@@ -259,6 +279,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Metode til at sørge for at spilleren går tilbage til idle ved stop af bevægelse
+        /// </summary>
         public void Stop()
         {
             if(isAttacking == false && grounded == true)
@@ -267,6 +290,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at hoppe
+        /// </summary>
         public void Jump()
         {
             if (grounded == true && inventory.ShowInventory == false)
@@ -276,6 +302,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at angribe
+        /// </summary>
         public void Attack()
         {
             if (cooldownTimer <= 0f && inventory.ShowInventory == false)
@@ -323,11 +352,18 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Boolean som bruges til at finde ud af om man må angribe
+        /// </summary>
+        /// <returns></returns>
         public bool CanUseAttack()
         {
             return cooldownTimer <= 0f;
         }
 
+        /// <summary>
+        /// Spillerens interaction med andre objekter
+        /// </summary>
         public void Interact()
         {
             //Her skal vi skrive vores interaction kode med NPC og Items
@@ -340,31 +376,45 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
                     && gameObject.GetComponent<NpcComponent>() != null);
 
+                var nearbyItem = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                    .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
+                    && gameObject.GetComponent<ItemComponent> != null);
+
                 if (nearbyNpc != null)
                 {
-                    Debug.WriteLine("Calling interaction on NPC...");
                     nearbyNpc.GetComponent<NpcComponent>().Interaction();
                 }
-                else
+                else if(nearbyItem != null)
                 {
-                    Debug.WriteLine("No nearby NPC found!");
+                    nearbyItem.GetComponent<ItemComponent>().PickUpItem();
                 }
 
                 cooldownTimer = interactionCooldown;
             }
         }
 
+        /// <summary>
+        /// Metode til at finde ud af om spilleren kan interagere med et objekt
+        /// </summary>
+        /// <returns></returns>
         public bool CanInteract()
         {
             return cooldownTimer <= 0f;
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at tage skade
+        /// </summary>
+        /// <param name="amount"></param>
         public void TakeDamage(int amount)
         {
             Health -= amount;
 
         }
 
+        /// <summary>
+        /// Tilføj animationer
+        /// </summary>
         private void AddAnimations()
         {
             //Load Frames
@@ -392,6 +442,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
 
+        /// <summary>
+        /// Hjælpemetode til at indlæse Texture2D arrays
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
         private Texture2D[] LoadFrames(string basePath, int frameCount)
         {
             Texture2D[] frames = new Texture2D[frameCount];
@@ -402,6 +458,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return frames;
         }
 
+        /// <summary>
+        /// Bind de forskellige commands til forskellige knapper
+        /// </summary>
         private void BindCommands()
         {
             //UpdateCommands

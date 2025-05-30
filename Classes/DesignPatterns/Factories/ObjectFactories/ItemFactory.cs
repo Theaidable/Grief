@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework;
 
 namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
 {
+    /// <summary>
+    /// Factory til oprettelse af items
+    /// </summary>
     public class ItemFactory : Factory
     {
 
@@ -24,11 +27,22 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             }
         }
 
+        /// <summary>
+        /// Standard oprettelse af items
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public override GameObject Create(Vector2 position)
         {
             return Create(null, position);
         }
 
+        /// <summary>
+        /// Oprettelse af et bestemt item
+        /// </summary>
+        /// <param name="item"></param> Hvilket item
+        /// <param name="position"></param> Dens position
+        /// <returns></returns>
         public GameObject Create(Item item, Vector2 position)
         {
             GameObject itemObject = new GameObject();

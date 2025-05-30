@@ -3,8 +3,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Grief.Classes.Items.Items
 {
+    /// <summary>
+    /// Quest item
+    /// </summary>
     public class QuestItem : Item
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="itemName"></param>
         public QuestItem(string itemName)
         {
             Texture = $"Items/QuestItems/{itemName}";

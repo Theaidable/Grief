@@ -10,24 +10,39 @@ using System.Windows.Forms;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
+    /// <summary>
+    /// Inventory component
+    /// </summary>
     public class InventoryComponent : Component
     {
+        //Fields
         private Texture2D backgroundTexture;
         private Rectangle backgroundSource;
         private Vector2 backgroundPosition;
 
         private List<Item> items = new List<Item>();
 
+        //Properties
         public bool ShowInventory { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public InventoryComponent(GameObject gameObject) : base(gameObject) { }
 
+        /// <summary>
+        /// Sæt inventorys baggrund
+        /// </summary>
         public override void Start()
         {
             backgroundTexture = GameWorld.Instance.Content.Load<Texture2D>("UI/SettingsMenu");
             backgroundSource = new Rectangle(125, 0, 120, 140);
         }
 
+        /// <summary>
+        /// Opdatere inventory position
+        /// </summary>
         public override void Update()
         {
             var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
@@ -37,16 +52,29 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             backgroundPosition = new Vector2(playerX - 100, playerY - 175);
         }
 
+        /// <summary>
+        /// Metode til at tilføje et item til inventory
+        /// </summary>
+        /// <param name="item"></param>
         public void AddItemToInventory(Item item)
         {
             items.Add(item);
         }
 
+        /// <summary>
+        /// Metode til at finde et item i inventory
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public bool HasItemByName(string name)
         {
             return items.Any(i => i.DisplayName == name);
         }
 
+        /// <summary>
+        /// Metode til at fjerne et item fra inventory
+        /// </summary>
+        /// <param name="name"></param>
         public void RemoveItemByName(string name)
         {
             var item = items.FirstOrDefault(i => i.DisplayName == name);
@@ -57,6 +85,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Tegn inventory
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             //Desired størrelse af baggrunden for Inventory
@@ -68,6 +100,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 spriteBatch.Draw(backgroundTexture, backgroundDestRect, backgroundSource, Color.White);
 
+                //Skriv itemets navn i inventory
                 for (int i = 0; i < items.Count; i++)
                 {
                     string name = items[i].DisplayName;
@@ -76,10 +109,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Metode til at toggle inventory
+        /// </summary>
         public void ToggleInventory()
         {
-            Debug.WriteLine("ToggleInventory");
-            Debug.WriteLine($"Inventory position: {backgroundPosition}");
             ShowInventory = !ShowInventory;
         }
     }

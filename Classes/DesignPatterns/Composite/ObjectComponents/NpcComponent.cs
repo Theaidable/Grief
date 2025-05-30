@@ -4,7 +4,6 @@ using Grief.Classes.Dialog;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,8 +11,12 @@ using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
+    /// <summary>
+    /// Npc component
+    /// </summary>
     public class NpcComponent : Component
     {
+        //Fields
         private Animator animator;
         private Vector2 velocity;
         private float gravity = 600f;
@@ -23,6 +26,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] idleDadFrames;
         private Texture2D[] happyDadFrames;
 
+        //Properties
         public string Name { get; set; }
         public List<string> DialogLinesBeforeAccept { get; set; }
         public List<string> DialogLinesAcceptedNotCompleted { get; set; }
@@ -32,8 +36,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public Quest QuestToGive { get; set; }
         public Texture2D Portrait { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public NpcComponent(GameObject gameObject) : base(gameObject) { }
 
+        /// <summary>
+        /// Tilføj animationer ved start
+        /// </summary>
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
@@ -41,6 +52,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.PlayAnimation($"Idle{Name}");
         }
 
+        /// <summary>
+        /// Sørg for at en NPC ikke står i luften
+        /// </summary>
         public override void Update()
         {
             if (grounded == false)
@@ -61,6 +75,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Hjælpemetode til at tjekke om et objekt står på jorden
+        /// </summary>
+        /// <returns></returns>
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
@@ -108,9 +126,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
                         float yOnSlope = p1.Y + slope * (playerX - p1.X);
 
-                        float playerBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
+                        float bottom = GameObject.Transform.Position.Y + collider.Height / 2f;
 
-                        if (playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
+                        if (bottom >= yOnSlope - 10 && bottom <= yOnSlope + 10)
                         {
                             return true;
                         }
@@ -121,6 +139,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             return false;
         }
 
+        /// <summary>
+        /// Hvis playeren interagere med en NPC, så startes dialog
+        /// </summary>
         public void Interaction()
         {
             Debug.WriteLine($"Interacting with {Name}. Dialog count: {DialogLinesBeforeAccept?.Count}");
@@ -167,6 +188,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Tilføj animationer
+        /// </summary>
         private void AddAnimations()
         {
             //Load Frames
@@ -178,6 +202,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("HappyDad", 2.5f, true, happyDadFrames));
         }
 
+        /// <summary>
+        /// Hjælpemetode til at indlæse Textur2D arrays
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
         private Texture2D[] LoadFrames(string basePath, int frameCount)
         {
             Texture2D[] frames = new Texture2D[frameCount];

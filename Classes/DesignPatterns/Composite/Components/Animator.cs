@@ -6,12 +6,18 @@ using System.Collections.Generic;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
+    /// <summary>
+    /// Enumaration til at bestemme animationstype om det er Sprite eller SpriteSheet
+    /// </summary>
     public enum AnimationType
     {
         Sprite,
         Rectangle
     }
 
+    /// <summary>
+    /// Animator component
+    /// </summary>
     public class Animator : Component
     {
         //Fields

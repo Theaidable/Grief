@@ -1,5 +1,4 @@
 ﻿using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Grief.Classes.Items
 {
