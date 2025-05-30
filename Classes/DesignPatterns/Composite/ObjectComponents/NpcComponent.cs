@@ -144,6 +144,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         QuestToGive.GrantReward(inventory);
                         QuestToGive.Complete();
 
+                        Debug.WriteLine("Quest has been completed");
+
                         dialog.StartDialog(DialogLinesOnCompleted, Portrait);
                         return;
                     }
@@ -157,6 +159,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     if (accepted == true)
                     {
                         QuestToGive.Accept();
+                        Debug.WriteLine("Quest has been accepted");
                     }
                 });
 

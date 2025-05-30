@@ -42,7 +42,6 @@ namespace Grief.Classes.DesignPatterns.Composite
         {
             foreach (var component in components)
             {
-                Debug.WriteLine($"{component.GetType().Name}");
                 component.Start();
             }
         }

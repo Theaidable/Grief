@@ -1,5 +1,4 @@
 ﻿using Greif;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -39,23 +38,48 @@ namespace Grief.Classes.Dialog
 
         public void Update()
         {
+
             if(IsActive == true)
             {
-                if(Keyboard.GetState().IsKeyDown(Keys.Enter) && wasEnterPressed == false)
+                if (awaitingResponse == true)
                 {
-                    if (currentLines.Count > 0)
+                    if (Keyboard.GetState().IsKeyDown(Keys.Y))
                     {
-                        NextLine();
-                        wasEnterPressed = true;
+                        awaitingResponse = false;
+                        IsActive = false;
+                        onDialogFinished?.Invoke(true);
                     }
-                    else
+                    else if (Keyboard.GetState().IsKeyDown(Keys.N))
                     {
-                        ShowChoice();
+                        awaitingResponse = false;
+                        IsActive = false;
+                        onDialogFinished?.Invoke(false);
                     }
                 }
-                else if (Keyboard.GetState().IsKeyUp(Keys.Enter))
+                else
                 {
-                    wasEnterPressed = false;
+                    if (Keyboard.GetState().IsKeyDown(Keys.Enter) && wasEnterPressed == false)
+                    {
+                        if (currentLines.Count > 0)
+                        {
+                            NextLine();
+                        }
+                        else if(onDialogFinished != null)
+                        {
+                            awaitingResponse = true;
+                            currentLine = "Y for accept, N for decline";
+                        }
+                        else
+                        {
+                            IsActive = false;
+                        }
+
+                        wasEnterPressed = true;
+                    }
+                    else if (Keyboard.GetState().IsKeyUp(Keys.Enter))
+                    {
+                        wasEnterPressed = false;
+                    }
                 }
             }
         }
@@ -63,26 +87,6 @@ namespace Grief.Classes.Dialog
         private void NextLine()
         {
             currentLine = currentLines.Dequeue();
-        }
-
-        private void ShowChoice()
-        {
-            if(awaitingResponse == true)
-            {
-                //Dette er midlertidig måde at accepetere eller benægte quests
-                if (Keyboard.GetState().IsKeyDown(Keys.Y))
-                {
-                    awaitingResponse = false;
-                    onDialogFinished?.Invoke(true);
-                }
-                else if (Keyboard.GetState().IsKeyDown(Keys.N))
-                {
-                    awaitingResponse = false;
-                    onDialogFinished?.Invoke(false);
-                }
-            }
-
-            IsActive = false;
         }
 
         public void Draw(SpriteBatch spriteBatch)
