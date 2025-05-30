@@ -301,9 +301,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Interact()
         {
-            //Her skal vi skrive vores interaction kode med NPC og Items
-
-            if(cooldownTimer <= 0f && inventory.ShowInventory == false)
+            if(cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false)
             {
                 isInteracting = true;
 
