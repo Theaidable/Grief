@@ -30,6 +30,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool patrolForward;
 
         private Animator animator;
+        private Collider collider;
         private AStar astar;
 
         private Texture2D[] idleFrames;
@@ -66,7 +67,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
+            collider = GameObject.GetComponent<Collider>();
             astar = GameWorld.Instance.LevelManager.CurrentLevel.PathFinder;
+            velocity = GameObject.Transform.Velocity;
             AddAnimations();
             animator.PlayAnimation("Idle");
         }
@@ -84,7 +87,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             EnemyAttackRange = stats.AttackRange;
             EnemyColliderSize = stats.ColliderSize;
 
-            var collider = GameObject.GetComponent<Collider>();
             if(collider != null)
             {
                 collider.ColliderSize = EnemyColliderSize;
@@ -119,7 +121,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
 
             //Sæt grounded
-            grounded = CheckGrounded();
+            grounded = collider.CheckGrounded(GameObject);
 
             //Hvis man rammer jorden, så resettes ens velocity på y-aksen - Man stopper med at falde
             if (grounded == true && velocity.Y > 0)
@@ -154,70 +156,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     Patrol();
                 }
             }
-        }
-
-        /// <summary>
-        /// Hjælpe metode som bruges til at finde ud af om enemies er på jorden
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckGrounded()
-        {
-            var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
-
-            foreach (var tile in rectTiles)
-            {
-                bool isAbove = collider.Bottom <= tile.Top + 5;
-                bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
-                bool horizontalOverlap = collider.Right > tile.Left && collider.Left < tile.Right;
-
-                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
-                {
-                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
-                    return true;
-                }
-            }
-
-            foreach (var tile in polyTiles)
-            {
-                var points = tile.Vertices;
-
-                for (int i = 0; i < points.Length - 1; i++)
-                {
-                    Vector2 p1 = points[i];
-                    Vector2 p2 = points[(i + 1) % points.Length];
-
-                    if (Math.Abs(p1.X - p2.X) < 1f)
-                    {
-                        continue;
-                    }
-
-                    if (p1.X > p2.X)
-                    {
-                        var temp = p1;
-                        p1 = p2;
-                        p2 = temp;
-                    }
-
-                    float enemyX = collider.Center.X;
-
-                    if (enemyX >= p1.X && enemyX <= p2.X)
-                    {
-                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
-                        float yOnSlope = p1.Y + slope * (enemyX - p1.X);
-
-                        float enemyBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
-
-                        if (enemyBottom >= yOnSlope - 10 && enemyBottom <= yOnSlope + 10)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -591,35 +529,19 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         private void AddAnimations()
         {
-            idleFrames = LoadFrames("Enemies/Skeleton/Idle/Idle", 4);
-            walkFrames = LoadFrames("Enemies/Skeleton/Walk/Walk", 4);
+            idleFrames = animator.LoadFrames("Enemies/Skeleton/Idle/Idle", 4);
+            walkFrames = animator.LoadFrames("Enemies/Skeleton/Walk/Walk", 4);
 
-            attackFrames = LoadFrames("Enemies/Skeleton/Attack/Attack", 8);
+            attackFrames = animator.LoadFrames("Enemies/Skeleton/Attack/Attack", 8);
 
-            hurtFrames = LoadFrames("Enemies/Skeleton/Hurt/Hurt", 4);
-            deathFrames = LoadFrames("Enemies/Skeleton/Death/Death", 4);
+            hurtFrames = animator.LoadFrames("Enemies/Skeleton/Hurt/Hurt", 4);
+            deathFrames = animator.LoadFrames("Enemies/Skeleton/Death/Death", 4);
 
             animator.AddAnimation(new Animation("Idle", 2.5f, true, idleFrames));
             animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
             animator.AddAnimation(new Animation("Hurt", 10f, false, hurtFrames));
             animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
-        }
-
-        /// <summary>
-        /// Hjælpemetode til at indlæse Texture2D arrays
-        /// </summary>
-        /// <param name="basePath"></param>
-        /// <param name="frameCount"></param>
-        /// <returns></returns>
-        private Texture2D[] LoadFrames(string basePath, int frameCount)
-        {
-            Texture2D[] frames = new Texture2D[frameCount];
-            for (int i = 0; i < frameCount; i++)
-            {
-                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}");
-            }
-            return frames;
         }
     }
 }

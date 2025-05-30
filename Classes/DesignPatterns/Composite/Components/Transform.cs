@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Greif;
+using Microsoft.Xna.Framework;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
@@ -13,6 +14,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public Vector2 Position { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
         public float Rotation { get; set; }
+        public Vector2 Velocity { get; set; }
 
         /// <summary>
         /// Constructor

@@ -134,6 +134,22 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
                 CurrentIndex = 0;
             }
         }
+
+        /// <summary>
+        /// Hjælpemetode til at indlæse Texture2D arrays
+        /// </summary>
+        /// <param name="basePath"></param>
+        /// <param name="frameCount"></param>
+        /// <returns></returns>
+        public Texture2D[] LoadFrames(string basePath, int frameCount)
+        {
+            Texture2D[] frames = new Texture2D[frameCount];
+            for (int i = 0; i < frameCount; i++)
+            {
+                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i + 1}");
+            }
+            return frames;
+        }
     }
 
     /// <summary>
