@@ -1,10 +1,13 @@
-﻿using Greif.Classes.Cameras;
+﻿using Greif;
+using System;
+using Greif.Classes.Cameras;
 using Grief.Classes.DesignPatterns.Builder;
 using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.Dialog;
+using Grief.Classes.GameManager;
 using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,6 +23,7 @@ namespace Greif
         //Private fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private GameManager gameManager;
 
         //Public properties
         public float DeltaTime { get; private set; }
@@ -56,8 +60,9 @@ namespace Greif
 
         protected override void Initialize()
         {
-            //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
-            LevelManager = new LevelManager();
+           
+            gameManager = new GameManager();
+            LevelManager = new LevelManager(); //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
             LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
             Camera = new Camera();
             Dialog = new DialogSystem();
@@ -87,6 +92,7 @@ namespace Greif
 
             InputHandler.Instance.Execute();
 
+            gameManager.Update(gameTime);
             LevelManager.Update(gameTime);
             Dialog.Update();
 
@@ -107,7 +113,7 @@ namespace Greif
                 transformMatrix: Camera.ViewMatrix
                 );
 
-
+            gameManager.Draw(_spriteBatch);
             LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
             
             Dialog.Draw(_spriteBatch);
