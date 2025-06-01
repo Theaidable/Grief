@@ -13,6 +13,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         public Vector2 Position { get; set; }
         public Vector2 Scale { get; set; } = Vector2.One;
         public float Rotation { get; set; }
+        public Vector2 Velocity { get; set; }
 
         /// <summary>
         /// Constructor

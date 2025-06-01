@@ -79,6 +79,12 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             SpriteRenderer spriteRenderer = enemyObject.AddComponent<SpriteRenderer>();
             Animator animator = enemyObject.AddComponent<Animator>();
             Collider collider = enemyObject.AddComponent<Collider>();
+
+            if(enemyStats.TryGetValue(enemyType, out var stats))
+            {
+                collider.ColliderSize = stats.ColliderSize;
+            }
+
             var enemy = enemyObject.AddComponent<EnemyComponent>();
             enemy.PatrolPoints = patrolPoints;
             enemyObject.Transform.Position = position;
@@ -90,10 +96,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
             }
 
             //Sæt stats
-            if(enemyStats.TryGetValue(enemyType, out var stats))
-            {
-                enemy.SetStats(stats);
-            }
+            enemy.SetStats(stats);
 
             if(item != null)
             {
