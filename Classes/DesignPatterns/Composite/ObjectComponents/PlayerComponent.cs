@@ -2,22 +2,24 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
 using MonoGame.Extended.Shapes;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
+    /// <summary>
+    /// Player component
+    /// </summary>
     public class PlayerComponent : Component
     {
         //Private fields
         private Animator animator;
+        private Collider collider;
+        private InventoryComponent inventory;
         private Vector2 moveDirection;
         private Vector2 velocity;
         private float gravity = 600f;
@@ -54,6 +56,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public float Health { get; private set; }
         public float MovementSpeed { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public PlayerComponent(GameObject gameObject) : base(gameObject)
         {
             Damage = 25;
@@ -61,16 +67,22 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             MovementSpeed = 100f;
         }
 
+        /// <summary>
+        /// Find komponenter og bind commands
+        /// </summary>
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
-
+            collider = GameObject.GetComponent<Collider>();
+            inventory = GameObject.GetComponent<InventoryComponent>();
             AddAnimations();
             BindCommands();
             animator.PlayAnimation("Idle");
         }
 
-        
+        /// <summary>
+        /// Physics udregninger, som gør at spilleren kan falde
+        /// </summary>
         public override void Update()
         {
             if (cooldownTimer > 0)
@@ -87,8 +99,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime);
             GameObject.Transform.Translate(movement);
-            grounded = CheckGrounded();
-            
+            grounded = collider.CheckGrounded(GameObject);
+
             if (grounded == true && velocity.Y > 0)
             {
                 velocity.Y = 0;
@@ -107,83 +119,33 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-        private bool CheckGrounded()
-        {
-            var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
-
-            foreach (var tile in rectTiles)
-            {
-                bool isAbove = collider.Bottom <= tile.Top + 5;
-                bool isFallingOnto = collider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
-                bool horizontalOverlap = collider.Right > tile.Left && collider.Left < tile.Right;
-
-                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
-                {
-                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
-                    return true;
-                }
-            }
-
-            foreach (var tile in polyTiles)
-            {
-                var points = tile.Vertices;
-
-                for (int i = 0; i < points.Length - 1; i++)
-                {
-                    Vector2 p1 = points[i];
-                    Vector2 p2 = points[(i + 1) % points.Length];
-
-                    if (Math.Abs(p1.X - p2.X) < 1f)
-                    {
-                        continue;
-                    }
-
-                    if (p1.X > p2.X)
-                    {
-                        var temp = p1;
-                        p1 = p2;
-                        p2 = temp;
-                    }
-
-                    float playerX = collider.Center.X;
-
-                    if (playerX >= p1.X && playerX <= p2.X)
-                    {
-                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
-                        float yOnSlope = p1.Y + slope * (playerX - p1.X);
-
-                        float playerBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
-
-                        if (playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
+        /// <summary>
+        /// Metode til at bevæge spilleren
+        /// </summary>
+        /// <param name="direction"></param>
         public void Move(Vector2 direction)
         {
+            if (inventory.ShowInventory == true)
+            {
+                return;
+            }
+
             SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             moveDirection = direction;
-            
+
             //Flip sprite baseret på direction
-            if(direction.X < 0)
+            if (direction.X < 0)
             {
                 spriteRenderer.SetEffects(SpriteEffects.FlipHorizontally);
-            } 
-            else if(direction.X > 0)
+            }
+            else if (direction.X > 0)
             {
                 spriteRenderer.SetEffects(SpriteEffects.None);
             }
 
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = direction * MovementSpeed * GameWorld.Instance.DeltaTime;
+
             GameObject.Transform.Translate(movement);
 
             //AABB
@@ -192,12 +154,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
             bool snappedToSlope = false;
 
-            if(rectangleCollision == true && polygonCollision == false)
+            if (rectangleCollision == true && polygonCollision == false)
             {
                 GameObject.Transform.Position = originalPosition;
             }
-            
-            if(polygonCollision == true)
+
+            if (polygonCollision == true)
             {
                 foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
                 {
@@ -208,7 +170,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         Vector2 p1 = points[i];
                         Vector2 p2 = points[(i + 1) % points.Length];
 
-                        if(Math.Abs(p1.X - p2.X) < 1f)
+                        if (Math.Abs(p1.X - p2.X) < 1f)
                         {
                             continue;
                         }
@@ -222,14 +184,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                         float playerX = playerCollider.Center.X;
 
-                        if(playerX >= p1.X && playerX <= p2.X)
+                        if (playerX >= p1.X && playerX <= p2.X)
                         {
                             float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
                             float yOnSlope = p1.Y + slope * (playerX - p1.X);
 
                             float playerBottom = GameObject.Transform.Position.Y + playerCollider.Height / 2f;
 
-                            if(playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
+                            if (playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
                             {
                                 GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, yOnSlope - playerCollider.Height / 2f);
                                 snappedToSlope = true;
@@ -238,7 +200,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         }
                     }
 
-                    if(snappedToSlope == true)
+                    if (snappedToSlope == true)
                     {
                         break;
                     }
@@ -251,26 +213,35 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Metode til at sørge for at spilleren går tilbage til idle ved stop af bevægelse
+        /// </summary>
         public void Stop()
         {
-            if(isAttacking == false && grounded == true)
+            if (isAttacking == false && grounded == true)
             {
                 animator.PlayAnimation("Idle");
             }
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at hoppe
+        /// </summary>
         public void Jump()
         {
-            if (grounded == true)
+            if (grounded == true && inventory.ShowInventory == false)
             {
                 velocity.Y = jumpForce;
                 grounded = false;
             }
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at angribe
+        /// </summary>
         public void Attack()
         {
-            if (cooldownTimer <= 0f)
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false)
             {
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
@@ -286,12 +257,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         var enemy = gameObjects.GetComponent<EnemyComponent>();
                         Collider enemyCollider = gameObjects.GetComponent<Collider>();
 
-                        if(enemy == null || enemyCollider == null)
+                        if (enemy == null || enemyCollider == null)
                         {
                             continue;
                         }
 
-                        if(playerCollider.CollisionBox.Intersects(enemyCollider.CollisionBox) == false)
+                        if (playerCollider.CollisionBox.Intersects(enemyCollider.CollisionBox) == false)
                         {
                             continue;
                         }
@@ -300,7 +271,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         .Any(pr => enemyCollider.PixelPerfectRectangles
                         .Any(er => pr.Rectangle.Intersects(er.Rectangle)));
 
-                        if(hit == true)
+                        if (hit == true)
                         {
                             enemy.TakeDamage(Damage);
                             break;
@@ -315,16 +286,21 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
+        /// <summary>
+        /// Boolean som bruges til at finde ud af om man må angribe
+        /// </summary>
+        /// <returns></returns>
         public bool CanUseAttack()
         {
             return cooldownTimer <= 0f;
         }
 
+        /// <summary>
+        /// Spillerens interaction med andre objekter
+        /// </summary>
         public void Interact()
         {
-            //Her skal vi skrive vores interaction kode med NPC og Items
-
-            if(cooldownTimer <= 0f)
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false)
             {
                 isInteracting = true;
 
@@ -332,44 +308,58 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
                     && gameObject.GetComponent<NpcComponent>() != null);
 
+                var nearbyItem = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                    .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
+                    && gameObject.GetComponent<ItemComponent> != null);
+
                 if (nearbyNpc != null)
                 {
-                    Debug.WriteLine("Calling interaction on NPC...");
                     nearbyNpc.GetComponent<NpcComponent>().Interaction();
                 }
-                else
+                else if (nearbyItem != null)
                 {
-                    Debug.WriteLine("No nearby NPC found!");
+                    nearbyItem.GetComponent<ItemComponent>().PickUpItem();
                 }
 
                 cooldownTimer = interactionCooldown;
             }
         }
 
+        /// <summary>
+        /// Metode til at finde ud af om spilleren kan interagere med et objekt
+        /// </summary>
+        /// <returns></returns>
         public bool CanInteract()
         {
             return cooldownTimer <= 0f;
         }
 
+        /// <summary>
+        /// Metode til at få spilleren til at tage skade
+        /// </summary>
+        /// <param name="amount"></param>
         public void TakeDamage(int amount)
         {
             Health -= amount;
 
         }
 
+        /// <summary>
+        /// Tilføj animationer
+        /// </summary>
         private void AddAnimations()
         {
             //Load Frames
-            idleFrames = LoadFrames("MainCharacter/Idle/Idle",2);
-            walkFrames = LoadFrames("MainCharacter/Walk/Walk",4);
-            runFrames = LoadFrames("MainCharacter/Run/Run",8);
-            jumpFrames = LoadFrames("MainCharacter/Jump/Jump",3);
-            fallFrames = LoadFrames("MainCharacter/Fall/Fall",5);
-            attackFrames = LoadFrames("MainCharacter/Attack/Attack",8);
-            blinkFrames = LoadFrames("MainCharacter/Blink/Blink",2);
-            deathFrames = LoadFrames("MainCharacter/Death/Death",4);
-            dieFrames = LoadFrames("MainCharacter/Die/Die",8);
-            sitFrames = LoadFrames("MainCharacter/Sit/Sit",6);
+            idleFrames = animator.LoadFrames("MainCharacter/Idle/Idle", 2);
+            walkFrames = animator.LoadFrames("MainCharacter/Walk/Walk", 4);
+            runFrames = animator.LoadFrames("MainCharacter/Run/Run", 8);
+            jumpFrames = animator.LoadFrames("MainCharacter/Jump/Jump", 3);
+            fallFrames = animator.LoadFrames("MainCharacter/Fall/Fall", 5);
+            attackFrames = animator.LoadFrames("MainCharacter/Attack/Attack", 8);
+            blinkFrames = animator.LoadFrames("MainCharacter/Blink/Blink", 2);
+            deathFrames = animator.LoadFrames("MainCharacter/Death/Death", 4);
+            dieFrames = animator.LoadFrames("MainCharacter/Die/Die", 8);
+            sitFrames = animator.LoadFrames("MainCharacter/Sit/Sit", 6);
 
             //Add animations
             animator.AddAnimation(new Animation("Idle", 3.5f, true, idleFrames));
@@ -384,16 +374,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
 
-        private Texture2D[] LoadFrames(string basePath, int frameCount)
-        {
-            Texture2D[] frames = new Texture2D[frameCount];
-            for (int i = 0; i < frameCount; i++)
-            {
-                frames[i] = GameWorld.Instance.Content.Load<Texture2D>($"{basePath}0{i+1}");
-            }
-            return frames;
-        }
 
+        /// <summary>
+        /// Bind de forskellige commands til forskellige knapper
+        /// </summary>
         private void BindCommands()
         {
             //UpdateCommands
@@ -403,6 +387,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //ButtonDown Commands
             InputHandler.Instance.AddButtonDownCommand(Keys.Space, new JumpCommand(this));
             InputHandler.Instance.AddButtonDownCommand(Keys.E, new InteractionCommand(this));
+            InputHandler.Instance.AddButtonDownCommand(Keys.I, new OpenInventoryCommand(inventory));
 
             //ButtonUp Commands
             InputHandler.Instance.AddButtonUpCommand(Keys.A, new StopCommand(this));

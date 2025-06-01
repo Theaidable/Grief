@@ -5,22 +5,35 @@ using System;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
+    /// <summary>
+    /// Enumaration til at bestemme hvilken type af sprite der bruges
+    /// </summary>
     public enum SpriteType
     {
         Sprite,
         Rectangle
     }
 
+    /// <summary>
+    /// Spriterenderer component
+    /// </summary>
     public class SpriteRenderer : Component
     {
+        //Properties
         public Vector2 Origin { get; set; }
         public Texture2D Sprite { get; set; }
         public Color Color { get; set; }
         public Rectangle? SourceRectangle { get; set; }
         public SpriteEffects Effects { get; set; }
+        
+        //Events
         public event Action OnSpriteChanged;
         public event Action OnEffectsChanged;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public SpriteRenderer(GameObject gameObject) : base(gameObject)
         {
             Color = Color.White;

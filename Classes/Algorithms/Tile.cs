@@ -2,11 +2,20 @@
 
 namespace Grief.Classes.Algorithms
 {
+    /// <summary>
+    /// Hjælpeklasse som bruges til at definere tiles på mappet som skal bruges til algoritmen
+    /// </summary>
     public class Tile
     {
+        //Properies
         public Point Position { get; private set; }
         public bool IsWalkable { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="isWalkable"></param>
         public Tile(Point position, bool isWalkable)
         {
             Position = position;

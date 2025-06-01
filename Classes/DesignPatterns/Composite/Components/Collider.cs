@@ -7,12 +7,15 @@ using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
+    /// <summary>
+    /// Collider component
+    /// </summary>
     public class Collider : Component
     {
+        //Fields
         private SpriteRenderer spriteRenderer;
         private bool shouldDraw;
         private Lazy<List<RectangleData>> pixelPerfectRectangles;
-
         public List<RectangleData> PixelPerfectRectangles { get => pixelPerfectRectangles.Value; }
         public Point ColliderSize { get; set; } = Point.Zero;
 
@@ -33,6 +36,10 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             }
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="gameObject"></param>
         public Collider(GameObject gameObject) : base(gameObject) { }
 
         /// <summary>
@@ -166,6 +173,70 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
                 }
             }
             return returnListOfRectangles;
+        }
+
+        /// <summary>
+        /// Hjælpe metode som bruges til at finde ud af om enemies er på jorden
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckGrounded(GameObject gameObject)
+        {
+            var collider = gameObject.GetComponent<Collider>().CollisionBox;
+            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
+
+            foreach (var tile in rectTiles)
+            {
+                bool isAbove = collider.Bottom <= tile.Top + 5;
+                bool isFallingOnto = collider.Bottom + gameObject.Transform.Velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
+                bool horizontalOverlap = collider.Right > tile.Left && collider.Left < tile.Right;
+
+                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
+                {
+                    gameObject.Transform.Position = new Vector2(gameObject.Transform.Position.X, tile.Top - collider.Height / 2f);
+                    return true;
+                }
+            }
+
+            foreach (var tile in polyTiles)
+            {
+                var points = tile.Vertices;
+
+                for (int i = 0; i < points.Length - 1; i++)
+                {
+                    Vector2 p1 = points[i];
+                    Vector2 p2 = points[(i + 1) % points.Length];
+
+                    if (Math.Abs(p1.X - p2.X) < 1f)
+                    {
+                        continue;
+                    }
+
+                    if (p1.X > p2.X)
+                    {
+                        var temp = p1;
+                        p1 = p2;
+                        p2 = temp;
+                    }
+
+                    float objectX = collider.Center.X;
+
+                    if (objectX >= p1.X && objectX <= p2.X)
+                    {
+                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                        float yOnSlope = p1.Y + slope * (objectX - p1.X);
+
+                        float enemyBottom = GameObject.Transform.Position.Y + collider.Height / 2f;
+
+                        if (enemyBottom >= yOnSlope - 10 && enemyBottom <= yOnSlope + 10)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
     }
