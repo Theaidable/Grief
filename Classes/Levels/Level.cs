@@ -117,7 +117,7 @@ namespace Grief.Classes.Levels
                         {
                             "Have you seen my daughter?",
                             "She should be around here...",
-                            "   NAME!!!",
+                            "   CAITLIN!!!",
                             "Could you help me find her?"
                         },
                         new List<string>
@@ -126,7 +126,7 @@ namespace Grief.Classes.Levels
                         },
                         new List<string>
                         {
-                            "Thank you so much"
+                            "Thank you so much for finding her"
                         },
                         new List<string>
                         {
