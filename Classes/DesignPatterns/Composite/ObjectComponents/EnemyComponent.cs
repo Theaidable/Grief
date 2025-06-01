@@ -135,14 +135,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Kør enemys logik så længe de er på jorden, ikke tager skade og har mere end 0 liv
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
+                var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
                 //Hvis player er inde for detection range, så begynder fjenden at jagte spilleren
-                if (PlayerIsWithInDetectionRange() == true)
+                if (PlayerIsWithInDetectionRange(player) == true)
                 {
                     Pursue();
 
                     //Hvis spilleren kommer inden for attack range, så angriber fjenden
-                    if (PlayerIsWithInAttackRange() == true)
+                    if (PlayerIsWithInAttackRange(player) == true)
                     {
                         Attack();
                     }
@@ -362,9 +363,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// Hjælpemetode til at beregne om spilleren er inde for detection range
         /// </summary>
         /// <returns></returns>
-        private bool PlayerIsWithInDetectionRange()
+        public bool PlayerIsWithInDetectionRange(GameObject player)
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            //var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
             if (player == null)
             {
@@ -441,9 +442,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// Hjælpemetode til at finde ud af om spilleren er inde for attacking range
         /// </summary>
         /// <returns></returns>
-        private bool PlayerIsWithInAttackRange()
+        public bool PlayerIsWithInAttackRange(GameObject player)
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            //var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
             if (player == null)
             {
