@@ -110,8 +110,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
+            var rectTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons;
 
             foreach (var tile in rectTiles)
             {
@@ -188,8 +188,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //AABB
             var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool rectangleCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
-            bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
+            bool rectangleCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            bool polygonCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
             bool snappedToSlope = false;
 
             if(rectangleCollision == true && polygonCollision == false)
@@ -199,7 +199,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             
             if(polygonCollision == true)
             {
-                foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
+                foreach (Polygon polygon in GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons)
                 {
                     var points = polygon.Vertices;
 
@@ -279,7 +279,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 animator.OnAnimationComplete = () =>
                 {
                     var playerCollider = GameObject.GetComponent<Collider>();
-                    var level = GameWorld.Instance.LevelManager.CurrentLevel;
+                    var level = GameWorld.Instance.GameManager.LevelManager.CurrentLevel;
 
                     foreach (GameObject gameObjects in level.GameObjects)
                     {
@@ -328,7 +328,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 isInteracting = true;
 
-                var nearbyNpc = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                var nearbyNpc = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
                     && gameObject.GetComponent<NpcComponent>() != null);
 

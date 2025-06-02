@@ -23,7 +23,6 @@ namespace Greif
         //Private fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private GameManager gameManager;
 
         //Public properties
         public float DeltaTime { get; private set; }
@@ -31,7 +30,7 @@ namespace Greif
         public SpriteFont DefaultFont { get; private set; }
         public Camera Camera { get; private set; }
         public DialogSystem Dialog { get; private set; }
-        public LevelManager LevelManager { get; private set; }
+        public GameManager GameManager { get; private set; }
 
         //Oprettelse af Singleton af GameWorld
         private static GameWorld instance;
@@ -61,13 +60,11 @@ namespace Greif
         protected override void Initialize()
         {
            
-            gameManager = new GameManager();
-            LevelManager = new LevelManager(); //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
-            LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
+            GameManager = new GameManager();
             Camera = new Camera();
             Dialog = new DialogSystem();
 
-            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(LevelManager.CurrentLevel.GameObjects));
+            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameManager.LevelManager.CurrentLevel.GameObjects));
 
             base.Initialize();
         }
@@ -92,8 +89,7 @@ namespace Greif
 
             InputHandler.Instance.Execute();
 
-            gameManager.Update(gameTime);
-            LevelManager.Update(gameTime);
+            GameManager.Update(gameTime);            
             Dialog.Update();
 
             base.Update(gameTime);
@@ -113,8 +109,7 @@ namespace Greif
                 transformMatrix: Camera.ViewMatrix
                 );
 
-            gameManager.Draw(_spriteBatch);
-            LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
+            GameManager.Draw(_spriteBatch);
             
             Dialog.Draw(_spriteBatch);
 

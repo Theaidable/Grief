@@ -48,6 +48,15 @@ namespace Grief.Classes.DesignPatterns.Composite
         }
 
         /// <summary>
+        /// Metode til at kalde alle compenents langsommere end start
+        /// </summary>
+        public void LateStart()
+        {
+            foreach (var component in components)
+                component.LateStart();
+        }
+
+        /// <summary>
         /// Metoden opdaterer alle components
         /// </summary>
         public void Update()

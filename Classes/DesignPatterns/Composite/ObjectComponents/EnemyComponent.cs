@@ -58,10 +58,25 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public override void Start()
         {
             animator = GameObject.GetComponent<Animator>();
-            astar = GameWorld.Instance.LevelManager.CurrentLevel.PathFinder;
+        
             AddAnimations();
             animator.PlayAnimation("Idle");
         }
+
+        public override void LateStart()
+        {
+            var level = GameWorld.Instance.GameManager?.LevelManager?.CurrentLevel;
+
+            if (level?.PathFinder == null)
+            {
+                Debug.WriteLine("ERROR (LateStart): PathFinder or CurrentLevel is null in EnemyComponent.");
+                return;
+            }
+
+            astar = level.PathFinder;
+            Debug.WriteLine("astar successfully assigned in LateStart.");
+        }
+
 
         public void SetStats(EnemyStats stats)
         {
@@ -136,8 +151,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
+            var rectTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons;
 
             foreach (var tile in rectTiles)
             {
@@ -238,7 +253,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         public void Pursue()
         {
-            var level = GameWorld.Instance.LevelManager.CurrentLevel;
+            var level = GameWorld.Instance.GameManager.LevelManager.CurrentLevel;
             var player = level.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
             if(player == null)
@@ -327,8 +342,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //AABB
             var enemyCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool rectCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
-            bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
+            bool rectCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(enemyCollider));
+            bool polygonCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
             bool snappedToSlope = false;
 
             //Debug.WriteLine($"Collision detected? {collision}");
@@ -341,7 +356,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             if (polygonCollision == true)
             {
-                foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
+                foreach (Polygon polygon in GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons)
                 {
                     var points = polygon.Vertices;
 
@@ -396,7 +411,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private bool PlayerIsWithInDetectionRange()
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
             if(player == null)
             {
@@ -424,7 +439,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 animator.OnAnimationComplete = () =>
                 {
                     var enemyCollider = GameObject.GetComponent<Collider>();
-                    var level = GameWorld.Instance.LevelManager.CurrentLevel;
+                    var level = GameWorld.Instance.GameManager.LevelManager.CurrentLevel;
 
                     foreach (GameObject gameObjects in level.GameObjects)
                     {
@@ -462,7 +477,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         private bool PlayerIsWithInAttackRange()
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
 
             if (player == null)
             {
@@ -493,7 +508,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             else
             {
                 animator.PlayAnimation("Death");
-                animator.OnAnimationComplete = () => GameWorld.Instance.LevelManager.CurrentLevel.QueueRemove(GameObject);
+                animator.OnAnimationComplete = () => GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueRemove(GameObject);
             }
         }
 

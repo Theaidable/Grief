@@ -56,8 +56,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool CheckGrounded()
         {
             var collider = GameObject.GetComponent<Collider>().CollisionBox;
-            var rectTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons;
+            var rectTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons;
 
             foreach (var tile in rectTiles)
             {

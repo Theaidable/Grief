@@ -1210,6 +1210,174 @@
 /processorParam:TextureFormat=Color
 /build:TileMaps/Assets/Trees/TreeTrunk.png;TileMaps/Assets/Trees/TreeTrunk
 
+#begin TileMaps/Assets/UI/Buttons/Continue.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/Continue.png;TileMaps/Assets/UI/Buttons/Continue
+
+#begin TileMaps/Assets/UI/Buttons/Exit.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/Exit.png;TileMaps/Assets/UI/Buttons/Exit
+
+#begin TileMaps/Assets/UI/Buttons/LG.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/LG.png;TileMaps/Assets/UI/Buttons/LG
+
+#begin TileMaps/Assets/UI/Buttons/NG.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/NG.png;TileMaps/Assets/UI/Buttons/NG
+
+#begin TileMaps/Assets/UI/Buttons/S1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/S1.png;TileMaps/Assets/UI/Buttons/S1
+
+#begin TileMaps/Assets/UI/Buttons/S2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/S2.png;TileMaps/Assets/UI/Buttons/S2
+
+#begin TileMaps/Assets/UI/Buttons/S3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/S3.png;TileMaps/Assets/UI/Buttons/S3
+
+#begin TileMaps/Assets/UI/Buttons/SG.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Buttons/SG.png;TileMaps/Assets/UI/Buttons/SG
+
+#begin TileMaps/Assets/UI/MenuBackground/MenuBG.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/MenuBackground/MenuBG.png;TileMaps/Assets/UI/MenuBackground/MenuBG
+
+#begin TileMaps/Assets/UI/Text/GamePaused.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Text/GamePaused.png;TileMaps/Assets/UI/Text/GamePaused
+
+#begin TileMaps/Assets/UI/Text/LoadGame.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Text/LoadGame.png;TileMaps/Assets/UI/Text/LoadGame
+
+#begin TileMaps/Assets/UI/Text/SaveGame.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Text/SaveGame.png;TileMaps/Assets/UI/Text/SaveGame
+
+#begin TileMaps/Assets/UI/Text/Title.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/Text/Title.png;TileMaps/Assets/UI/Text/Title
+
+#begin TileMaps/Assets/UI/TextButton.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:TileMaps/Assets/UI/TextButton.png;TileMaps/Assets/TextButton
+
 #begin TileMaps/GriefMap1.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
