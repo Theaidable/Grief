@@ -540,7 +540,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
             animator.AddAnimation(new Animation("Hurt", 10f, false, hurtFrames));
-            animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
+            animator.AddAnimation(new Animation("Death", 4f, false, deathFrames));
         }
     }
 }

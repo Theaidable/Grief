@@ -84,7 +84,7 @@ namespace Grief.Classes.Levels
                 {
                     Point gridPosition = new Point(x, y);
                     Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth, Map.TileHeight);
-                    bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
+                    bool walkable = CollisionRectangles.Any(r => r.Intersects(tileRectangle)) == false;
                     tiles[gridPosition] = new Tile(gridPosition,walkable);
                 }
             }
