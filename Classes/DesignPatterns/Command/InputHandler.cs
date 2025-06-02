@@ -37,17 +37,17 @@ namespace Grief.Classes.DesignPatterns.Command
 
         public void AddUpdateCommand(Keys inputKey, ICommand command)
         {
-            keybindsUpdate.Add(inputKey, command);
+            keybindsUpdate[inputKey] = command;
         }
         public void AddButtonDownCommand(Keys inputKey, ICommand command)
         {
-            keybindsButtonDown.Add(inputKey, command);
+            keybindsButtonDown[inputKey] = command;
         }
-
         public void AddButtonUpCommand(Keys inputKey, ICommand command)
         {
-            keybindsButtonUp.Add(inputKey, command);
+            keybindsButtonUp[inputKey] = command;
         }
+
 
         public void AddMouseButtonDownCommand(MouseButton button, ICommand command)
         {
