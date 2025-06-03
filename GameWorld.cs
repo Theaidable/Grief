@@ -1,29 +1,59 @@
-﻿using Greif.Classes.Cameras;
+﻿using Greif;
+using System;
+using Greif.Classes.Cameras;
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.Dialog;
-using Grief.Classes.Levels;
+using Grief.Classes.GameManager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Greif
 {
+    /// <summary>
+    /// Den centrale klasse for hele spillet – Singleton mønster
+    /// </summary>
     public class GameWorld : Game
     {
-        //Private fields
+        // Private fields
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        //Public properties
+        /// <summary>
+        /// Tidsforskel mellem frames
+        /// </summary>
         public float DeltaTime { get; private set; }
-        public Texture2D Pixel { get; private set; }
-        public SpriteFont DefaultFont { get; private set; }
-        public Camera Camera { get; private set; }
-        public DialogSystem Dialog { get; private set; }
-        public LevelManager LevelManager { get; private set; }
 
-        //Oprettelse af Singleton af GameWorld
+        /// <summary>
+        /// 1x1 pixel til at tegne primitive shapes
+        /// </summary>
+        public Texture2D Pixel { get; private set; }
+
+        /// <summary>
+        /// Standard font til tekst i spillet
+        /// </summary>
+        public SpriteFont DefaultFont { get; private set; }
+
+        /// <summary>
+        /// Kamera til at flytte og zoome viewet
+        /// </summary>
+        public Camera Camera { get; private set; }
+
+        /// <summary>
+        /// Dialogsystem – håndterer dialogbokse og tekst
+        /// </summary>
+        public DialogSystem Dialog { get; private set; }
+
+        /// <summary>
+        /// GameManager – håndterer alle scener (menu, level, pause, mv.)
+        /// </summary>
+        public GameManager GameManager { get; private set; }
+
+        // Singleton setup
         private static GameWorld instance;
         public static GameWorld Instance
         {
@@ -38,7 +68,7 @@ namespace Greif
         }
 
         /// <summary>
-        /// Private constructor
+        /// Privat constructor – Singleton pattern
         /// </summary>
         private GameWorld()
         {
@@ -46,30 +76,31 @@ namespace Greif
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
-            //Sæt vinduestørrelse
+            // Sæt vinduestørrelse (kan tilpasses)
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;
             _graphics.ApplyChanges();
         }
 
         /// <summary>
-        /// Initaliaze
+        /// Initialiserer alle systemer og scener (MainMenu, Level, Pause osv.)
         /// </summary>
         protected override void Initialize()
         {
-            //Midlertidig placering for indlæsning af første level indtil der laves en GameManager når vi skal arbejde med database
-            LevelManager = new LevelManager();
-            LevelManager.LoadLevel("GriefMap1"); //Skal ændres til Level0 når vi laver mainmenu
+            GameManager = new GameManager(); // Scene- og state-system
             Camera = new Camera();
             Dialog = new DialogSystem();
 
-            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(LevelManager.CurrentLevel.GameObjects));
+            // Bind test-kommando til at toggle collider drawing på det nuværende level
+            InputHandler.Instance.AddButtonDownCommand(
+                Keys.K,
+                new ToggleColliderDrawingCommand(GameManager.LevelManager.CurrentLevel.GameObjects));
 
             base.Initialize();
         }
 
         /// <summary>
-        /// Load
+        /// Loader grafik og fonts
         /// </summary>
         protected override void LoadContent()
         {
@@ -81,12 +112,13 @@ namespace Greif
         }
 
         /// <summary>
-        /// Opdatering af GameWorld
+        /// Opdaterer spillets logik (input, scene, dialog)
         /// </summary>
         /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+                Keyboard.GetState().IsKeyDown(Keys.Escape))
             {
                 Exit();
             }
@@ -95,14 +127,16 @@ namespace Greif
 
             InputHandler.Instance.Execute();
 
-            LevelManager.Update(gameTime);
+            // Opdater aktiv scene via GameManager (kan være MainMenu, Level, Pause osv.)
+            GameManager.Update(gameTime);
+
             Dialog.Update();
 
             base.Update(gameTime);
         }
 
         /// <summary>
-        /// Draw alt i GameWorld
+        /// Tegner alt i nuværende scene
         /// </summary>
         /// <param name="gameTime"></param>
         protected override void Draw(GameTime gameTime)
@@ -114,14 +148,15 @@ namespace Greif
                 blendState: BlendState.AlphaBlend,
                 samplerState: SamplerState.PointClamp,
                 depthStencilState: null,
-                rasterizerState: null, 
+                rasterizerState: null,
                 effect: null,
                 transformMatrix: Camera.ViewMatrix
-                );
+            );
 
+            // Tegn nuværende scene via GameManager
+            GameManager.Draw(_spriteBatch);
 
-            LevelManager.Draw(_spriteBatch, Camera.ViewMatrix);
-            
+            // Tegn dialog ovenpå scenen (fx tekstbokse)
             Dialog.Draw(_spriteBatch);
 
             _spriteBatch.End();
