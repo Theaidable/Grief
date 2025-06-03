@@ -41,5 +41,10 @@ namespace Greif.Classes.Cameras
         {
             zoom = MathHelper.Clamp(newZoom, 0.1f, 10f);
         }
+
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            return Vector2.Transform(screenPosition, Matrix.Invert(ViewMatrix));
+        }
     }
 }
