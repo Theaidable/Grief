@@ -231,7 +231,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         {
             if (grounded == true && inventory.ShowInventory == false)
             {
-                GameObject.Transform.Velocity = jumpForce;
+                velocity.Y = jumpForce;
                 grounded = false;
             }
         }
