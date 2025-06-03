@@ -2,14 +2,11 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
 using MonoGame.Extended.Shapes;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -93,26 +90,25 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 cooldownTimer -= GameWorld.Instance.DeltaTime;
             }
 
-            // Gravity via Transform.Velocity
-            if (!grounded)
+            if (grounded == false)
             {
-                GameObject.Transform.Velocity += new Vector2(0, gravity * GameWorld.Instance.DeltaTime);
+                velocity.Y += gravity * GameWorld.Instance.DeltaTime;
             }
 
-            // Bevæg spilleren baseret på velocity
-            Vector2 movement = new Vector2(0, GameObject.Transform.Velocity.Y * GameWorld.Instance.DeltaTime);
+            //Bevæg spilleren baseret på velocity
+            Vector2 originalPosition = GameObject.Transform.Position;
+            Vector2 movement = new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime);
             GameObject.Transform.Translate(movement);
+            grounded = collider.CheckGrounded(GameObject);
 
-            grounded = collider != null && collider.CheckGrounded(GameObject);
-
-            if (grounded && GameObject.Transform.Velocity.Y > 0)
+            if (grounded == true && velocity.Y > 0)
             {
-                GameObject.Transform.Velocity = new Vector2(GameObject.Transform.Velocity.X, 0);
+                velocity.Y = 0;
                 animator.PlayAnimation("Idle");
             }
-            else if (!grounded)
+            else if (grounded == false)
             {
-                if (GameObject.Transform.Velocity.Y < 0)
+                if (velocity.Y < 0)
                 {
                     animator.PlayAnimation("Jump");
                 }
@@ -123,14 +119,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-
         /// <summary>
         /// Metode til at bevæge spilleren
         /// </summary>
         /// <param name="direction"></param>
         public void Move(Vector2 direction)
         {
-            if (inventory != null && inventory.ShowInventory == true)
+            if (inventory.ShowInventory == true)
             {
                 return;
             }
@@ -234,7 +229,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Jump()
         {
-            if (grounded == true && (inventory == null || inventory.ShowInventory == false))
+            if (grounded == true && inventory.ShowInventory == false)
             {
                 GameObject.Transform.Velocity = jumpForce;
                 grounded = false;
@@ -246,7 +241,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Attack()
         {
-            if (cooldownTimer <= 0f && (inventory == null || inventory.ShowInventory == false))
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false)
             {
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
@@ -305,7 +300,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Interact()
         {
-            if (cooldownTimer <= 0f && (inventory == null || (inventory.ShowInventory == false)) && grounded == true && isAttacking == false)
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false)
             {
                 isInteracting = true;
 
@@ -315,7 +310,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                 var nearbyItem = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
-                    && gameObject.GetComponent<ItemComponent>() != null);
+                    && gameObject.GetComponent<ItemComponent> != null);
 
                 if (nearbyNpc != null)
                 {
@@ -346,6 +341,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public void TakeDamage(int amount)
         {
             Health -= amount;
+
         }
 
         /// <summary>
@@ -377,6 +373,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
+
 
         /// <summary>
         /// Bind de forskellige commands til forskellige knapper
