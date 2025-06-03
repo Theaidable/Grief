@@ -2,11 +2,14 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.Levels;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended;
 using MonoGame.Extended.Shapes;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -99,7 +102,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime);
             GameObject.Transform.Translate(movement);
-            grounded = collider.CheckGrounded(GameObject);
+
+            grounded = collider != null
+                ? collider.CheckGrounded(GameObject)
+                : CheckGrounded();
 
             if (grounded == true && velocity.Y > 0)
             {
@@ -120,12 +126,77 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         }
 
         /// <summary>
+        /// Alternativ collision-tjek hvis ikke collider.CheckGrounded er implementeret.
+        /// </summary>
+        private bool CheckGrounded()
+        {
+            var playerCollider = GameObject.GetComponent<Collider>()?.CollisionBox;
+            if (playerCollider == null) return false;
+
+            var rectTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles;
+            var polyTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons;
+
+            foreach (var tile in rectTiles)
+            {
+                bool isAbove = playerCollider.Bottom <= tile.Top + 5;
+                bool isFallingOnto = playerCollider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
+                bool horizontalOverlap = playerCollider.Right > tile.Left && playerCollider.Left < tile.Right;
+
+                if (isAbove == true && isFallingOnto == true && horizontalOverlap == true)
+                {
+                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - playerCollider.Height / 2f);
+                    return true;
+                }
+            }
+
+            foreach (var tile in polyTiles)
+            {
+                var points = tile.Vertices;
+
+                for (int i = 0; i < points.Length - 1; i++)
+                {
+                    Vector2 p1 = points[i];
+                    Vector2 p2 = points[(i + 1) % points.Length];
+
+                    if (Math.Abs(p1.X - p2.X) < 1f)
+                    {
+                        continue;
+                    }
+
+                    if (p1.X > p2.X)
+                    {
+                        var temp = p1;
+                        p1 = p2;
+                        p2 = temp;
+                    }
+
+                    float playerX = playerCollider.Center.X;
+
+                    if (playerX >= p1.X && playerX <= p2.X)
+                    {
+                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+                        float yOnSlope = p1.Y + slope * (playerX - p1.X);
+
+                        float playerBottom = GameObject.Transform.Position.Y + playerCollider.Height / 2f;
+
+                        if (playerBottom >= yOnSlope - 10 && playerBottom <= yOnSlope + 10)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Metode til at bevæge spilleren
         /// </summary>
         /// <param name="direction"></param>
         public void Move(Vector2 direction)
         {
-            if (inventory.ShowInventory == true)
+            if (inventory != null && inventory.ShowInventory == true)
             {
                 return;
             }
@@ -150,8 +221,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             //AABB
             var playerCollider = GameObject.GetComponent<Collider>().CollisionBox;
-            bool rectangleCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
-            bool polygonCollision = GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
+            bool rectangleCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles.Any(tile => tile.Intersects(playerCollider));
+            bool polygonCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(playerCollider));
             bool snappedToSlope = false;
 
             if (rectangleCollision == true && polygonCollision == false)
@@ -161,7 +232,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
             if (polygonCollision == true)
             {
-                foreach (Polygon polygon in GameWorld.Instance.LevelManager.CurrentLevel.CollisionPolygons)
+                foreach (Polygon polygon in GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons)
                 {
                     var points = polygon.Vertices;
 
@@ -229,7 +300,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Jump()
         {
-            if (grounded == true && inventory.ShowInventory == false)
+            if (grounded == true && (inventory == null || inventory.ShowInventory == false))
             {
                 velocity.Y = jumpForce;
                 grounded = false;
@@ -241,7 +312,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Attack()
         {
-            if (cooldownTimer <= 0f && inventory.ShowInventory == false)
+            if (cooldownTimer <= 0f && (inventory == null || inventory.ShowInventory == false))
             {
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
@@ -250,7 +321,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 animator.OnAnimationComplete = () =>
                 {
                     var playerCollider = GameObject.GetComponent<Collider>();
-                    var level = GameWorld.Instance.LevelManager.CurrentLevel;
+                    var level = GameWorld.Instance.GameManager.LevelManager.CurrentLevel;
 
                     foreach (GameObject gameObjects in level.GameObjects)
                     {
@@ -300,17 +371,17 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Interact()
         {
-            if (cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false)
+            if (cooldownTimer <= 0f && (inventory == null || (inventory.ShowInventory == false)) && grounded == true && isAttacking == false)
             {
                 isInteracting = true;
 
-                var nearbyNpc = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                var nearbyNpc = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
                     && gameObject.GetComponent<NpcComponent>() != null);
 
-                var nearbyItem = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects
+                var nearbyItem = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
-                    && gameObject.GetComponent<ItemComponent> != null);
+                    && gameObject.GetComponent<ItemComponent>() != null);
 
                 if (nearbyNpc != null)
                 {
@@ -341,7 +412,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public void TakeDamage(int amount)
         {
             Health -= amount;
-
         }
 
         /// <summary>
@@ -373,7 +443,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
-
 
         /// <summary>
         /// Bind de forskellige commands til forskellige knapper

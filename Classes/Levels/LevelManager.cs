@@ -4,25 +4,41 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Grief.Classes.Levels
 {
     /// <summary>
-    /// Kontrollere alle levels
+    /// Kontrollerer alle levels i spillet.
     /// </summary>
     public class LevelManager
     {
-        //Properties
+        /// <summary>
+        /// Nuværende aktive level.
+        /// </summary>
         public Level CurrentLevel { get; private set; }
 
         /// <summary>
-        /// Metode til at indlæse et bestemt level
+        /// Loader et bestemt level og kalder LateStart() på alle objekter efter load.
         /// </summary>
         /// <param name="levelName"></param>
         public void LoadLevel(string levelName)
         {
             CurrentLevel = new Level();
             CurrentLevel.Load(levelName);
+
+            // Kald LateStart på alle gameobjects (vigtigt for fx EnemyComponent og lign.)
+            foreach (var gameObject in CurrentLevel.GameObjects)
+            {
+                gameObject.LateStart();
+            }
         }
 
         /// <summary>
-        /// Opdatere alt i current level
+        /// Unloader det aktuelle level.
+        /// </summary>
+        public void UnloadLevel()
+        {
+            CurrentLevel = null;
+        }
+
+        /// <summary>
+        /// Opdaterer alt i current level.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
@@ -31,7 +47,7 @@ namespace Grief.Classes.Levels
         }
 
         /// <summary>
-        /// Tegner alt i currentlevel
+        /// Tegner alt i current level.
         /// </summary>
         /// <param name="spriteBatch"></param>
         /// <param name="viewMatrix"></param>
