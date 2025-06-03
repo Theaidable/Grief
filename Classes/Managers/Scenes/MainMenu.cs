@@ -9,28 +9,34 @@ namespace Grief.Classes.GameManager.Scenes
 {
     public class MainMenu : Scene
     {
+        //Fields
+
+        //Textures + en scale
         private Texture2D background;
         private Texture2D title;
-
         private Texture2D startButton;
         private Texture2D loadButton;
         private Texture2D exitButton;
-
         private float buttonScale = 0.1f;
 
-        // These are your "world"/menu coordinates - keep as you like
+        //World coordinates
         private Vector2 startButtonPos = new Vector2(-40, -30);
         private Vector2 loadButtonPos = new Vector2(-40, 0);
         private Vector2 exitButtonPos = new Vector2(-40, 30);
 
+        //Box Rectangles
         private Rectangle startRect;
         private Rectangle loadRect;
         private Rectangle exitRect;
 
+        //MousePosition
         private MouseState currentMouse;
         private MouseState previousMouse;
         private Point mousePosition;
 
+        /// <summary>
+        /// Load Textures og knappers placering
+        /// </summary>
         public override void LoadContent()
         {
             var content = GameWorld.Instance.Content;
@@ -42,7 +48,6 @@ namespace Grief.Classes.GameManager.Scenes
             loadButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/LG");
             exitButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
 
-            // Calculate hitboxes to match draw
             startRect = new Rectangle
                 (
                     (int)startButtonPos.X,
@@ -68,6 +73,10 @@ namespace Grief.Classes.GameManager.Scenes
                 );
         }
 
+        /// <summary>
+        /// Update af musens placering
+        /// </summary>
+        /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
             currentMouse = Mouse.GetState();
@@ -92,11 +101,23 @@ namespace Grief.Classes.GameManager.Scenes
             previousMouse = currentMouse;
         }
 
+        /// <summary>
+        /// Tjek om musen hover en knap
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsHovering(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition);
         }
         
+        /// <summary>
+        /// Tjekker om man klikker på knappen
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition) 
@@ -104,6 +125,10 @@ namespace Grief.Classes.GameManager.Scenes
                 && previousMouse.LeftButton == ButtonState.Released;
         }
 
+        /// <summary>
+        /// Tegner main menuen
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             //Draw Background

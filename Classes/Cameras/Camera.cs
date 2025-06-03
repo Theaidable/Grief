@@ -42,6 +42,11 @@ namespace Greif.Classes.Cameras
             zoom = MathHelper.Clamp(newZoom, 0.1f, 10f);
         }
 
+        /// <summary>
+        /// Skal bruges til at omsætte screen position til world position
+        /// </summary>
+        /// <param name="screenPosition"></param>
+        /// <returns></returns>
         public Vector2 ScreenToWorld(Vector2 screenPosition)
         {
             return Vector2.Transform(screenPosition, Matrix.Invert(ViewMatrix));
