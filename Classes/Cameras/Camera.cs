@@ -47,8 +47,8 @@ namespace Greif.Classes.Cameras
 
             var viewport = GameWorld.Instance.GraphicsDevice.Viewport;
 
-            position.X = MathHelper.Clamp(position.X,viewport.Width / (2 * zoom), mapWidth - viewport.Width / (2 * zoom));
-            position.Y = MathHelper.Clamp(position.Y,viewport.Height / (2 * zoom),mapHeight - viewport.Height / (2 *zoom));
+            position.X = MathHelper.Clamp(position.X, viewport.Width / (2 * zoom), mapWidth - viewport.Width / (2 * zoom));
+            position.Y = MathHelper.Clamp(position.Y, viewport.Height / (2 * zoom), mapHeight - viewport.Height / (2 * zoom));
         }
 
         /// <summary>
@@ -58,6 +58,16 @@ namespace Greif.Classes.Cameras
         public void SetZoom(float newZoom)
         {
             zoom = MathHelper.Clamp(newZoom, 0.1f, 10f);
+        }
+
+        /// <summary>
+        /// Skal bruges til at omsætte screen position til world position
+        /// </summary>
+        /// <param name="screenPosition"></param>
+        /// <returns></returns>
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            return Vector2.Transform(screenPosition, Matrix.Invert(ViewMatrix));
         }
     }
 }

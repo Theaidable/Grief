@@ -117,24 +117,24 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             if (cooldownTimer > 0)
                 cooldownTimer -= GameWorld.Instance.DeltaTime;
 
-            // Tilføj gravity hvis ikke grounded
+            // Tilføj gravity via Transform.Velocity hvis ikke grounded
             if (!grounded)
-                velocity.Y += gravity * GameWorld.Instance.DeltaTime;
+                GameObject.Transform.Velocity += new Vector2(0, gravity * GameWorld.Instance.DeltaTime);
 
             // Hvis enemy angriber, så stop alle andre handlinger
             if (isAttacking)
                 return;
 
             // Opdatér position baseret på Y-velocity
-            Vector2 originalPosition = GameObject.Transform.Position;
-            GameObject.Transform.Translate(new Vector2(0, velocity.Y * GameWorld.Instance.DeltaTime));
+            Vector2 movement = new Vector2(0, GameObject.Transform.Velocity.Y * GameWorld.Instance.DeltaTime);
+            GameObject.Transform.Translate(movement);
 
-            // Tjek om enemy er grounded
-            grounded = CheckGrounded();
+            // Tjek om enemy er grounded via Collider
+            grounded = collider != null && collider.CheckGrounded(GameObject);
 
             // Stop nedadgående bevægelse hvis grounded
-            if (grounded && velocity.Y > 0)
-                velocity.Y = 0;
+            if (grounded && GameObject.Transform.Velocity.Y > 0)
+                GameObject.Transform.Velocity = new Vector2(GameObject.Transform.Velocity.X, 0);
             else if (!grounded)
                 animator.PlayAnimation("Idle"); // Mulighed for jump/fall animation
 
@@ -156,65 +156,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             }
         }
 
-        /// <summary>
-        /// Tjek om enemy står på jorden (tager højde for både rektangler og polygoner).
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckGrounded()
-        {
-            var enemyCollider = collider.CollisionBox;
-            var rectTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionRectangles;
-            var polyTiles = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons;
-
-            foreach (var tile in rectTiles)
-            {
-                bool isAbove = enemyCollider.Bottom <= tile.Top + 5;
-                bool isFallingOnto = enemyCollider.Bottom + velocity.Y * GameWorld.Instance.DeltaTime >= tile.Top;
-                bool horizontalOverlap = enemyCollider.Right > tile.Left && enemyCollider.Left < tile.Right;
-
-                if (isAbove && isFallingOnto && horizontalOverlap)
-                {
-                    GameObject.Transform.Position = new Vector2(GameObject.Transform.Position.X, tile.Top - enemyCollider.Height / 2f);
-                    return true;
-                }
-            }
-
-            foreach (var tile in polyTiles)
-            {
-                var points = tile.Vertices;
-
-                for (int i = 0; i < points.Length - 1; i++)
-                {
-                    Vector2 p1 = points[i];
-                    Vector2 p2 = points[(i + 1) % points.Length];
-
-                    if (Math.Abs(p1.X - p2.X) < 1f)
-                        continue;
-
-                    if (p1.X > p2.X)
-                    {
-                        var temp = p1;
-                        p1 = p2;
-                        p2 = temp;
-                    }
-
-                    float enemyX = enemyCollider.Center.X;
-
-                    if (enemyX >= p1.X && enemyX <= p2.X)
-                    {
-                        float slope = (p2.Y - p1.Y) / (p2.X - p1.X);
-                        float yOnSlope = p1.Y + slope * (enemyX - p1.X);
-
-                        float enemyBottom = GameObject.Transform.Position.Y + enemyCollider.Height / 2f;
-
-                        if (enemyBottom >= yOnSlope - 10 && enemyBottom <= yOnSlope + 10)
-                            return true;
-                    }
-                }
-            }
-
-            return false;
-        }
 
         /// <summary>
         /// Patruljer mellem forudbestemte punkter.
