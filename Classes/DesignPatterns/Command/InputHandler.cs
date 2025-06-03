@@ -56,7 +56,7 @@ namespace Grief.Classes.DesignPatterns.Command
         /// <param name="command"></param>
         public void AddUpdateCommand(Keys inputKey, ICommand command)
         {
-            keybindsUpdate.Add(inputKey, command);
+            keybindsUpdate[inputKey] = command;
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Grief.Classes.DesignPatterns.Command
         /// <param name="command"></param>
         public void AddButtonDownCommand(Keys inputKey, ICommand command)
         {
-            keybindsButtonDown.Add(inputKey, command);
+            keybindsButtonDown[inputKey] = command;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Grief.Classes.DesignPatterns.Command
         /// <param name="command"></param>
         public void AddButtonUpCommand(Keys inputKey, ICommand command)
         {
-            keybindsButtonUp.Add(inputKey, command);
+            keybindsButtonUp[inputKey] = command;
         }
 
         /// <summary>
