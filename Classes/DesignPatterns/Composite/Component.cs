@@ -19,6 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite
         //Virtuelle metoder som skal bruges af components children
         public virtual void Awake() { }
         public virtual void Start() { }
+        public virtual void LateStart() { }
         public virtual void Update() { }
         public virtual void Draw(SpriteBatch spriteBatch) { }
     }

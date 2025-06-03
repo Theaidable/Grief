@@ -36,7 +36,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public override void Start()
         {
-            backgroundTexture = GameWorld.Instance.Content.Load<Texture2D>("UI/SettingsMenu");
+            backgroundTexture = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/SettingsMenu");
             backgroundSource = new Rectangle(125, 0, 120, 140);
         }
 
@@ -45,7 +45,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public override void Update()
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
+            var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
             var playerX = player.Transform.Position.X;
             var playerY = player.Transform.Position.Y;
 

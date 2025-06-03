@@ -25,7 +25,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void PickUpItem()
         {
-            var player = GameWorld.Instance.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
+            var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
 
             if (player != null)
             {
@@ -37,7 +37,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     var inventory = player.GetComponent<InventoryComponent>();
                     inventory.AddItemToInventory(Item);
 
-                    GameWorld.Instance.LevelManager.CurrentLevel.QueueRemove(GameObject);
+                    GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueRemove(GameObject);
                 }
             }
         }
