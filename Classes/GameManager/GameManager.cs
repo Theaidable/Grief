@@ -42,7 +42,6 @@ namespace Grief.Classes.GameManager
             pauseOverlay = new PauseOverlay();
 
             LevelManager = new LevelManager();
-            LevelManager.LoadLevel("GriefMap1");
 
             ChangeState(GameState.MainMenu);
         }

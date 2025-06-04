@@ -7,6 +7,7 @@ namespace Grief.Classes.GameManager
     {
         private static Song menuSong;
         private static Song levelSong;
+        private static Song currentSong;
 
         public static void LoadContent(ContentManager content)
         {
@@ -16,21 +17,23 @@ namespace Grief.Classes.GameManager
 
         public static void PlayMenuMusic()
         {
-            if (MediaPlayer.Queue.ActiveSong != menuSong)
+            if (currentSong != menuSong)
             {
                 MediaPlayer.Stop();
                 MediaPlayer.IsRepeating = true;
                 MediaPlayer.Play(menuSong);
+                currentSong = menuSong;
             }
         }
 
         public static void PlayLevelMusic()
         {
-            if (MediaPlayer.Queue.ActiveSong != levelSong)
+            if (currentSong != levelSong)
             {
                 MediaPlayer.Stop();
                 MediaPlayer.IsRepeating = true;
                 MediaPlayer.Play(levelSong);
+                currentSong = levelSong;
             }
         }
 
