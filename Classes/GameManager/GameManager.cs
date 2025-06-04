@@ -72,30 +72,33 @@ namespace Grief.Classes.GameManager
             switch (CurrentState)
             {
                 case GameState.MainMenu:
-                    mainMenu.Update(gameTime);
+
+                    GameWorld.Instance.Camera.Position = Vector2.Zero;
+                    mainMenu.Update(gameTime); 
                     break;
+
                 case GameState.LoadGame:
                     loadGameScene.Update(gameTime);
                     break;
+
                 case GameState.Level:
                     // TJEK for ESC kun i Level-state
                     if (keyState.IsKeyDown(Keys.Escape) && previousKeyState.IsKeyUp(Keys.Escape))
                     {
                         ChangeState(GameState.Paused);
-                        // evt. return; hvis du ikke vil have LevelManager.Update kørt samme frame
                     }
                     else
                     {
                         LevelManager.Update(gameTime);
                     }
                     break;
+
                 case GameState.Paused:
-                    LevelManager.Update(gameTime); // valgfrit
                     pauseOverlay.Update(gameTime);
                     break;
             }
 
-            previousKeyState = keyState; // Opdater state til næste frame
+            previousKeyState = keyState;
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -105,12 +108,15 @@ namespace Grief.Classes.GameManager
                 case GameState.MainMenu:
                     mainMenu.Draw(spriteBatch);
                     break;
+
                 case GameState.LoadGame:
                     loadGameScene.Draw(spriteBatch);
                     break;
+
                 case GameState.Level:
                     LevelManager.Draw(spriteBatch, GameWorld.Instance.Camera.ViewMatrix);
                     break;
+
                 case GameState.Paused:
                     LevelManager.Draw(spriteBatch, GameWorld.Instance.Camera.ViewMatrix);
                     pauseOverlay.Draw(spriteBatch);

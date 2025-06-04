@@ -230,12 +230,9 @@ namespace Grief.Classes.Levels
         {
             mapRenderer.Update(gameTime);
 
-            if(GameWorld.Instance.GameManager.CurrentState != GameManager.GameManager.GameState.Paused)
+            foreach (GameObject gameObject in GameObjects)
             {
-                foreach (GameObject gameObject in GameObjects)
-                {
-                    gameObject.Update();
-                }
+                gameObject.Update();
             }
 
             foreach (GameObject gameObject in objectsToRemove)

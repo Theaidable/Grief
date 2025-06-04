@@ -141,12 +141,13 @@ namespace Grief.Classes.GameManager.Scenes
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Tegn mørk overlay for at "fade" baggrunden
+            Vector2 topLeft = GameWorld.Instance.Camera.ScreenToWorld(Vector2.Zero);
             Vector2 bottomRight = GameWorld.Instance.Camera.ScreenToWorld(new Vector2(viewport.Width, viewport.Height));
 
             Rectangle fadeRect = new Rectangle
                 (
-                    0,
-                    0,
+                    (int)topLeft.X,
+                    (int)topLeft.Y,
                     (int)bottomRight.X,
                     (int)bottomRight.Y
                 );

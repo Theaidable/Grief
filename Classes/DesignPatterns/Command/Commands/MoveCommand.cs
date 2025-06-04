@@ -1,6 +1,4 @@
-﻿using Greif;
-using Grief.Classes.DesignPatterns.Composite;
-using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
+﻿using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Microsoft.Xna.Framework;
 
 namespace Grief.Classes.DesignPatterns.Command.Commands
@@ -29,10 +27,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
         /// </summary>
         public void Execute()
         {
-            if (GameWorld.Instance.GameManager.CurrentState != GameManager.GameManager.GameState.Paused)
-            {
-                player.Move(direction);
-            }
+            player.Move(direction);
         }
     }
 }

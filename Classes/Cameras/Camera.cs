@@ -9,16 +9,18 @@ namespace Greif.Classes.Cameras
     public class Camera
     {
         //Private fields
-        private Vector2 position;
         private float zoom;
         private float rotation;
+        private Vector2 position;
+
+        public Vector2 Position { get; set; }
 
         //Matrix
         public Matrix ViewMatrix
         {
             get
             {
-                return Matrix.CreateTranslation(new Vector3(-position.X, -position.Y, 0)) *
+                return Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *
                        Matrix.CreateRotationZ(rotation) *
                        Matrix.CreateScale(zoom, zoom, 1f) *
                        Matrix.CreateTranslation(new Vector3(GameWorld.Instance.GraphicsDevice.Viewport.Width / 2f, GameWorld.Instance.GraphicsDevice.Viewport.Height / 2f, 0));
@@ -32,7 +34,7 @@ namespace Greif.Classes.Cameras
         {
             zoom = 2.7f;
             rotation = 0f;
-            position = Vector2.Zero;
+            Position = Vector2.Zero;
         }
 
         /// <summary>
@@ -43,12 +45,14 @@ namespace Greif.Classes.Cameras
         /// <param name="mapHeight"></param>
         public void Follow(GameObject target, int mapWidth, int mapHeight)
         {
-            position = target.Transform.Position;
+            Position = target.Transform.Position;
 
             var viewport = GameWorld.Instance.GraphicsDevice.Viewport;
 
-            position.X = MathHelper.Clamp(position.X, viewport.Width / (2 * zoom), mapWidth - viewport.Width / (2 * zoom));
-            position.Y = MathHelper.Clamp(position.Y, viewport.Height / (2 * zoom), mapHeight - viewport.Height / (2 * zoom));
+            position.X = MathHelper.Clamp(Position.X, viewport.Width / (2 * zoom), mapWidth - viewport.Width / (2 * zoom));
+            position.Y = MathHelper.Clamp(Position.Y, viewport.Height / (2 * zoom), mapHeight - viewport.Height / (2 * zoom));
+
+            Position = position;
         }
 
         /// <summary>
