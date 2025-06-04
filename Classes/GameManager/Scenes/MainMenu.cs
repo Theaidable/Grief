@@ -40,6 +40,7 @@ namespace Grief.Classes.GameManager.Scenes
         public override void LoadContent()
         {
             var content = GameWorld.Instance.Content;
+            SoundManager.PlayMenuMusic();
 
             background = content.Load<Texture2D>("TileMaps/Assets/UI/MenuBackground/MenuBG");
             title = content.Load<Texture2D>("TileMaps/Assets/UI/Text/Title");

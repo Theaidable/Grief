@@ -994,6 +994,60 @@
 /processorParam:TextureFormat=Color
 /build:NPCs/Portraits/PortraitMom.png
 
+#begin Sound/BGM/Cuddle Clouds.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Cuddle Clouds.mp3;Sound/BGM/Cuddle Clouds
+
+#begin Sound/BGM/Evening Harmony.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Evening Harmony.mp3;Sound/BGM/Evening Harmony
+
+#begin Sound/BGM/Floating Dream.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Floating Dream.mp3;Sound/BGM/Floating Dream
+
+#begin Sound/BGM/Gentle Breeze.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Gentle Breeze.mp3;Sound/BGM/Gentle Breeze
+
+#begin Sound/BGM/Golden Gleam.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Golden Gleam.mp3;Sound/BGM/Golden Gleam
+
+#begin Sound/BGM/Polar Lights.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Polar Lights.mp3;Sound/BGM/Polar Lights
+
+#begin Sound/BGM/Sunlight Through Leaves.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Sunlight Through Leaves.mp3;Sound/BGM/Sunlight Through Leaves
+
+#begin Sound/BGM/Wanderer's Tale.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Wanderer's Tale.mp3;Sound/BGM/Wanderer's Tale
+
+#begin Sound/BGM/Whispering Woods.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Whispering Woods.mp3;Sound/BGM/Whispering Woods
+
 #begin TileMaps/Assets/Character/Character_Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -9,6 +9,7 @@ using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.GameManager;
 using Grief.Classes.Items.Items;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
@@ -50,6 +51,8 @@ namespace Grief.Classes.Levels
         /// <param name="levelName"></param>
         public void Load(string levelName)
         {
+            SoundManager.PlayLevelMusic();
+
             Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, Map);
 
