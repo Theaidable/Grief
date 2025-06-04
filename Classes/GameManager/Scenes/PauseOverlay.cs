@@ -112,7 +112,7 @@ namespace Grief.Classes.GameManager.Scenes
             }
             if (IsClicked(saveRect, mousePosition))
             {
-                Debug.WriteLine("Save clicked! (Not implemented)");
+                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.SaveGame);
             }
             if (IsClicked(quitRect, mousePosition))
             {
