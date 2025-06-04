@@ -56,8 +56,8 @@ CREATE TABLE Quest (
     questGiver INT REFERENCES NPC(npcID),
     description VARCHAR(500),
     requiredItemName INT REFERENCES Item(itemID),
-    isAccepted INT NOT NULL,
-    isCompleted INT NOT NULL
+    isAccepted BIT NOT NULL,
+    isCompleted BIT NOT NULL
 );
 
 -- Inventory Table
