@@ -112,7 +112,7 @@ namespace Grief.Classes.GameManager.Scenes
             }
             if (IsClicked(saveRect, mousePosition))
             {
-                Debug.WriteLine("Save clicked! (Not implemented)");
+                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.SaveGame);
             }
             if (IsClicked(quitRect, mousePosition))
             {
@@ -130,7 +130,7 @@ namespace Grief.Classes.GameManager.Scenes
             return rect.Contains(mousePosition);
         }
 
-        // Klik tjek (ligesom MainMenu)
+        // Klik tjek
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition)

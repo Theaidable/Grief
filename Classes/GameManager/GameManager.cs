@@ -16,6 +16,7 @@ namespace Grief.Classes.GameManager
         {
             MainMenu,
             LoadGame,
+            SaveGame,
             Level,
             Paused
         }
@@ -24,6 +25,7 @@ namespace Grief.Classes.GameManager
 
         private Scene mainMenu;
         private Scene loadGameScene;
+        private Scene saveGameScene;
         private PauseOverlay pauseOverlay;
 
         private KeyboardState previousKeyState;
@@ -35,7 +37,8 @@ namespace Grief.Classes.GameManager
             mainMenu = new MainMenu();
             mainMenu.LoadContent();
 
-            loadGameScene = new LoadGame();           
+            loadGameScene = new LoadGame();
+            saveGameScene = new SaveGame();
             pauseOverlay = new PauseOverlay();
 
             LevelManager = new LevelManager();
@@ -54,7 +57,10 @@ namespace Grief.Classes.GameManager
                     // Setup for MainMenu
                     break;
                 case GameState.LoadGame:
-                    // Setup for LoadGame
+                    loadGameScene.LoadContent();// Setup for LoadGame
+                    break;
+                case GameState.SaveGame:
+                    saveGameScene.LoadContent();// Setup for SaveGame
                     break;
                 case GameState.Level:
                     // Setup gameplay
@@ -72,13 +78,16 @@ namespace Grief.Classes.GameManager
             switch (CurrentState)
             {
                 case GameState.MainMenu:
-
                     GameWorld.Instance.Camera.Position = Vector2.Zero;
                     mainMenu.Update(gameTime); 
                     break;
 
                 case GameState.LoadGame:
                     loadGameScene.Update(gameTime);
+                    break;
+
+                case GameState.SaveGame:
+                    saveGameScene.Update(gameTime);
                     break;
 
                 case GameState.Level:
@@ -111,6 +120,11 @@ namespace Grief.Classes.GameManager
 
                 case GameState.LoadGame:
                     loadGameScene.Draw(spriteBatch);
+                    break;
+
+                case GameState.SaveGame:
+                    LevelManager.Draw(spriteBatch, GameWorld.Instance.Camera.ViewMatrix);
+                    saveGameScene.Draw(spriteBatch);
                     break;
 
                 case GameState.Level:
