@@ -337,9 +337,9 @@ namespace Grief.Classes.GameManager
                         string name = npcComponent.Name;
 
                         string insertNpc = @"
-                            INSERT INTO NPC (npcName, positionX, positionY, levelID)
+                            INSERT INTO NPC (npcName, positionX, positionY, levelID, dialogBeforeAccept, dialogAcceptedNotCompleted, dialogOnCompleted, dialogAlreadyCompleted)
                             OUTPUT INSERTED.npcID
-                            VALUES (@name, @x, @y, @levelID)";
+                            VALUES (@name, @x, @y, @levelID, @beforeAccept, @acceptedNotCompleted, @onCompleted, @alreadyComplted)";
 
                         int npcID;
                         using (SqlCommand cmd = new SqlCommand(insertNpc, con))
@@ -348,6 +348,10 @@ namespace Grief.Classes.GameManager
                             cmd.Parameters.AddWithValue("@x", npc.Transform.Position.X);
                             cmd.Parameters.AddWithValue("@y", npc.Transform.Position.Y);
                             cmd.Parameters.AddWithValue("@levelID", levelID);
+                            cmd.Parameters.AddWithValue("@beforeAccept", string.Join("|", npcComponent.DialogLinesBeforeAccept));
+                            cmd.Parameters.AddWithValue("@acceptedNotCompleted", string.Join("|", npcComponent.DialogLinesAcceptedNotCompleted));
+                            cmd.Parameters.AddWithValue("@onCompleted", string.Join("|", npcComponent.DialogLinesOnCompleted));
+                            cmd.Parameters.AddWithValue("@alreadyCompleted", string.Join("|", npcComponent.DialogLinesAlreadyCompleted));
                             npcID = (int)cmd.ExecuteScalar();
                         }
 
@@ -377,10 +381,34 @@ namespace Grief.Classes.GameManager
                                     requiredItemID = (int)cmd.ExecuteScalar();
                                 }
 
+                                int? rewardItemID = null;
+
+                                if(fetch.RewardItem != null)
+                                {
+                                    string insertRewardItem = @"
+                                        IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                                        BEGIN
+                                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                                        END";
+
+                                    using (SqlCommand cmd = new SqlCommand(insertRewardItem, con))
+                                    {
+                                        cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
+                                        cmd.Parameters.AddWithValue("@itemType", fetch.RewardItem.Type);
+                                        cmd.ExecuteNonQuery();
+                                    }
+
+                                    using (SqlCommand cmd = new SqlCommand("SELECT itemID FROM Item WHERE itemName = @itemName", con))
+                                    {
+                                        cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
+                                        rewardItemID = (int)cmd.ExecuteScalar();
+                                    }
+                                }
+
                                 //Insert Quest
                                 string insertQuest = @"
-                                    INSERT INTO Quest (questName, questGiver, description, requiredItemName, isAccepted, isCompleted)
-                                    VALUES (@title, @giver, @desc, @item, @accepted, @completed)";
+                                    INSERT INTO Quest (questName, questGiver, description, requiredItemName, rewardItemName, isAccepted, isCompleted)
+                                    VALUES (@title, @giver, @desc, @item, @reward, @accepted, @completed)";
 
                                 using (SqlCommand cmd = new SqlCommand(insertQuest, con))
                                 {
@@ -388,6 +416,7 @@ namespace Grief.Classes.GameManager
                                     cmd.Parameters.AddWithValue("@giver", npcID);
                                     cmd.Parameters.AddWithValue("@desc", fetch.Description);
                                     cmd.Parameters.AddWithValue("@item", requiredItemID.HasValue ? requiredItemID.Value : (object)DBNull.Value);
+                                    cmd.Parameters.AddWithValue("@reward", rewardItemID.HasValue ? rewardItemID.Value : (object)DBNull.Value);
                                     cmd.Parameters.AddWithValue("@accepted", fetch.IsAccepted);
                                     cmd.Parameters.AddWithValue("@completed", fetch.IsCompleted);
                                     cmd.ExecuteNonQuery();
@@ -399,6 +428,10 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Metode til at indlæse et tidligere spils tilstand
+        /// </summary>
+        /// <param name="saveSlot"></param>
         public void LoadGame(int saveSlot)
         {
             using (SqlConnection con = new SqlConnection(connectionString))
@@ -516,11 +549,14 @@ namespace Grief.Classes.GameManager
                 //Load NPCs og Quests
                 string query = @"
                     SELECT 
-                    NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
-                    Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted
+                        NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
+                        Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted,
+                        NPC.dialogBeforeAccept, NPC.dialogAcceptedNotCompleted, NPC.dialogOnCompleted, NPC.dialogAlreadyCompleted,
+                        R.itemName AS rewardItemName, R.itemType AS rewardItemType
                     FROM NPC
                     LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
                     LEFT JOIN Item I ON Q.requiredItemName = I.itemID
+                    LEFT JOIN Item R ON Q.rewardItemName = R.itemID
                     WHERE NPC.levelID = @levelID";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
@@ -542,11 +578,29 @@ namespace Grief.Classes.GameManager
                             bool? accepted = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7);
                             bool? completed = reader.IsDBNull(8) ? (bool?)null : reader.GetBoolean(8);
 
+                            // Dialog
+                            string beforeAccept = reader.IsDBNull(9) ? "" : reader.GetString(9);
+                            string acceptedNotCompleted = reader.IsDBNull(10) ? "" : reader.GetString(10);
+                            string onCompleted = reader.IsDBNull(11) ? "" : reader.GetString(11);
+                            string alreadyCompleted = reader.IsDBNull(12) ? "" : reader.GetString(12);
+
+                            // Reward item
+                            string rewardItemName = reader.IsDBNull(13) ? null : reader.GetString(13);
+                            string rewardItemType = reader.IsDBNull(14) ? null : reader.GetString(14);
+
                             Quest quest = null;
                             if (questName != null)
                             {
-                                var reward = new StoryItem("DiaryPage", "StoryItem");
-                                var fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, reward);
+                                Item rewardItem = rewardItemName != null
+                                    ? rewardItemType switch
+                                    {
+                                        "StoryItem" => new StoryItem(rewardItemName, rewardItemType),
+                                        "QuestItem" => new QuestItem(rewardItemName, rewardItemType),
+                                        _ => null
+                                    }
+                                    : null;
+                                
+                                Quest fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, rewardItem);
 
                                 if (accepted == true)
                                 {
@@ -561,12 +615,18 @@ namespace Grief.Classes.GameManager
                                 quest = fetchQuest;
                             }
 
-                            // Opret NPC via builder
+                            //Konverter dialog
+                            List<string> dialogBeforeAccept = beforeAccept.Split('|').ToList();
+                            List<string> dialogAcceptedNotCompleted = acceptedNotCompleted.Split('|').ToList();
+                            List<string> dialogOnCompleted = onCompleted.Split('|').ToList();
+                            List<string> dialogAlreadyCompleted = alreadyCompleted.Split('|').ToList();
+
+                            //Byg NPC
                             var npcBuilder = new NpcBuilder();
                             var npcDirector = new GameObjectDirector(npcBuilder);
                             npcBuilder.SetPosition(new Vector2(x, y));
                             npcBuilder.SetName(name);
-                            npcBuilder.SetDialog(new List<string> { "..." }, new List<string> { "..." }, new List<string> { "..." }, new List<string> { "..." });
+                            npcBuilder.SetDialog(dialogBeforeAccept, dialogAcceptedNotCompleted, dialogOnCompleted, dialogAlreadyCompleted);
                             npcBuilder.SetQuest(quest);
                             npcBuilder.AddScriptComponent<NpcComponent>();
                             var npc = npcDirector.Construct(name);
