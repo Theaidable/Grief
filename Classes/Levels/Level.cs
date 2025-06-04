@@ -51,8 +51,6 @@ namespace Grief.Classes.Levels
         /// <param name="levelName"></param>
         public void Load(string levelName)
         {
-            SoundManager.PlayLevelMusic();
-
             Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, Map);
 
