@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System.Collections.Generic;
-using Grief.Classes.Scenes;
 using Grief.Classes.GameManager.Scenes;
 using Grief.Classes.Levels;
 
@@ -26,6 +25,8 @@ namespace Grief.Classes.GameManager
         private Scene mainMenu;
         private Scene loadGameScene;
         private PauseOverlay pauseOverlay;
+
+        private KeyboardState previousKeyState;
 
         public LevelManager LevelManager { get; private set; }
 
@@ -59,13 +60,15 @@ namespace Grief.Classes.GameManager
                     // Setup gameplay
                     break;
                 case GameState.Paused:
-                    // Pause-specific actions
+                    pauseOverlay.LoadContent(); // Pause-specific actions
                     break;
             }
         }
 
         public void Update(GameTime gameTime)
         {
+            KeyboardState keyState = Keyboard.GetState();
+
             switch (CurrentState)
             {
                 case GameState.MainMenu:
@@ -75,13 +78,24 @@ namespace Grief.Classes.GameManager
                     loadGameScene.Update(gameTime);
                     break;
                 case GameState.Level:
-                    LevelManager.Update(gameTime);
+                    // TJEK for ESC kun i Level-state
+                    if (keyState.IsKeyDown(Keys.Escape) && previousKeyState.IsKeyUp(Keys.Escape))
+                    {
+                        ChangeState(GameState.Paused);
+                        // evt. return; hvis du ikke vil have LevelManager.Update kørt samme frame
+                    }
+                    else
+                    {
+                        LevelManager.Update(gameTime);
+                    }
                     break;
                 case GameState.Paused:
-                    LevelManager.Update(gameTime); // Optional: minimal updates
+                    LevelManager.Update(gameTime); // valgfrit
                     pauseOverlay.Update(gameTime);
                     break;
             }
+
+            previousKeyState = keyState; // Opdater state til næste frame
         }
 
         public void Draw(SpriteBatch spriteBatch)
