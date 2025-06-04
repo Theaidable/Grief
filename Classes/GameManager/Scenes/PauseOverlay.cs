@@ -17,9 +17,14 @@ namespace Grief.Classes.GameManager.Scenes
         private float buttonScale = 0.1f;
 
         // Button positions
-        private Vector2 continueButtonPos = new Vector2(0, -30);
-        private Vector2 saveButtonPos = new Vector2(0, 0);
-        private Vector2 quitButtonPos = new Vector2(0, 30);
+        private Vector2 continueButtonPos;
+        private Vector2 saveButtonPos;
+        private Vector2 quitButtonPos;
+
+        //Position
+        private Viewport viewport;
+        private Vector2 screenCenter;
+        private Vector2 worldCenter;
 
         // Box Rectangles
         private Rectangle continueRect;
@@ -37,43 +42,64 @@ namespace Grief.Classes.GameManager.Scenes
 
         public override void LoadContent()
         {
-            var content = GameWorld.Instance.Content;
-
             //background = content.Load<Texture2D>("TileMaps/Assets/UI/MenuBackground/MenuBG");
-            continueButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Continue");
-            saveButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/SG");
-            quitButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
+            continueButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Continue");
+            saveButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/SG");
+            quitButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
 
-            continueRect = new Rectangle(
-                (int)continueButtonPos.X,
-                (int)continueButtonPos.Y,
-                (int)(continueButton.Width * buttonScale),
-                (int)(continueButton.Height * buttonScale)
-            );
-            saveRect = new Rectangle(
-                (int)saveButtonPos.X,
-                (int)saveButtonPos.Y,
-                (int)(saveButton.Width * buttonScale),
-                (int)(saveButton.Height * buttonScale)
-            );
-            quitRect = new Rectangle(
-                (int)quitButtonPos.X,
-                (int)quitButtonPos.Y,
-                (int)(quitButton.Width * buttonScale),
-                (int)(quitButton.Height * buttonScale)
-            );
-
+            //Debug checks
             if (continueButton == null)
+            {
                 Debug.WriteLine("continueButton texture is NULL!");
+            }
+
             if (saveButton == null)
+            {
                 Debug.WriteLine("saveButton texture is NULL!");
+            }
+
             if (quitButton == null)
+            {
                 Debug.WriteLine("quitButton texture is NULL!");
+            }
 
         }
 
         public override void Update(GameTime gameTime)
         {
+            //Opdatere postionen for rectanglerne
+            viewport = GameWorld.Instance.GraphicsDevice.Viewport;
+            screenCenter = new Vector2(viewport.Width / 2, viewport.Height / 2);
+            worldCenter = GameWorld.Instance.Camera.ScreenToWorld(screenCenter);
+
+            continueButtonPos = worldCenter + new Vector2(-continueButton.Width * buttonScale / 2f, -30);
+            saveButtonPos = worldCenter + new Vector2(-saveButton.Width * buttonScale / 2f, 0);
+            quitButtonPos = worldCenter + new Vector2(-quitButton.Width * buttonScale / 2f, 30);
+
+            continueRect = new Rectangle
+                (
+                    (int)continueButtonPos.X,
+                    (int)continueButtonPos.Y,
+                    (int)(continueButton.Width * buttonScale),
+                    (int)(continueButton.Height * buttonScale)
+                );
+
+            saveRect = new Rectangle
+                (
+                    (int)saveButtonPos.X,
+                    (int)saveButtonPos.Y,
+                    (int)(saveButton.Width * buttonScale),
+                    (int)(saveButton.Height * buttonScale)
+                );
+
+            quitRect = new Rectangle
+                (
+                    (int)quitButtonPos.X,
+                    (int)quitButtonPos.Y,
+                    (int)(quitButton.Width * buttonScale),
+                    (int)(quitButton.Height * buttonScale)
+                );
+
             currentMouse = Mouse.GetState();
             KeyboardState keyState = Keyboard.GetState();
             Vector2 worldMousePos = GameWorld.Instance.Camera.ScreenToWorld(currentMouse.Position.ToVector2());
@@ -115,7 +141,17 @@ namespace Grief.Classes.GameManager.Scenes
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Tegn mørk overlay for at "fade" baggrunden
-            spriteBatch.Draw(GameWorld.Instance.Pixel, new Rectangle(0, 0, 576, 324), Color.Black * 0.5f);
+            Vector2 bottomRight = GameWorld.Instance.Camera.ScreenToWorld(new Vector2(viewport.Width, viewport.Height));
+
+            Rectangle fadeRect = new Rectangle
+                (
+                    0,
+                    0,
+                    (int)bottomRight.X,
+                    (int)bottomRight.Y
+                );
+
+            spriteBatch.Draw(GameWorld.Instance.Pixel, fadeRect, Color.Black * 0.5f);
 
             // Tegn menu baggrund
             //spriteBatch.Draw(background, new Rectangle(-320, -135, 576, 324), Color.White);
