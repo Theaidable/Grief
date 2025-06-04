@@ -130,7 +130,7 @@ namespace Grief.Classes.GameManager.Scenes
             return rect.Contains(mousePosition);
         }
 
-        // Klik tjek (ligesom MainMenu)
+        // Klik tjek
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition)
