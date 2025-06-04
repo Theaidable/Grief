@@ -91,11 +91,6 @@ namespace Greif
             Camera = new Camera();
             Dialog = new DialogSystem();
 
-            // Bind test-kommando til at toggle collider drawing på det nuværende level
-            InputHandler.Instance.AddButtonDownCommand(
-                Keys.K,
-                new ToggleColliderDrawingCommand(GameManager.LevelManager.CurrentLevel.GameObjects));
-
             base.Initialize();
         }
 
