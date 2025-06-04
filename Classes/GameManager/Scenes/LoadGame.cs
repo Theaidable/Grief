@@ -40,31 +40,37 @@ namespace Grief.Classes.GameManager.Scenes
             slot3Button = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/S3");
             backButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
 
-            // Brug texture-størrelse direkte da dine knapbilleder er i den ønskede størrelse
-            slot1Rect = new Rectangle(
-                (int)slot1Pos.X,
-                (int)slot1Pos.Y,
-                (int)(slot1Button.Width * buttonScale),
-                (int)(slot1Button.Height * buttonScale)
-            );
-            slot2Rect = new Rectangle(
-                (int)slot2Pos.X,
-                (int)slot2Pos.Y,
-                (int)(slot2Button.Width * buttonScale),
-                (int)(slot2Button.Height * buttonScale)
-            );
-            slot3Rect = new Rectangle(
-                (int)slot3Pos.X,
-                (int)slot3Pos.Y,
-                (int)(slot3Button.Width * buttonScale),
-                (int)(slot3Button.Height * buttonScale)
-            );
-            backRect = new Rectangle(
-                (int)backButtonPos.X,
-                (int)backButtonPos.Y,
-                (int)(backButton.Width * 0.1f),
-                (int)(backButton.Height * 0.1f)
-            );
+            slot1Rect = new Rectangle
+                (
+                    (int)slot1Pos.X,
+                    (int)slot1Pos.Y,
+                    (int)(slot1Button.Width * buttonScale),
+                    (int)(slot1Button.Height * buttonScale)
+                );
+            
+            slot2Rect = new Rectangle
+                (
+                    (int)slot2Pos.X,
+                    (int)slot2Pos.Y,
+                    (int)(slot2Button.Width * buttonScale),
+                    (int)(slot2Button.Height * buttonScale)
+                );
+            
+            slot3Rect = new Rectangle
+                (
+                    (int)slot3Pos.X,
+                    (int)slot3Pos.Y,
+                    (int)(slot3Button.Width * buttonScale),
+                    (int)(slot3Button.Height * buttonScale)
+                );
+            
+            backRect = new Rectangle
+                (
+                    (int)backButtonPos.X,
+                    (int)backButtonPos.Y,
+                    (int)(backButton.Width * 0.1f),
+                    (int)(backButton.Height * 0.1f)
+                );
         }
 
         public override void Update(GameTime gameTime)
@@ -78,16 +84,19 @@ namespace Grief.Classes.GameManager.Scenes
                 Debug.WriteLine("Load slot 1 clicked!");
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
+
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 2 clicked!");
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
+
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 3 clicked!");
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
+
             if (IsClicked(backRect, mousePosition))
             {
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.MainMenu);
@@ -110,15 +119,15 @@ namespace Grief.Classes.GameManager.Scenes
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            // Draw background
+            //Draw background
             spriteBatch.Draw(background, new Rectangle(-320, -135, 576, 324), Color.White);
 
-            // Draw each slot button (med hover-effekt som farve overlay hvis du vil)
+            //Draw each slot button
             spriteBatch.Draw(slot1Button, slot1Pos, null, IsHovering(slot1Rect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
             spriteBatch.Draw(slot2Button, slot2Pos, null, IsHovering(slot2Rect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
             spriteBatch.Draw(slot3Button, slot3Pos, null, IsHovering(slot3Rect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
 
-            // Draw back button (evt. med mindre scale)
+            //Draw back button
             spriteBatch.Draw(backButton, backButtonPos, null, IsHovering(backRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, 0.1f, SpriteEffects.None, 0f);
         }
     }

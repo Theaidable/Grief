@@ -78,7 +78,6 @@ namespace Grief.Classes.GameManager
             switch (CurrentState)
             {
                 case GameState.MainMenu:
-
                     GameWorld.Instance.Camera.Position = Vector2.Zero;
                     mainMenu.Update(gameTime); 
                     break;

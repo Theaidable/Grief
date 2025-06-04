@@ -55,30 +55,37 @@ namespace Grief.Classes.GameManager.Scenes
             slot3Pos = worldCenter + new Vector2(-slot3Button.Width * buttonScale / 2f, 40);
             backButtonPos = worldCenter + new Vector2(-backButton.Width * buttonScale / 2f, 80);
 
-            slot1Rect = new Rectangle(
-                (int)slot1Pos.X,
-                (int)slot1Pos.Y,
-                (int)(slot1Button.Width * buttonScale),
-                (int)(slot1Button.Height * buttonScale)
-            );
-            slot2Rect = new Rectangle(
-                (int)slot2Pos.X,
-                (int)slot2Pos.Y,
-                (int)(slot2Button.Width * buttonScale),
-                (int)(slot2Button.Height * buttonScale)
-            );
-            slot3Rect = new Rectangle(
-                (int)slot3Pos.X,
-                (int)slot3Pos.Y,
-                (int)(slot3Button.Width * buttonScale),
-                (int)(slot3Button.Height * buttonScale)
-            );
-            backRect = new Rectangle(
-                (int)backButtonPos.X,
-                (int)backButtonPos.Y,
-                (int)(backButton.Width * buttonScale),
-                (int)(backButton.Height * buttonScale)
-            );
+            slot1Rect = new Rectangle
+                (
+                    (int)slot1Pos.X,
+                    (int)slot1Pos.Y,
+                    (int)(slot1Button.Width * buttonScale),
+                    (int)(slot1Button.Height * buttonScale)
+                );
+            
+            slot2Rect = new Rectangle
+                (
+                    (int)slot2Pos.X,
+                    (int)slot2Pos.Y,
+                    (int)(slot2Button.Width * buttonScale),
+                    (int)(slot2Button.Height * buttonScale)
+                );
+            
+            slot3Rect = new Rectangle
+                (
+                    (int)slot3Pos.X,
+                    (int)slot3Pos.Y,
+                    (int)(slot3Button.Width * buttonScale),
+                    (int)(slot3Button.Height * buttonScale)
+                );
+            
+            backRect = new Rectangle
+                (
+                    (int)backButtonPos.X,
+                    (int)backButtonPos.Y,
+                    (int)(backButton.Width * buttonScale),
+                    (int)(backButton.Height * buttonScale)
+                );
 
             currentMouse = Mouse.GetState();
             Vector2 worldMousePos = GameWorld.Instance.Camera.ScreenToWorld(currentMouse.Position.ToVector2());
