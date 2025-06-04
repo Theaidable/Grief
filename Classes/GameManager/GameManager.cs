@@ -199,7 +199,7 @@ namespace Grief.Classes.GameManager
                 }
 
                 //Slet tidligere save på samme slot
-                string deleteSave = "DELETE FROM Player WHERE playerID = @saveSlot";
+                string deleteSave = "DELETE FROM Player WHERE playerID = @slot";
                 using (SqlCommand cmd = new SqlCommand(deleteSave, con))
                 {
                     cmd.Parameters.AddWithValue("@slot", saveSlot);
@@ -312,6 +312,13 @@ namespace Grief.Classes.GameManager
 
                 //NPCS
 
+                // Slet quests knyttet til de NPCs i dette level
+                string deleteQuests = "DELETE FROM Quest WHERE questGiver IN (SELECT npcID FROM NPC WHERE levelID = @levelID)";
+                using (SqlCommand cmd = new SqlCommand(deleteQuests, con))
+                {
+                    cmd.Parameters.AddWithValue("@levelID", levelID);
+                    cmd.ExecuteNonQuery();
+                }
                 //Slet tidligere NPCer
                 string deleteNpcs = "DELETE FROM NPC WHERE levelID = @levelID";
 
@@ -505,12 +512,16 @@ namespace Grief.Classes.GameManager
                 }
 
                 //Load NPCs og Quests
-                string getNpcs = @"
-                    SELECT npcID, npcName, positionX, positionY 
-                    FROM NPC 
-                    WHERE levelID = @levelID";
+                string query = @"
+                    SELECT 
+                    NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
+                    Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted
+                FROM NPC
+                LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
+                LEFT JOIN Item I ON Q.requiredItemName = I.itemID
+                WHERE NPC.levelID = @levelID";
 
-                using (SqlCommand cmd = new SqlCommand(getNpcs, con))
+                using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@levelID", levelID);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -522,36 +533,23 @@ namespace Grief.Classes.GameManager
                             float x = (float)reader.GetDouble(2);
                             float y = (float)reader.GetDouble(3);
 
-                            // Load quest hvis eksisterer
+                            // Quest-data (kan være null)
+                            string questName = reader.IsDBNull(4) ? null : reader.GetString(4);
+                            string questDesc = reader.IsDBNull(5) ? null : reader.GetString(5);
+                            string requiredItemName = reader.IsDBNull(6) ? null : reader.GetString(6);
+                            bool? accepted = reader.IsDBNull(7) ? (bool?)null : reader.GetBoolean(7);
+                            bool? completed = reader.IsDBNull(8) ? (bool?)null : reader.GetBoolean(8);
+
                             Quest quest = null;
-                            string questQuery = @"
-                                SELECT questName, description, requiredItemName, isAccepted, isCompleted
-                                FROM Quest 
-                                JOIN Item ON Quest.requiredItemName = Item.itemID
-                                WHERE questGiver = @npcID";
-
-                            using (SqlCommand qCmd = new SqlCommand(questQuery, con))
+                            if (questName != null)
                             {
-                                qCmd.Parameters.AddWithValue("@npcID", npcID);
-                                using (SqlDataReader qReader = qCmd.ExecuteReader())
-                                {
-                                    if (qReader.Read())
-                                    {
-                                        string title = qReader.GetString(0);
-                                        string desc = qReader.GetString(1);
-                                        string requiredItemName = qReader.GetString(2);
-                                        bool accepted = qReader.GetBoolean(3);
-                                        bool completed = qReader.GetBoolean(4);
+                                var reward = new StoryItem("DiaryPage", "StoryItem");
+                                var fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, reward);
 
-                                        var reward = new StoryItem("DiaryPage", "StoryItem");
-                                        var fetchQuest = new FetchQuest(title, desc, requiredItemName, reward);
+                                if (accepted == true) fetchQuest.Accept();
+                                if (completed == true) fetchQuest.Complete();
 
-                                        if (accepted) fetchQuest.Accept();
-                                        if (completed) fetchQuest.Complete();
-
-                                        quest = fetchQuest;
-                                    }
-                                }
+                                quest = fetchQuest;
                             }
 
                             // Opret NPC via builder
