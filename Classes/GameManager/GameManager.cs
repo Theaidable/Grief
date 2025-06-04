@@ -405,6 +405,8 @@ namespace Grief.Classes.GameManager
             {
                 con.Open();
 
+                LevelManager.CurrentLevel.GameObjects.Clear();
+
                 // 1. Hent Player info
                 string getPlayer = @"
                     SELECT playerHealth, positionX, positionY, currentLevelID 
