@@ -9,6 +9,7 @@ using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.GameManager;
 using Grief.Classes.Items.Items;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;

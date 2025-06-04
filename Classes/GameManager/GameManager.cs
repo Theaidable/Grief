@@ -42,7 +42,6 @@ namespace Grief.Classes.GameManager
             pauseOverlay = new PauseOverlay();
 
             LevelManager = new LevelManager();
-            LevelManager.LoadLevel("GriefMap1");
 
             ChangeState(GameState.MainMenu);
         }
@@ -54,16 +53,16 @@ namespace Grief.Classes.GameManager
             switch (newState)
             {
                 case GameState.MainMenu:
-                    // Setup for MainMenu
+                    SoundManager.PlayMenuMusic(); // Setup for MainMenu
                     break;
                 case GameState.LoadGame:
-                    loadGameScene.LoadContent();// Setup for LoadGame
+                    loadGameScene.LoadContent(); // Setup for LoadGame
                     break;
                 case GameState.SaveGame:
-                    saveGameScene.LoadContent();// Setup for SaveGame
+                    saveGameScene.LoadContent(); // Setup for SaveGame
                     break;
                 case GameState.Level:
-                    // Setup gameplay
+                    SoundManager.PlayLevelMusic(); // Setup gameplay
                     break;
                 case GameState.Paused:
                     pauseOverlay.LoadContent(); // Pause-specific actions

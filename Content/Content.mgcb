@@ -994,6 +994,186 @@
 /processorParam:TextureFormat=Color
 /build:NPCs/Portraits/PortraitMom.png
 
+#begin Sound/BGM/Cuddle Clouds.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Cuddle Clouds.mp3;Sound/BGM/Cuddle Clouds
+
+#begin Sound/BGM/Evening Harmony.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Evening Harmony.mp3;Sound/BGM/Evening Harmony
+
+#begin Sound/BGM/Floating Dream.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Floating Dream.mp3;Sound/BGM/Floating Dream
+
+#begin Sound/BGM/Gentle Breeze.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Gentle Breeze.mp3;Sound/BGM/Gentle Breeze
+
+#begin Sound/BGM/Golden Gleam.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Golden Gleam.mp3;Sound/BGM/Golden Gleam
+
+#begin Sound/BGM/Polar Lights.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Polar Lights.mp3;Sound/BGM/Polar Lights
+
+#begin Sound/BGM/Sunlight Through Leaves.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Sunlight Through Leaves.mp3;Sound/BGM/Sunlight Through Leaves
+
+#begin Sound/BGM/Wanderer's Tale.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Wanderer's Tale.mp3;Sound/BGM/Wanderer's Tale
+
+#begin Sound/BGM/Whispering Woods.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sound/BGM/Whispering Woods.mp3;Sound/BGM/Whispering Woods
+
+#begin Sound/SFX/human_atk_sword_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_1.wav
+
+#begin Sound/SFX/human_atk_sword_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_2.wav
+
+#begin Sound/SFX/human_atk_sword_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_3.wav
+
+#begin Sound/SFX/human_damage_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_1.wav
+
+#begin Sound/SFX/human_damage_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_2.wav
+
+#begin Sound/SFX/human_damage_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_3.wav
+
+#begin Sound/SFX/human_jump_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_1.wav
+
+#begin Sound/SFX/human_jump_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_2.wav
+
+#begin Sound/SFX/human_jump_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_3.wav
+
+#begin Sound/SFX/human_walk_stone_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_1.wav
+
+#begin Sound/SFX/human_walk_stone_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_2.wav
+
+#begin Sound/SFX/human_walk_stone_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_3.wav
+
+#begin Sound/SFX/orc_damage_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_1.wav
+
+#begin Sound/SFX/orc_damage_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_2.wav
+
+#begin Sound/SFX/orc_damage_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_3.wav
+
+#begin Sound/SFX/sack_open_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_1.wav
+
+#begin Sound/SFX/sack_open_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_2.wav
+
+#begin Sound/SFX/sack_open_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_3.wav
+
+#begin Sound/SFX/sword_miss_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_1.wav
+
+#begin Sound/SFX/sword_miss_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_2.wav
+
+#begin Sound/SFX/sword_miss_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_3.wav
+
 #begin TileMaps/Assets/Character/Character_Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor

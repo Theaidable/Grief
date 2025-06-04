@@ -87,6 +87,8 @@ namespace Greif
         /// </summary>
         protected override void Initialize()
         {
+            SoundManager.LoadContent(Content);
+
             GameManager = new GameManager(); // Scene- og state-system
             Camera = new Camera();
             Dialog = new DialogSystem();
