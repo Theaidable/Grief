@@ -1,17 +1,18 @@
 ﻿using Greif;
 using Grief.Classes.Algorithms;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
+using Grief.Classes.GameManager;
 using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Diagnostics;
-using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -339,6 +340,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
+                SoundManager.PlayEnemyAttackSound();
                 animator.ClearOnAnimationComplete();
 
                 animator.OnAnimationComplete = () =>

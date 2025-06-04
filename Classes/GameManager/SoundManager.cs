@@ -14,6 +14,7 @@ namespace Grief.Classes.GameManager
 
         private static List<SoundEffect> jumpSounds = new();
         private static List<SoundEffect> attackSounds = new();
+        private static List<SoundEffect> enemyAttackSounds = new();
 
         private static Random random = new();
 
@@ -25,9 +26,14 @@ namespace Grief.Classes.GameManager
             jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_1"));
             jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_2"));
             jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_3"));
+
             attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_1"));
             attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_2"));
             attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_3"));
+            
+            enemyAttackSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_atk_sword_1"));
+            enemyAttackSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_atk_sword_2"));
+            enemyAttackSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_atk_sword_3"));
         }
 
         public static void PlayMenuMusic()
@@ -69,6 +75,16 @@ namespace Grief.Classes.GameManager
                 attackSounds[index].Play();
             }
         }
+
+        public static void PlayEnemyAttackSound()
+        {
+            if (enemyAttackSounds.Count > 0)
+            {
+                int index = random.Next(enemyAttackSounds.Count);
+                enemyAttackSounds[index].Play();
+            }
+        }
+
 
         public static void StopMusic()
         {
