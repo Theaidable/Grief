@@ -2,6 +2,7 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.GameManager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -235,6 +236,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 velocity.Y = jumpForce;
                 grounded = false;
             }
+            SoundManager.PlayJumpSound();
         }
 
         /// <summary>
@@ -247,6 +249,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 isAttacking = true;
                 animator.PlayAnimation("Attack");
                 animator.ClearOnAnimationComplete();
+
+                SoundManager.PlayAttackSound();
 
                 animator.OnAnimationComplete = () =>
                 {

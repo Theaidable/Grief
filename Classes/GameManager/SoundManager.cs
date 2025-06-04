@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework.Media;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Grief.Classes.GameManager
 {
@@ -9,10 +12,22 @@ namespace Grief.Classes.GameManager
         private static Song levelSong;
         private static Song currentSong;
 
+        private static List<SoundEffect> jumpSounds = new();
+        private static List<SoundEffect> attackSounds = new();
+
+        private static Random random = new();
+
         public static void LoadContent(ContentManager content)
         {
             menuSong = content.Load<Song>("Sound/BGM/Evening Harmony");
             levelSong = content.Load<Song>("Sound/BGM/Wanderer's Tale");
+
+            jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_1"));
+            jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_2"));
+            jumpSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_jump_3"));
+            attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_1"));
+            attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_2"));
+            attackSounds.Add(content.Load<SoundEffect>("Sound/SFX/sword_miss_3"));
         }
 
         public static void PlayMenuMusic()
@@ -34,6 +49,24 @@ namespace Grief.Classes.GameManager
                 MediaPlayer.IsRepeating = true;
                 MediaPlayer.Play(levelSong);
                 currentSong = levelSong;
+            }
+        }
+
+        public static void PlayJumpSound()
+        {
+            if (jumpSounds.Count > 0)
+            {
+                int index = random.Next(jumpSounds.Count);
+                jumpSounds[index].Play();
+            }
+        }
+
+        public static void PlayAttackSound()
+        {
+            if (attackSounds.Count > 0)
+            {
+                int index = random.Next(attackSounds.Count);
+                attackSounds[index].Play();
             }
         }
 

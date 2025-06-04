@@ -1048,6 +1048,132 @@
 /processorParam:Quality=Best
 /build:Sound/BGM/Whispering Woods.mp3;Sound/BGM/Whispering Woods
 
+#begin Sound/SFX/human_atk_sword_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_1.wav
+
+#begin Sound/SFX/human_atk_sword_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_2.wav
+
+#begin Sound/SFX/human_atk_sword_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_atk_sword_3.wav
+
+#begin Sound/SFX/human_damage_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_1.wav
+
+#begin Sound/SFX/human_damage_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_2.wav
+
+#begin Sound/SFX/human_damage_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_damage_3.wav
+
+#begin Sound/SFX/human_jump_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_1.wav
+
+#begin Sound/SFX/human_jump_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_2.wav
+
+#begin Sound/SFX/human_jump_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_jump_3.wav
+
+#begin Sound/SFX/human_walk_stone_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_1.wav
+
+#begin Sound/SFX/human_walk_stone_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_2.wav
+
+#begin Sound/SFX/human_walk_stone_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/human_walk_stone_3.wav
+
+#begin Sound/SFX/orc_damage_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_1.wav
+
+#begin Sound/SFX/orc_damage_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_2.wav
+
+#begin Sound/SFX/orc_damage_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/orc_damage_3.wav
+
+#begin Sound/SFX/sack_open_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_1.wav
+
+#begin Sound/SFX/sack_open_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_2.wav
+
+#begin Sound/SFX/sack_open_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sack_open_3.wav
+
+#begin Sound/SFX/sword_miss_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_1.wav
+
+#begin Sound/SFX/sword_miss_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_2.wav
+
+#begin Sound/SFX/sword_miss_3.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sound/SFX/sword_miss_3.wav
+
 #begin TileMaps/Assets/Character/Character_Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
