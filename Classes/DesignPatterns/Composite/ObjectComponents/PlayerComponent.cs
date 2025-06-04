@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Shapes;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
@@ -311,6 +312,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 var nearbyItem = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
                     && gameObject.GetComponent<ItemComponent> != null);
+                Debug.WriteLine(nearbyItem != null, "Nearby Item blev fundet korrekt");
 
                 if (nearbyNpc != null)
                 {
@@ -318,7 +320,17 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 }
                 else if (nearbyItem != null)
                 {
-                    nearbyItem.GetComponent<ItemComponent>().PickUpItem();
+                    var itemComp = nearbyItem.GetComponent<ItemComponent>();
+                    Debug.WriteLine(itemComp != null, "ItemComponent blev hentet korrekt");
+
+                    if (itemComp != null)
+                    {
+                        itemComp.PickUpItem();
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Fejl med at få ItemComponent");
+                    }
                 }
 
                 cooldownTimer = interactionCooldown;

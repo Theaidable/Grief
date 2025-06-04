@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Diagnostics;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
@@ -419,8 +420,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     if (droppedItem != null)
                     {
                         DropItem(droppedItem);
-                        // For at spawne item i verdenen som gameobject, brug:
-                        // GameWorld.Instance.GameManager.LevelManager.CurrentLevel.AddGameObject(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position));
+
+                        //For at spawne item i verdenen som gameobject, brug:
+                        GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueAdd(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position + new Vector2(0,20)));
                     }
                 };
             }

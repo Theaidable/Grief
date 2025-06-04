@@ -18,6 +18,7 @@ using MonoGame.Extended.Shapes;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Grief.Classes.Levels
@@ -39,6 +40,7 @@ namespace Grief.Classes.Levels
         public int MapHeight { get; private set; }
         public List<GameObject> GameObjects { get; private set; } = new List<GameObject>();
         private List<GameObject> objectsToRemove = new List<GameObject>();
+        private List<GameObject> objectsToAdd = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
         public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
 
@@ -91,6 +93,9 @@ namespace Grief.Classes.Levels
             TileDictionary = tiles;
             PathFinder = new AStar(tiles);
 
+            // Bind test-kommando til at toggle collider drawing på det nuværende level
+            InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
+
             // Switch case som opretter det bestemte level
             switch (levelName)
             {
@@ -102,7 +107,8 @@ namespace Grief.Classes.Levels
                     enemies.Add(EnemyFactory.Instance.Create(
                         new Vector2(500, 150),
                         EnemyType.Enemy1,
-                        new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) }
+                        new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) },
+                        new StoryItem("DiaryPage")
                     ));
                     enemies.Add(EnemyFactory.Instance.Create(
                         new Vector2(1325, 150),
@@ -140,10 +146,10 @@ namespace Grief.Classes.Levels
                             "There, there, pappa is here now"
                         },
                         new FetchQuest(
-                            "Look for his Daughter",
+                            "Look for Dad's Daughter",
                             "Look for my daughter and bring her back to me",
                             "Doll",
-                            new StoryItem("DiaryPage #1")
+                            new StoryItem("DiaryPage")
                         )
                     ));
 
@@ -222,6 +228,11 @@ namespace Grief.Classes.Levels
             objectsToRemove.Add(gameObject);
         }
 
+        public void QueueAdd(GameObject gameObject)
+        {
+            objectsToAdd.Add(gameObject);
+        }
+
         /// <summary>
         /// Opdaterer alle objekter i spillet, og sørg for at objekter fjernes korrekt.
         /// </summary>
@@ -234,6 +245,12 @@ namespace Grief.Classes.Levels
             {
                 gameObject.Update();
             }
+
+            foreach (GameObject gameObject in objectsToAdd)
+            {
+                AddGameObject(gameObject);
+            }
+            objectsToAdd.Clear();
 
             foreach (GameObject gameObject in objectsToRemove)
             {
