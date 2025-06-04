@@ -26,7 +26,6 @@ namespace Grief.Classes.DesignPatterns.Builder
         /// <returns></returns>
         public GameObject Construct(string tag)
         {
-            //her tilføjes de ting som SKAL tilføjes - et tag og de essentielle komponenter og konstruerer et objekt
             return builder.SetTag(tag).AddSpriteRenderer().AddAnimator().AddCollider().GetResult();
         }
     }

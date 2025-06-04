@@ -1,19 +1,21 @@
 ﻿using Greif;
+using Grief.Classes.DesignPatterns.Builder;
+using Grief.Classes.DesignPatterns.Builder.Builders;
 using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Grief.Classes.GameManager.Scenes;
 using Grief.Classes.Items;
+using Grief.Classes.Items.Items;
 using Grief.Classes.Levels;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Xml;
 
 namespace Grief.Classes.GameManager
 {
@@ -50,8 +52,9 @@ namespace Grief.Classes.GameManager
             saveGameScene = new SaveGame();
             pauseOverlay = new PauseOverlay();
 
-            connectionString = "Server=DAVID\\SQLEXPRESS01;Database=Shattered Reflections;Trusted_Connection=True;TrustServerCertificate=True;";
-
+            //connectionString = "Server=DAVID\\SQLEXPRESS01;Database=Shattered Reflections;Trusted_Connection=True;TrustServerCertificate=True;";
+            connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=GriefGameDB;Integrated Security=True";
+            
             LevelManager = new LevelManager();
             LevelManager.LoadLevel("GriefMap1");
 
@@ -173,8 +176,11 @@ namespace Grief.Classes.GameManager
                 con.Open();
 
                 //Gem level hvis ikke det findes
-                string insertLevel = "IF NOT EXISTS (SELECT * FROM Level WHERE levelNAME = @levelName " +
-                    "INSERT INTO Level(levelName) VALUES (@levelName)";
+                string insertLevel = @"
+            IF NOT EXISTS (SELECT * FROM Level WHERE levelName = @levelName)
+            BEGIN
+                INSERT INTO Level(levelName) VALUES (@levelName)
+            END";
 
                 using (SqlCommand cmd = new SqlCommand(insertLevel, con))
                 {
@@ -235,8 +241,10 @@ namespace Grief.Classes.GameManager
                     foreach (Item item in items)
                     {
                         string insertItem = @"
-                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)";
+                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                    BEGIN
+                        INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                    END";
 
                         using (SqlCommand cmd = new SqlCommand(insertItem, con))
                         {
@@ -344,8 +352,10 @@ namespace Grief.Classes.GameManager
                             if(string.IsNullOrEmpty(fetch.RequiredItemName) == false)
                             {
                                 string insertItem = @"
-                                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                                    INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')";
+                        IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                        BEGIN
+                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')
+                        END";
 
                                 using (SqlCommand cmd = new SqlCommand(insertItem, con))
                                 {
@@ -382,33 +392,179 @@ namespace Grief.Classes.GameManager
             }
         }
 
-        public void LoadGame(int loadSlot)
+        public void LoadGame(int saveSlot)
         {
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
 
-                //Get player save
-                string query = @"
-                    SELECT playerHealth, positionX, positionY, levelName
-                    FROM Player p
-                    JOIN Level l ON p.currentLevelID = l.levelID
+                // 1. Hent Player info
+                string getPlayer = @"
+                    SELECT playerHealth, positionX, positionY, currentLevelID 
+                    FROM Player 
                     WHERE playerID = @slot";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@slot", loadSlot);
+                int playerHealth = 0;
+                Vector2 playerPosition = Vector2.Zero;
+                int levelID = 0;
 
+                using (SqlCommand cmd = new SqlCommand(getPlayer, con))
+                {
+                    cmd.Parameters.AddWithValue("@slot", saveSlot);
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            int health = reader.GetInt32(0);
-                            float posX = (float)reader.GetDouble(1);
-                            float posY = (float)reader.GetDouble(2);
-                            string levelName = reader.GetString(3);
+                            playerHealth = reader.GetInt32(0);
+                            playerPosition = new Vector2((float)reader.GetDouble(1), (float)reader.GetDouble(2));
+                            levelID = reader.GetInt32(3);
+                        }
+                    }
+                }
 
-                            //Load Level
+                //Find levelName og Load Level
+                string levelName = "";
+                
+                using (SqlCommand cmd = new SqlCommand("SELECT levelName FROM Level WHERE levelID = @id", con))
+                {
+                    cmd.Parameters.AddWithValue("@id", levelID);
+                    levelName = (string)cmd.ExecuteScalar();
+                }
+
+                var levelManager = GameWorld.Instance.GameManager.LevelManager;
+                levelManager.LoadLevel(levelName);
+
+                //Skab Player og sæt position + liv
+                var playerBuilder = new PlayerBuilder();
+                var director = new GameObjectDirector(playerBuilder);
+                playerBuilder.SetPosition(playerPosition);
+                playerBuilder.AddScriptComponent<InventoryComponent>();
+                playerBuilder.AddScriptComponent<PlayerComponent>();
+                var player = director.Construct("Player");
+
+                var playerComp = player.GetComponent<PlayerComponent>();
+                playerComp.Health = playerHealth;
+
+                levelManager.CurrentLevel.AddGameObject(player);
+
+                //Load Inventory
+                var inventory = player.GetComponent<InventoryComponent>();
+                string getInventory = @"
+                    SELECT I.itemName, I.itemType
+                    FROM Inventory Inv
+                    JOIN Item I ON Inv.itemID = I.itemID
+                    WHERE Inv.playerID = @playerID";
+
+                using (SqlCommand cmd = new SqlCommand(getInventory, con))
+                {
+                    cmd.Parameters.AddWithValue("@playerID", saveSlot);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string name = reader.GetString(0);
+                            string type = reader.GetString(1);
+
+                            Item item = type switch
+                            {
+                                "StoryItem" => new StoryItem(name, type),
+                                "QuestItem" => new QuestItem(name, type),
+                            };
+
+                            inventory.AddItemToInventory(item);
+                        }
+                    }
+                }
+
+                //Load Enemies
+                string getEnemies = @"
+                    SELECT enemyType, enemyHealth, positionX, positionY 
+                    FROM Enemy 
+                    WHERE levelID = @levelID";
+
+                using (SqlCommand cmd = new SqlCommand(getEnemies, con))
+                {
+                    cmd.Parameters.AddWithValue("@levelID", levelID);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string typeStr = reader.GetString(0);
+                            int health = reader.GetInt32(1);
+                            float x = (float)reader.GetDouble(2);
+                            float y = (float)reader.GetDouble(3);
+
+                            if (Enum.TryParse(typeStr, out EnemyType enemyType))
+                            {
+                                var enemy = EnemyFactory.Instance.Create(new Vector2(x, y), enemyType);
+                                enemy.GetComponent<EnemyComponent>().EnemyHealth = health;
+                                levelManager.CurrentLevel.AddGameObject(enemy);
+                            }
+                        }
+                    }
+                }
+
+                //Load NPCs og Quests
+                string getNpcs = @"
+                    SELECT npcID, npcName, positionX, positionY 
+                    FROM NPC 
+                    WHERE levelID = @levelID";
+
+                using (SqlCommand cmd = new SqlCommand(getNpcs, con))
+                {
+                    cmd.Parameters.AddWithValue("@levelID", levelID);
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int npcID = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            float x = (float)reader.GetDouble(2);
+                            float y = (float)reader.GetDouble(3);
+
+                            // Load quest hvis eksisterer
+                            Quest quest = null;
+                            string questQuery = @"
+                                SELECT questName, description, requiredItemName, isAccepted, isCompleted
+                                FROM Quest 
+                                JOIN Item ON Quest.requiredItemName = Item.itemID
+                                WHERE questGiver = @npcID";
+
+                            using (SqlCommand qCmd = new SqlCommand(questQuery, con))
+                            {
+                                qCmd.Parameters.AddWithValue("@npcID", npcID);
+                                using (SqlDataReader qReader = qCmd.ExecuteReader())
+                                {
+                                    if (qReader.Read())
+                                    {
+                                        string title = qReader.GetString(0);
+                                        string desc = qReader.GetString(1);
+                                        string requiredItemName = qReader.GetString(2);
+                                        bool accepted = qReader.GetBoolean(3);
+                                        bool completed = qReader.GetBoolean(4);
+
+                                        var reward = new StoryItem("DiaryPage", "StoryItem");
+                                        var fetchQuest = new FetchQuest(title, desc, requiredItemName, reward);
+
+                                        if (accepted) fetchQuest.Accept();
+                                        if (completed) fetchQuest.Complete();
+
+                                        quest = fetchQuest;
+                                    }
+                                }
+                            }
+
+                            // Opret NPC via builder
+                            var npcBuilder = new NpcBuilder();
+                            var npcDirector = new GameObjectDirector(npcBuilder);
+                            npcBuilder.SetPosition(new Vector2(x, y));
+                            npcBuilder.SetName(name);
+                            npcBuilder.SetDialog(new List<string> { "..." }, new List<string> { "..." }, new List<string> { "..." }, new List<string> { "..." });
+                            npcBuilder.SetQuest(quest);
+                            npcBuilder.AddScriptComponent<NpcComponent>();
+                            var npc = npcDirector.Construct(name);
+
+                            levelManager.CurrentLevel.AddGameObject(npc);
                         }
                     }
                 }

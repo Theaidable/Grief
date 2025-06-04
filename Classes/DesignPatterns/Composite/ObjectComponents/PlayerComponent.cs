@@ -54,7 +54,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         //Public properties
         public int Damage { get; private set; }
-        public float Health { get; private set; }
+        public float Health { get; set; }
         public float MovementSpeed { get; private set; }
 
         /// <summary>

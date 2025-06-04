@@ -48,7 +48,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private float RecalculatePathTimer = 0f;
 
         // Properties
-        public int EnemyHealth { get; private set; }
+        public int EnemyHealth { get; set; }
         public int EnemyDamage { get; private set; }
         public float EnemySpeed { get; private set; }
         public int EnemyDetectionRange { get; private set; }
