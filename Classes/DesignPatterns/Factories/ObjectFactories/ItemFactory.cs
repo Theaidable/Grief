@@ -4,6 +4,7 @@ using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
 using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
 {
@@ -50,6 +51,8 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             Animator animator = itemObject.AddComponent<Animator>();
             Collider collider = itemObject.AddComponent<Collider>();
             var itemComp = itemObject.AddComponent<ItemComponent>();
+
+            Debug.WriteLine(itemComp != null, "ItemComponent blev tilføjet korrekt");
 
             itemComp.Item = item;
             itemObject.Transform.Position = position;

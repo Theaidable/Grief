@@ -91,11 +91,6 @@ namespace Greif
             Camera = new Camera();
             Dialog = new DialogSystem();
 
-            // Bind test-kommando til at toggle collider drawing på det nuværende level
-            InputHandler.Instance.AddButtonDownCommand(
-                Keys.K,
-                new ToggleColliderDrawingCommand(GameManager.LevelManager.CurrentLevel.GameObjects));
-
             base.Initialize();
         }
 
@@ -117,11 +112,11 @@ namespace Greif
         /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
+            //if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            //    Keyboard.GetState().IsKeyDown(Keys.Escape))
+            //{
+            //    Exit();
+            //}
 
             DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
