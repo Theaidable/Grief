@@ -54,7 +54,7 @@ namespace Grief.Classes.GameManager
                     // Setup for MainMenu
                     break;
                 case GameState.LoadGame:
-                    // Setup for LoadGame
+                    loadGameScene.LoadContent();// Setup for LoadGame
                     break;
                 case GameState.Level:
                     // Setup gameplay
