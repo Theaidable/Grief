@@ -20,10 +20,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Rectangle backgroundSource;
         private Vector2 backgroundPosition;
 
-        private List<Item> items = new List<Item>();
-
         //Properties
         public bool ShowInventory { get; private set; }
+        public List<Item> Items = new List<Item>();
 
         /// <summary>
         /// Constructor
@@ -58,7 +57,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// <param name="item"></param>
         public void AddItemToInventory(Item item)
         {
-            items.Add(item);
+            Items.Add(item);
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// <returns></returns>
         public bool HasItemByName(string name)
         {
-            return items.Any(i => i.DisplayName == name);
+            return Items.Any(i => i.DisplayName == name);
         }
 
         /// <summary>
@@ -77,11 +76,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// <param name="name"></param>
         public void RemoveItemByName(string name)
         {
-            var item = items.FirstOrDefault(i => i.DisplayName == name);
+            var item = Items.FirstOrDefault(i => i.DisplayName == name);
 
             if(item != null)
             {
-                items.Remove(item);
+                Items.Remove(item);
             }
         }
 
@@ -101,9 +100,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 spriteBatch.Draw(backgroundTexture, backgroundDestRect, backgroundSource, Color.White);
 
                 //Skriv itemets navn i inventory
-                for (int i = 0; i < items.Count; i++)
+                for (int i = 0; i < Items.Count; i++)
                 {
-                    string name = items[i].DisplayName;
+                    string name = Items[i].DisplayName;
                     spriteBatch.DrawString(GameWorld.Instance.DefaultFont, name, new Vector2(backgroundPosition.X + 40, backgroundPosition.Y + 20 + i * 20), Color.White);
                 }
             }

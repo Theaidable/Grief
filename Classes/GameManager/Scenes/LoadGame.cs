@@ -82,18 +82,21 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 1 clicked!");
+                GameWorld.Instance.GameManager.LoadGame(1);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
 
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 2 clicked!");
+                GameWorld.Instance.GameManager.LoadGame(2);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
 
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 3 clicked!");
+                GameWorld.Instance.GameManager.LoadGame(3);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
 

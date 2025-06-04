@@ -44,6 +44,14 @@ namespace Grief.Classes.Levels
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
         public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
 
+        public string LevelName { get; private set; }
+
+
+        public Level(string levelName)
+        {
+            LevelName = levelName;
+        }
+
         /// <summary>
         /// Metode til at indlæse et bestemt level gennem en switch case.
         /// </summary>
@@ -99,22 +107,19 @@ namespace Grief.Classes.Levels
             // Switch case som opretter det bestemte level
             switch (levelName)
             {
-                case "Level0":
-                    // Her kan vi lave koden til en main menu (kan evt. tilføjes senere)
-                    break;
                 case "GriefMap1":
                     // Tilføj enemies (med patrol points, quest items, mv.)
                     enemies.Add(EnemyFactory.Instance.Create(
                         new Vector2(500, 150),
                         EnemyType.Enemy1,
                         new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) },
-                        new StoryItem("DiaryPage")
+                        new StoryItem("DiaryPage", "StoryItem")
                     ));
                     enemies.Add(EnemyFactory.Instance.Create(
                         new Vector2(1325, 150),
                         EnemyType.Enemy1,
                         null,
-                        new QuestItem("Doll")
+                        new QuestItem("Doll", "QuestItem")
                     ));
 
                     foreach (var enemy in enemies)
@@ -149,7 +154,7 @@ namespace Grief.Classes.Levels
                             "Look for Dad's Daughter",
                             "Look for my daughter and bring her back to me",
                             "Doll",
-                            new StoryItem("DiaryPage")
+                            new StoryItem("DiaryPage", "StoryItem")
                         )
                     ));
 

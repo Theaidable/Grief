@@ -55,6 +55,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public int EnemyAttackRange { get; private set; }
         public Point EnemyColliderSize { get; private set; }
         public List<Vector2> PatrolPoints { get; set; }
+        public EnemyType EnemyType { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -435,6 +436,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         public void SetDropItem(Item item)
         {
             droppedItem = item;
+        }
+
+        public void SetEnemyType(EnemyType enemyType)
+        {
+            EnemyType = enemyType;
         }
 
         /// <summary>

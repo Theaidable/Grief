@@ -97,8 +97,9 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 
             //Sæt stats
             enemy.SetStats(stats);
+            enemy.SetEnemyType(enemyType);
 
-            if(item != null)
+            if (item != null)
             {
                 enemy.SetDropItem(item);
             }

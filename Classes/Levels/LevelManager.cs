@@ -19,7 +19,7 @@ namespace Grief.Classes.Levels
         /// <param name="levelName"></param>
         public void LoadLevel(string levelName)
         {
-            CurrentLevel = new Level();
+            CurrentLevel = new Level(levelName);
             CurrentLevel.Load(levelName);
 
             // Kald LateStart på alle gameobjects (vigtigt for fx EnemyComponent og lign.)

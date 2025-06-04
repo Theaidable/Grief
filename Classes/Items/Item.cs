@@ -6,6 +6,7 @@ namespace Grief.Classes.Items
     {
         public string Texture { get; protected set; }
         public string DisplayName { get; protected set; }
+        public string Type { get; protected set; }
 
         public virtual void Use(PlayerComponent player) { }
 

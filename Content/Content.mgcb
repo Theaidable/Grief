@@ -310,7 +310,7 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Default.spritefont
 
-#begin Items/StoryItems/DiaryPage.png
+#begin Items/StoryItem/DiaryPage.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -320,7 +320,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Items/StoryItems/DiaryPage.png
+/build:Items/StoryItem/DiaryPage.png
 
 #begin MainCharacter/Attack/Attack01.png
 /importer:TextureImporter

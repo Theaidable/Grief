@@ -94,19 +94,19 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 1 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(1);
+                GameWorld.Instance.GameManager.SaveGame(1);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 2 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(2);
+                GameWorld.Instance.GameManager.SaveGame(2);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 3 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(3);
+                GameWorld.Instance.GameManager.SaveGame(3);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(backRect, mousePosition))
