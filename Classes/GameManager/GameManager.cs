@@ -177,10 +177,10 @@ namespace Grief.Classes.GameManager
 
                 //Gem level hvis ikke det findes
                 string insertLevel = @"
-            IF NOT EXISTS (SELECT * FROM Level WHERE levelName = @levelName)
-            BEGIN
-                INSERT INTO Level(levelName) VALUES (@levelName)
-            END";
+                    IF NOT EXISTS (SELECT * FROM Level WHERE levelName = @levelName)
+                        BEGIN
+                    INSERT INTO Level(levelName) VALUES (@levelName)
+                        END";
 
                 using (SqlCommand cmd = new SqlCommand(insertLevel, con))
                 {
@@ -241,10 +241,10 @@ namespace Grief.Classes.GameManager
                     foreach (Item item in items)
                     {
                         string insertItem = @"
-                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                    BEGIN
-                        INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
-                    END";
+                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                                BEGIN
+                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                                END";
 
                         using (SqlCommand cmd = new SqlCommand(insertItem, con))
                         {
@@ -359,10 +359,10 @@ namespace Grief.Classes.GameManager
                             if(string.IsNullOrEmpty(fetch.RequiredItemName) == false)
                             {
                                 string insertItem = @"
-                        IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                        BEGIN
-                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')
-                        END";
+                                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                                        BEGIN
+                                    INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')
+                                        END";
 
                                 using (SqlCommand cmd = new SqlCommand(insertItem, con))
                                 {
@@ -518,10 +518,10 @@ namespace Grief.Classes.GameManager
                     SELECT 
                     NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
                     Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted
-                FROM NPC
-                LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
-                LEFT JOIN Item I ON Q.requiredItemName = I.itemID
-                WHERE NPC.levelID = @levelID";
+                    FROM NPC
+                    LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
+                    LEFT JOIN Item I ON Q.requiredItemName = I.itemID
+                    WHERE NPC.levelID = @levelID";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -548,8 +548,15 @@ namespace Grief.Classes.GameManager
                                 var reward = new StoryItem("DiaryPage", "StoryItem");
                                 var fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, reward);
 
-                                if (accepted == true) fetchQuest.Accept();
-                                if (completed == true) fetchQuest.Complete();
+                                if (accepted == true)
+                                {
+                                    fetchQuest.Accept();
+                                }
+
+                                if (completed == true)
+                                {
+                                    fetchQuest.Complete();
+                                }
 
                                 quest = fetchQuest;
                             }
