@@ -123,6 +123,7 @@ namespace Grief.Classes.GameManager
                     break;
 
                 case GameState.SaveGame:
+                    LevelManager.Draw(spriteBatch, GameWorld.Instance.Camera.ViewMatrix);
                     saveGameScene.Draw(spriteBatch);
                     break;
 
