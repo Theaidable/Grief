@@ -18,7 +18,7 @@ namespace Grief.Classes.Levels
         /// Rydder først tidligere level, hvis et findes.
         /// </summary>
         /// <param name="levelName"></param>
-        public void LoadLevel(string levelName)
+        public void LoadLevel(string levelName, bool skipDefaultObjects = false)
         {
             // Ryd tidligere level hvis der er et
             if (CurrentLevel != null)
@@ -27,7 +27,7 @@ namespace Grief.Classes.Levels
             }
 
             CurrentLevel = new Level(levelName);
-            CurrentLevel.Load(levelName);
+            CurrentLevel.Load(levelName, skipDefaultObjects);
 
             // Kald LateStart på alle gameobjects (vigtigt for fx EnemyComponent og lign.)
             foreach (var gameObject in CurrentLevel.GameObjects)

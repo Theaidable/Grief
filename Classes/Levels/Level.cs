@@ -56,7 +56,7 @@ namespace Grief.Classes.Levels
         /// Metode til at indlæse et bestemt level gennem en switch case.
         /// </summary>
         /// <param name="levelName"></param>
-        public void Load(string levelName)
+        public void Load(string levelName, bool skipDefaultObjects = false)
         {
             Map = GameWorld.Instance.Content.Load<TiledMap>($"TileMaps/{levelName}");
             mapRenderer = new TiledMapRenderer(GameWorld.Instance.GraphicsDevice, Map);
@@ -104,65 +104,68 @@ namespace Grief.Classes.Levels
             // Bind test-kommando til at toggle collider drawing på det nuværende level
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
 
-            // Switch case som opretter det bestemte level
-            switch (levelName)
+            // Tilføjer kun standard-objekter hvis det IKKE er load fra save
+            if (!skipDefaultObjects)
             {
-                case "GriefMap1":
-                    // Tilføj enemies (med patrol points, quest items, mv.)
-                    enemies.Add(EnemyFactory.Instance.Create(
-                        new Vector2(500, 150),
-                        EnemyType.Enemy1,
-                        new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) },
-                        new StoryItem("DiaryPage", "StoryItem")
-                    ));
-                    enemies.Add(EnemyFactory.Instance.Create(
-                        new Vector2(1325, 150),
-                        EnemyType.Enemy1,
-                        null,
-                        new QuestItem("Doll", "QuestItem")
-                    ));
-
-                    foreach (var enemy in enemies)
-                    {
-                        AddGameObject(enemy);
-                    }
-
-                    // Tilføj en NPC i spillet (eksempel med fetch quest)
-                    AddGameObject(CreateNPC(
-                        new Vector2(80, 175),
-                        "Dad",
-                        new List<string>
-                        {
-                            "Have you seen my daughter?",
-                            "She should be around here...",
-                            "   CAITLIN!!!",
-                            "Could you help me find her?"
-                        },
-                        new List<string>
-                        {
-                            "Please find her"
-                        },
-                        new List<string>
-                        {
-                            "Thank you so much for finding her"
-                        },
-                        new List<string>
-                        {
-                            "There, there, pappa is here now"
-                        },
-                        new FetchQuest(
-                            "Look for Dad's Daughter",
-                            "Look for my daughter and bring her back to me",
-                            "Doll",
+                switch (levelName)
+                {
+                    case "GriefMap1":
+                        // Tilføj enemies (med patrol points, quest items, mv.)
+                        enemies.Add(EnemyFactory.Instance.Create(
+                            new Vector2(500, 150),
+                            EnemyType.Enemy1,
+                            new List<Vector2> { new Vector2(550, 167), new Vector2(450, 167) },
                             new StoryItem("DiaryPage", "StoryItem")
-                        )
-                    ));
+                        ));
+                        enemies.Add(EnemyFactory.Instance.Create(
+                            new Vector2(1325, 150),
+                            EnemyType.Enemy1,
+                            null,
+                            new QuestItem("Doll", "QuestItem")
+                        ));
 
-                    // Tilføj player
-                    AddGameObject(CreatePlayer(new Vector2(100, 175)));
+                        foreach (var enemy in enemies)
+                        {
+                            AddGameObject(enemy);
+                        }
 
-                    // Yderligere GameObjects kan tilføjes her
-                    break;
+                        // Tilføj en NPC i spillet (eksempel med fetch quest)
+                        AddGameObject(CreateNPC(
+                            new Vector2(80, 175),
+                            "Dad",
+                            new List<string>
+                            {
+                        "Have you seen my daughter?",
+                        "She should be around here...",
+                        "   CAITLIN!!!",
+                        "Could you help me find her?"
+                            },
+                            new List<string>
+                            {
+                        "Please find her"
+                            },
+                            new List<string>
+                            {
+                        "Thank you so much for finding her"
+                            },
+                            new List<string>
+                            {
+                        "There, there, pappa is here now"
+                            },
+                            new FetchQuest(
+                                "Look for Dad's Daughter",
+                                "Look for my daughter and bring her back to me",
+                                "Doll",
+                                new StoryItem("DiaryPage", "StoryItem")
+                            )
+                        ));
+
+                        // Tilføj player
+                        AddGameObject(CreatePlayer(new Vector2(100, 175)));
+
+                        // Yderligere GameObjects kan tilføjes her
+                        break;
+                }
             }
         }
 

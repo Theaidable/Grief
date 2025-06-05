@@ -80,10 +80,9 @@ namespace Grief.Classes.GameManager
                     saveGameScene.LoadContent();// Setup for SaveGame
                     break;
                 case GameState.Level:
-                    // Kun load nyt level hvis det er “nyt spil” (ikke ved LoadGame)
                     if (StartNewGameRequested)
                     {
-                        LevelManager.LoadLevel("GriefMap1");
+                        LevelManager.LoadLevel("GriefMap1", false); // False = Opret standard-objekter (nyt spil)
                         StartNewGameRequested = false;
                     }
                     // Ellers gør intet (Level bliver loaded i LoadGame-metoden)
@@ -463,7 +462,7 @@ namespace Grief.Classes.GameManager
                 }
 
                 var levelManager = GameWorld.Instance.GameManager.LevelManager;
-                levelManager.LoadLevel(levelName);
+                levelManager.LoadLevel(levelName, true);
 
                 // 3. Skab Player og sæt position + liv
                 var playerBuilder = new PlayerBuilder();
