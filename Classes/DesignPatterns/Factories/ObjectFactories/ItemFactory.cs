@@ -27,6 +27,8 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             }
         }
 
+        private ItemFactory() { }
+
         /// <summary>
         /// Standard oprettelse af items
         /// </summary>
