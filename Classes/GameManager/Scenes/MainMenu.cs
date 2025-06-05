@@ -85,7 +85,7 @@ namespace Grief.Classes.GameManager.Scenes
 
             if (IsClicked(startRect, mousePosition))
             {
-                GameWorld.Instance.GameManager.LevelManager.LoadLevel("GriefMap1");
+                GameWorld.Instance.GameManager.StartNewGameRequested = true;
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
             }
 

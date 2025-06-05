@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Grief.Classes.GameManager
@@ -42,6 +43,9 @@ namespace Grief.Classes.GameManager
         public GameState CurrentState { get; private set; }
 
         public LevelManager LevelManager { get; private set; }
+
+        public bool StartNewGameRequested { get; set; } = false;
+
 
         public GameManager()
         {
@@ -76,7 +80,13 @@ namespace Grief.Classes.GameManager
                     saveGameScene.LoadContent();// Setup for SaveGame
                     break;
                 case GameState.Level:
-                    // Setup gameplay
+                    // Kun load nyt level hvis det er “nyt spil” (ikke ved LoadGame)
+                    if (StartNewGameRequested)
+                    {
+                        LevelManager.LoadLevel("GriefMap1");
+                        StartNewGameRequested = false;
+                    }
+                    // Ellers gør intet (Level bliver loaded i LoadGame-metoden)
                     break;
                 case GameState.Paused:
                     pauseOverlay.LoadContent(); // Pause-specific actions
@@ -406,13 +416,11 @@ namespace Grief.Classes.GameManager
         /// Metode til at indlæse et tidligere spils tilstand
         /// </summary>
         /// <param name="saveSlot"></param>
-        public void LoadGame(int saveSlot)
+        public bool LoadGame(int saveSlot)
         {
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-
-                LevelManager.CurrentLevel.GameObjects.Clear();
 
                 // 1. Hent Player info
                 string getPlayer = @"
@@ -423,6 +431,7 @@ namespace Grief.Classes.GameManager
                 int playerHealth = 0;
                 Vector2 playerPosition = Vector2.Zero;
                 int levelID = 0;
+                bool foundSave = false;
 
                 using (SqlCommand cmd = new SqlCommand(getPlayer, con))
                 {
@@ -431,11 +440,18 @@ namespace Grief.Classes.GameManager
                     {
                         if (reader.Read())
                         {
+                            foundSave = true;
                             playerHealth = reader.GetInt32(0);
                             playerPosition = new Vector2((float)reader.GetDouble(1), (float)reader.GetDouble(2));
                             levelID = reader.GetInt32(3);
                         }
                     }
+                }
+
+                if (!foundSave)
+                {
+                    Debug.WriteLine($"No save file found for slot {saveSlot}!");
+                    return false;
                 }
 
                 // 2. Find levelName og Load Level
@@ -602,6 +618,7 @@ namespace Grief.Classes.GameManager
                         }
                     }
                 }
+                return true;
             }
         }
 

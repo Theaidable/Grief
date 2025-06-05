@@ -14,6 +14,7 @@ namespace Grief.Classes.GameManager.Scenes
         private Texture2D slot2Button;
         private Texture2D slot3Button;
         private Texture2D backButton;
+        private string loadErrorMessage = "";
         private float buttonScale = 0.1f; // Brug 1.0f hvis dine billeder allerede er i den ønskede størrelse
 
         private Vector2 slot1Pos = new Vector2(-40, -60);
@@ -78,31 +79,49 @@ namespace Grief.Classes.GameManager.Scenes
             currentMouse = Mouse.GetState();
             Vector2 worldMousePos = GameWorld.Instance.Camera.ScreenToWorld(currentMouse.Position.ToVector2());
             mousePosition = worldMousePos.ToPoint();
-
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 1 clicked!");
-                GameWorld.Instance.GameManager.LoadGame(1);
-                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
+                bool success = GameWorld.Instance.GameManager.LoadGame(1);
+                if (success)
+                {
+                    loadErrorMessage = "";
+                    GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
+                }
+                else
+                {
+                    loadErrorMessage = "No save file found in slot 1!";
+                }
             }
 
+            // Gør tilsvarende for slot2Rect og slot3Rect:
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 2 clicked!");
-                GameWorld.Instance.GameManager.LoadGame(2);
-                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
+                bool success = GameWorld.Instance.GameManager.LoadGame(2);
+                if (success)
+                {
+                    loadErrorMessage = "";
+                    GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
+                }
+                else
+                {
+                    loadErrorMessage = "No save file found in slot 2!";
+                }
             }
-
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 3 clicked!");
-                GameWorld.Instance.GameManager.LoadGame(3);
-                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
-            }
-
-            if (IsClicked(backRect, mousePosition))
-            {
-                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.MainMenu);
+                bool success = GameWorld.Instance.GameManager.LoadGame(3);
+                if (success)
+                {
+                    loadErrorMessage = "";
+                    GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
+                }
+                else
+                {
+                    loadErrorMessage = "No save file found in slot 3!";
+                }
             }
 
             previousMouse = currentMouse;
@@ -132,6 +151,14 @@ namespace Grief.Classes.GameManager.Scenes
 
             //Draw back button
             spriteBatch.Draw(backButton, backButtonPos, null, IsHovering(backRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, 0.1f, SpriteEffects.None, 0f);
+
+            //Draw error msg
+            if (!string.IsNullOrEmpty(loadErrorMessage))
+            {
+                var font = GameWorld.Instance.Content.Load<SpriteFont>("Fonts/Default");
+                var textPosition = new Vector2(-100, 100); // Juster placering
+                spriteBatch.DrawString(font, loadErrorMessage, textPosition, Color.Red);
+            }
         }
     }
 }
