@@ -8,12 +8,13 @@ namespace Greif.Classes.Cameras
     /// </summary>
     public class Camera
     {
-        //Private fields
-        private float zoom;
-        private float rotation;
+        //fields:
         private Vector2 position;
 
+        //Properties
         public Vector2 Position { get; set; }
+        public float Rotation { get; set; }
+        public float Zoom { get; private set; }
 
         //Matrix
         public Matrix ViewMatrix
@@ -21,8 +22,8 @@ namespace Greif.Classes.Cameras
             get
             {
                 return Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *
-                       Matrix.CreateRotationZ(rotation) *
-                       Matrix.CreateScale(zoom, zoom, 1f) *
+                       Matrix.CreateRotationZ(Rotation) *
+                       Matrix.CreateScale(Zoom, Zoom, 1f) *
                        Matrix.CreateTranslation(new Vector3(GameWorld.Instance.GraphicsDevice.Viewport.Width / 2f, GameWorld.Instance.GraphicsDevice.Viewport.Height / 2f, 0));
             }
         }
@@ -32,8 +33,8 @@ namespace Greif.Classes.Cameras
         /// </summary>
         public Camera()
         {
-            zoom = 2.7f;
-            rotation = 0f;
+            Zoom = 2.7f;
+            Rotation = 0f;
             Position = Vector2.Zero;
         }
 
@@ -49,8 +50,8 @@ namespace Greif.Classes.Cameras
 
             var viewport = GameWorld.Instance.GraphicsDevice.Viewport;
 
-            position.X = MathHelper.Clamp(Position.X, viewport.Width / (2 * zoom), mapWidth - viewport.Width / (2 * zoom));
-            position.Y = MathHelper.Clamp(Position.Y, viewport.Height / (2 * zoom), mapHeight - viewport.Height / (2 * zoom));
+            position.X = MathHelper.Clamp(Position.X, viewport.Width / (2 * Zoom), mapWidth - viewport.Width / (2 * Zoom));
+            position.Y = MathHelper.Clamp(Position.Y, viewport.Height / (2 * Zoom), mapHeight - viewport.Height / (2 * Zoom));
 
             Position = position;
         }
@@ -61,7 +62,7 @@ namespace Greif.Classes.Cameras
         /// <param name="newZoom"></param>
         public void SetZoom(float newZoom)
         {
-            zoom = MathHelper.Clamp(newZoom, 0.1f, 10f);
+            Zoom = MathHelper.Clamp(newZoom, 0.1f, 10f);
         }
 
         /// <summary>
