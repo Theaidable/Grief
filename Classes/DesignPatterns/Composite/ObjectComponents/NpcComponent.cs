@@ -133,6 +133,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                         QuestToGive.GrantReward(inventory);
                         QuestToGive.Complete();
 
+                        animator.PlayAnimation($"Happy{Name}");
                         Debug.WriteLine("Quest has been completed");
 
                         dialog.StartDialog(DialogLinesOnCompleted, Portrait);
