@@ -143,9 +143,9 @@ namespace Grief.Classes.GameManager.Scenes
             spriteBatch.Draw(exitButton, exitButtonPos, null, IsHovering(exitRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
 
             //Draw Color
-            spriteBatch.Draw(GameWorld.Instance.Pixel, startRect, Color.Green * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, loadRect, Color.Blue * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, exitRect, Color.Red * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, startRect, Color.Green * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, loadRect, Color.Blue * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, exitRect, Color.Red * 0.3f);
         }
     }
 }
