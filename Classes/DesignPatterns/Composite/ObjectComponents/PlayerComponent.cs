@@ -23,7 +23,6 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Animator animator;
         private Collider collider;
         private InventoryComponent inventory;
-        //private ItemComponent item;
 
         private Vector2 moveDirection;
         private Vector2 velocity;
@@ -51,15 +50,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] blinkFrames;
 
         //Death animation frames
+        private Texture2D[] hurtFrames;
         private Texture2D[] deathFrames;
-        private Texture2D[] dieFrames;
 
         //Sit animation frames when saving the game
         private Texture2D[] sitFrames;
 
         //Public properties
         public int Damage { get; private set; }
-        public float Health { get; private set; }
+        public int Health { get; private set; }
         public float MovementSpeed { get; private set; }
 
         /// <summary>
@@ -311,7 +310,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Interact()
         {
-            if (cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false)
+            if (cooldownTimer <= 0f && inventory.ShowInventory == false && grounded == true && isAttacking == false && isInteracting == false)
             {
                 isInteracting = true;
 
@@ -334,6 +333,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     nearbyItem.GetComponent<ItemComponent>().PickUpItem();
                 }
 
+                isInteracting = false;
                 cooldownTimer = interactionCooldown;
             }
         }
@@ -390,8 +390,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             fallFrames = animator.LoadFrames("MainCharacter/Fall/Fall", 5);
             attackFrames = animator.LoadFrames("MainCharacter/Attack/Attack", 8);
             blinkFrames = animator.LoadFrames("MainCharacter/Blink/Blink", 2);
-            deathFrames = animator.LoadFrames("MainCharacter/Death/Death", 4);
-            dieFrames = animator.LoadFrames("MainCharacter/Die/Die", 8);
+            hurtFrames = animator.LoadFrames("MainCharacter/Death/Death", 4);
+            deathFrames = animator.LoadFrames("MainCharacter/Die/Die", 8);
             sitFrames = animator.LoadFrames("MainCharacter/Sit/Sit", 6);
 
             //Add animations
@@ -402,8 +402,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Fall", 10f, false, fallFrames));
             animator.AddAnimation(new Animation("Attack", 15f, false, attackFrames));
             animator.AddAnimation(new Animation("Blink", 5f, false, blinkFrames));
-            animator.AddAnimation(new Animation("Hurt", 15f, false, deathFrames));
-            animator.AddAnimation(new Animation("Death", 5f, false, dieFrames));
+            animator.AddAnimation(new Animation("Hurt", 15f, false, hurtFrames));
+            animator.AddAnimation(new Animation("Death", 5f, false, deathFrames));
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
 
