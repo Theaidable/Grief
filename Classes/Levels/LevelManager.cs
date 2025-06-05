@@ -15,10 +15,15 @@ namespace Grief.Classes.Levels
 
         /// <summary>
         /// Loader et bestemt level og kalder LateStart() på alle objekter efter load.
+        /// Rydder først tidligere level, hvis et findes.
         /// </summary>
         /// <param name="levelName"></param>
         public void LoadLevel(string levelName)
         {
+            // Ryd tidligere level hvis der er et
+            if (CurrentLevel != null)
+                UnloadLevel();
+
             CurrentLevel = new Level(levelName);
             CurrentLevel.Load(levelName);
 
@@ -34,6 +39,7 @@ namespace Grief.Classes.Levels
         /// </summary>
         public void UnloadLevel()
         {
+            // Ryd memory for gamle objekter, hvis nødvendigt (her sættes bare til null)
             CurrentLevel = null;
         }
 

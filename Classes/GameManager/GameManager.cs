@@ -56,7 +56,6 @@ namespace Grief.Classes.GameManager
             connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=GriefGameDB;Integrated Security=True";
             
             LevelManager = new LevelManager();
-            LevelManager.LoadLevel("GriefMap1");
 
             ChangeState(GameState.MainMenu);
         }
