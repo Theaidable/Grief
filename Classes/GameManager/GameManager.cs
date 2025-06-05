@@ -270,8 +270,8 @@ namespace Grief.Classes.GameManager
 
                         // PLAYER
                         string insertPlayer = @"
-                    INSERT INTO Player (playerID, playerHealth, positionX, positionY, currentLevelID, saveTimeStamp)
-                    VALUES (@playerID, @health, @posX, @posY, @levelID, @timestamp)";
+                            INSERT INTO Player (playerID, playerHealth, positionX, positionY, currentLevelID, saveTimeStamp)
+                            VALUES (@playerID, @health, @posX, @posY, @levelID, @timestamp)";
                         using (SqlCommand cmd = new SqlCommand(insertPlayer, con))
                         {
                             cmd.Parameters.AddWithValue("@playerID", saveSlot);
@@ -290,10 +290,10 @@ namespace Grief.Classes.GameManager
                             {
                                 // Opret item hvis ikke eksisterer
                                 string insertItem = @"
-                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                            BEGIN
-                                INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
-                            END";
+                                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                                    BEGIN
+                                        INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                                    END";
                                 using (SqlCommand cmd = new SqlCommand(insertItem, con))
                                 {
                                     cmd.Parameters.AddWithValue("@itemName", item.DisplayName);
