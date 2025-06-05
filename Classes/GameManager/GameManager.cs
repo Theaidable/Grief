@@ -163,7 +163,7 @@ namespace Grief.Classes.GameManager
             var inventoryComponent = player?.GetComponent<InventoryComponent>();
             var items = inventoryComponent?.Items;
 
-            if(player == null || playerComponent == null)
+            if (player == null || playerComponent == null)
             {
                 return;
             }
@@ -175,30 +175,36 @@ namespace Grief.Classes.GameManager
             {
                 con.Open();
 
-                //Gem level hvis ikke det findes
+                // Gem level hvis ikke det findes
                 string insertLevel = @"
-                    IF NOT EXISTS (SELECT * FROM Level WHERE levelName = @levelName)
-                        BEGIN
-                    INSERT INTO Level(levelName) VALUES (@levelName)
-                        END";
-
+            IF NOT EXISTS (SELECT * FROM Level WHERE levelName = @levelName)
+            BEGIN
+                INSERT INTO Level(levelName) VALUES (@levelName)
+            END";
                 using (SqlCommand cmd = new SqlCommand(insertLevel, con))
                 {
                     cmd.Parameters.AddWithValue("@levelName", LevelManager.CurrentLevel.LevelName);
                     cmd.ExecuteNonQuery();
                 }
 
-                //Hent levelID
+                // Hent levelID
                 int levelID;
                 string getLevelIdQuery = "SELECT levelID FROM Level WHERE levelName = @levelName";
-
                 using (SqlCommand cmd = new SqlCommand(getLevelIdQuery, con))
                 {
                     cmd.Parameters.AddWithValue("@levelName", LevelManager.CurrentLevel.LevelName);
                     levelID = (int)cmd.ExecuteScalar();
                 }
 
-                //Slet tidligere save på samme slot
+                // SLET: Inventory (før Player pga. FK constraint)
+                string deleteInventory = "DELETE FROM Inventory WHERE playerID = @slot";
+                using (SqlCommand cmd = new SqlCommand(deleteInventory, con))
+                {
+                    cmd.Parameters.AddWithValue("@slot", saveSlot);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // SLET: Player
                 string deleteSave = "DELETE FROM Player WHERE playerID = @slot";
                 using (SqlCommand cmd = new SqlCommand(deleteSave, con))
                 {
@@ -206,13 +212,10 @@ namespace Grief.Classes.GameManager
                     cmd.ExecuteNonQuery();
                 }
 
-                //PLAYER
-
-                //Insert Player
+                // PLAYER
                 string insertPlayer = @"
-                    INSERT INTO Player (playerID, playerHealth, positionX, positionY, currentLevelID, saveTimeStamp)
-                    VALUES (@playerID, @health, @posX, @posY, @levelID, @timestamp)";
-                
+            INSERT INTO Player (playerID, playerHealth, positionX, positionY, currentLevelID, saveTimeStamp)
+            VALUES (@playerID, @health, @posX, @posY, @levelID, @timestamp)";
                 using (SqlCommand cmd = new SqlCommand(insertPlayer, con))
                 {
                     cmd.Parameters.AddWithValue("@playerID", saveSlot);
@@ -224,28 +227,17 @@ namespace Grief.Classes.GameManager
                     cmd.ExecuteNonQuery();
                 }
 
-                //INVENTORY OG ITEMS
-
-                //Først slet tidligere inventory
-                string deleteInventory = "DELETE FROM Inventory WHERE playerID = @playerID";
-
-                using (SqlCommand cmd = new SqlCommand(deleteInventory, con))
-                {
-                    cmd.Parameters.AddWithValue("@playerID", saveSlot);
-                    cmd.ExecuteNonQuery();
-                }
-
-                //Indsæt nuværende items
-                if(items != null)
+                // INVENTORY & ITEMS
+                if (items != null)
                 {
                     foreach (Item item in items)
                     {
+                        // Opret item hvis ikke eksisterer
                         string insertItem = @"
-                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                                BEGIN
-                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
-                                END";
-
+                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                    BEGIN
+                        INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                    END";
                         using (SqlCommand cmd = new SqlCommand(insertItem, con))
                         {
                             cmd.Parameters.AddWithValue("@itemName", item.DisplayName);
@@ -253,19 +245,17 @@ namespace Grief.Classes.GameManager
                             cmd.ExecuteNonQuery();
                         }
 
-                        //Find itemID
+                        // Hent itemID
                         int itemID;
                         string getItemID = "SELECT itemID FROM Item WHERE itemName = @itemName";
-
                         using (SqlCommand cmd = new SqlCommand(getItemID, con))
                         {
-                            cmd.Parameters.AddWithValue("itemName", item.DisplayName);
+                            cmd.Parameters.AddWithValue("@itemName", item.DisplayName);
                             itemID = (int)cmd.ExecuteScalar();
                         }
 
-                        //Gem i Inventory
+                        // Gem i Inventory
                         string insertInventory = "INSERT INTO Inventory (playerID, itemID) VALUES (@playerID, @itemID)";
-
                         using (SqlCommand cmd = new SqlCommand(insertInventory, con))
                         {
                             cmd.Parameters.AddWithValue("@playerID", saveSlot);
@@ -275,29 +265,22 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                //ENEMIES
-
-                //slet tidligere fjender
+                // ENEMIES
                 string deleteEnemies = "DELETE FROM Enemy WHERE levelID = @levelID";
-
                 using (SqlCommand cmd = new SqlCommand(deleteEnemies, con))
                 {
                     cmd.Parameters.AddWithValue("@levelID", levelID);
                     cmd.ExecuteNonQuery();
                 }
-
-                if(enemies != null)
+                if (enemies != null)
                 {
-                    //Gem fjender
                     foreach (GameObject enemy in enemies)
                     {
                         var enemyComponent = enemy.GetComponent<EnemyComponent>();
                         var enemyType = enemyComponent.EnemyType.ToString();
-
                         string insertEnemy = @"
-                                INSERT INTO Enemy (enemyType, enemyHealth, positionX, positionY, levelID)
-                                VALUES (@type, @health, @posX, @posY, @levelID)";
-
+                    INSERT INTO Enemy (enemyType, enemyHealth, positionX, positionY, levelID)
+                    VALUES (@type, @health, @posX, @posY, @levelID)";
                         using (SqlCommand cmd = new SqlCommand(insertEnemy, con))
                         {
                             cmd.Parameters.AddWithValue("@type", enemyType);
@@ -310,37 +293,37 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                //NPCS
-
-                // Slet quests knyttet til de NPCs i dette level
+                // SLET: Quests før NPCs (foreign key constraint)
                 string deleteQuests = "DELETE FROM Quest WHERE questGiver IN (SELECT npcID FROM NPC WHERE levelID = @levelID)";
                 using (SqlCommand cmd = new SqlCommand(deleteQuests, con))
                 {
                     cmd.Parameters.AddWithValue("@levelID", levelID);
                     cmd.ExecuteNonQuery();
                 }
-                //Slet tidligere NPCer
-                string deleteNpcs = "DELETE FROM NPC WHERE levelID = @levelID";
 
+                // SLET: NPCs
+                string deleteNpcs = "DELETE FROM NPC WHERE levelID = @levelID";
                 using (SqlCommand cmd = new SqlCommand(deleteNpcs, con))
                 {
                     cmd.Parameters.AddWithValue("@levelID", levelID);
                     cmd.ExecuteNonQuery();
                 }
 
-                if(npcs != null)
+                // GEM: NPCs og deres Quests
+                if (npcs != null)
                 {
-                    //Gem NPC'er
                     foreach (GameObject npc in npcs)
                     {
                         var npcComponent = npc.GetComponent<NpcComponent>();
                         string name = npcComponent.Name;
 
                         string insertNpc = @"
-                            INSERT INTO NPC (npcName, positionX, positionY, levelID, dialogBeforeAccept, dialogAcceptedNotCompleted, dialogOnCompleted, dialogAlreadyCompleted)
-                            OUTPUT INSERTED.npcID
-                            VALUES (@name, @x, @y, @levelID, @beforeAccept, @acceptedNotCompleted, @onCompleted, @alreadyComplted)";
-
+                    INSERT INTO NPC (
+                        npcName, positionX, positionY, levelID, 
+                        dialogBeforeAccept, dialogAcceptedNotCompleted, dialogOnCompleted, dialogAlreadyCompleted
+                    )
+                    OUTPUT INSERTED.npcID
+                    VALUES (@name, @x, @y, @levelID, @beforeAccept, @acceptedNotCompleted, @onCompleted, @alreadyCompleted)";
                         int npcID;
                         using (SqlCommand cmd = new SqlCommand(insertNpc, con))
                         {
@@ -358,75 +341,67 @@ namespace Grief.Classes.GameManager
                         if (npcComponent.QuestToGive is FetchQuest fetch)
                         {
                             int? requiredItemID = null;
-
-                            //Sikr at item eksisterer
-                            if(string.IsNullOrEmpty(fetch.RequiredItemName) == false)
+                            if (!string.IsNullOrEmpty(fetch.RequiredItemName))
                             {
                                 string insertItem = @"
-                                    IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                                        BEGIN
-                                    INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')
-                                        END";
-
+                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                            BEGIN
+                                INSERT INTO Item (itemName, itemType) VALUES (@itemName, 'QuestItem')
+                            END";
                                 using (SqlCommand cmd = new SqlCommand(insertItem, con))
                                 {
                                     cmd.Parameters.AddWithValue("@itemName", fetch.RequiredItemName);
                                     cmd.ExecuteNonQuery();
                                 }
-
-                                //Hent itemID
                                 using (SqlCommand cmd = new SqlCommand("SELECT itemID FROM Item WHERE itemName = @itemName", con))
                                 {
                                     cmd.Parameters.AddWithValue("@itemName", fetch.RequiredItemName);
                                     requiredItemID = (int)cmd.ExecuteScalar();
                                 }
+                            }
 
-                                int? rewardItemID = null;
-
-                                if(fetch.RewardItem != null)
+                            int? rewardItemID = null;
+                            if (fetch.RewardItem != null)
+                            {
+                                string insertRewardItem = @"
+                            IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
+                            BEGIN
+                                INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
+                            END";
+                                using (SqlCommand cmd = new SqlCommand(insertRewardItem, con))
                                 {
-                                    string insertRewardItem = @"
-                                        IF NOT EXISTS (SELECT * FROM Item WHERE itemName = @itemName)
-                                        BEGIN
-                                            INSERT INTO Item (itemName, itemType) VALUES (@itemName, @itemType)
-                                        END";
-
-                                    using (SqlCommand cmd = new SqlCommand(insertRewardItem, con))
-                                    {
-                                        cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
-                                        cmd.Parameters.AddWithValue("@itemType", fetch.RewardItem.Type);
-                                        cmd.ExecuteNonQuery();
-                                    }
-
-                                    using (SqlCommand cmd = new SqlCommand("SELECT itemID FROM Item WHERE itemName = @itemName", con))
-                                    {
-                                        cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
-                                        rewardItemID = (int)cmd.ExecuteScalar();
-                                    }
-                                }
-
-                                //Insert Quest
-                                string insertQuest = @"
-                                    INSERT INTO Quest (questName, questGiver, description, requiredItemName, rewardItemName, isAccepted, isCompleted)
-                                    VALUES (@title, @giver, @desc, @item, @reward, @accepted, @completed)";
-
-                                using (SqlCommand cmd = new SqlCommand(insertQuest, con))
-                                {
-                                    cmd.Parameters.AddWithValue("@title", fetch.Title);
-                                    cmd.Parameters.AddWithValue("@giver", npcID);
-                                    cmd.Parameters.AddWithValue("@desc", fetch.Description);
-                                    cmd.Parameters.AddWithValue("@item", requiredItemID.HasValue ? requiredItemID.Value : (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@reward", rewardItemID.HasValue ? rewardItemID.Value : (object)DBNull.Value);
-                                    cmd.Parameters.AddWithValue("@accepted", fetch.IsAccepted);
-                                    cmd.Parameters.AddWithValue("@completed", fetch.IsCompleted);
+                                    cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
+                                    cmd.Parameters.AddWithValue("@itemType", fetch.RewardItem.Type);
                                     cmd.ExecuteNonQuery();
                                 }
+                                using (SqlCommand cmd = new SqlCommand("SELECT itemID FROM Item WHERE itemName = @itemName", con))
+                                {
+                                    cmd.Parameters.AddWithValue("@itemName", fetch.RewardItem.DisplayName);
+                                    rewardItemID = (int)cmd.ExecuteScalar();
+                                }
+                            }
+
+                            // GEM: Quest
+                            string insertQuest = @"
+                        INSERT INTO Quest (questName, questGiver, description, requiredItemName, rewardItemName, isAccepted, isCompleted)
+                        VALUES (@title, @giver, @desc, @item, @reward, @accepted, @completed)";
+                            using (SqlCommand cmd = new SqlCommand(insertQuest, con))
+                            {
+                                cmd.Parameters.AddWithValue("@title", fetch.Title);
+                                cmd.Parameters.AddWithValue("@giver", npcID);
+                                cmd.Parameters.AddWithValue("@desc", fetch.Description);
+                                cmd.Parameters.AddWithValue("@item", requiredItemID.HasValue ? requiredItemID.Value : (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@reward", rewardItemID.HasValue ? rewardItemID.Value : (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@accepted", fetch.IsAccepted);
+                                cmd.Parameters.AddWithValue("@completed", fetch.IsCompleted);
+                                cmd.ExecuteNonQuery();
                             }
                         }
                     }
                 }
             }
         }
+
 
         /// <summary>
         /// Metode til at indlæse et tidligere spils tilstand
@@ -442,9 +417,9 @@ namespace Grief.Classes.GameManager
 
                 // 1. Hent Player info
                 string getPlayer = @"
-                    SELECT playerHealth, positionX, positionY, currentLevelID 
-                    FROM Player 
-                    WHERE playerID = @slot";
+            SELECT playerHealth, positionX, positionY, currentLevelID 
+            FROM Player 
+            WHERE playerID = @slot";
 
                 int playerHealth = 0;
                 Vector2 playerPosition = Vector2.Zero;
@@ -464,9 +439,8 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                //Find levelName og Load Level
+                // 2. Find levelName og Load Level
                 string levelName = "";
-                
                 using (SqlCommand cmd = new SqlCommand("SELECT levelName FROM Level WHERE levelID = @id", con))
                 {
                     cmd.Parameters.AddWithValue("@id", levelID);
@@ -476,7 +450,7 @@ namespace Grief.Classes.GameManager
                 var levelManager = GameWorld.Instance.GameManager.LevelManager;
                 levelManager.LoadLevel(levelName);
 
-                //Skab Player og sæt position + liv
+                // 3. Skab Player og sæt position + liv
                 var playerBuilder = new PlayerBuilder();
                 var director = new GameObjectDirector(playerBuilder);
                 playerBuilder.SetPosition(playerPosition);
@@ -489,13 +463,13 @@ namespace Grief.Classes.GameManager
 
                 levelManager.CurrentLevel.AddGameObject(player);
 
-                //Load Inventory
+                // 4. Load Inventory
                 var inventory = player.GetComponent<InventoryComponent>();
                 string getInventory = @"
-                    SELECT I.itemName, I.itemType
-                    FROM Inventory Inv
-                    JOIN Item I ON Inv.itemID = I.itemID
-                    WHERE Inv.playerID = @playerID";
+            SELECT I.itemName, I.itemType
+            FROM Inventory Inv
+            JOIN Item I ON Inv.itemID = I.itemID
+            WHERE Inv.playerID = @playerID";
 
                 using (SqlCommand cmd = new SqlCommand(getInventory, con))
                 {
@@ -511,6 +485,7 @@ namespace Grief.Classes.GameManager
                             {
                                 "StoryItem" => new StoryItem(name, type),
                                 "QuestItem" => new QuestItem(name, type),
+                                _ => new Item(name, type)
                             };
 
                             inventory.AddItemToInventory(item);
@@ -518,11 +493,11 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                //Load Enemies
+                // 5. Load Enemies
                 string getEnemies = @"
-                    SELECT enemyType, enemyHealth, positionX, positionY 
-                    FROM Enemy 
-                    WHERE levelID = @levelID";
+            SELECT enemyType, enemyHealth, positionX, positionY 
+            FROM Enemy 
+            WHERE levelID = @levelID";
 
                 using (SqlCommand cmd = new SqlCommand(getEnemies, con))
                 {
@@ -546,18 +521,18 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                //Load NPCs og Quests
+                // 6. Load NPCs + quests + dialog (én query med LEFT JOIN)
                 string query = @"
-                    SELECT 
-                        NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
-                        Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted,
-                        NPC.dialogBeforeAccept, NPC.dialogAcceptedNotCompleted, NPC.dialogOnCompleted, NPC.dialogAlreadyCompleted,
-                        R.itemName AS rewardItemName, R.itemType AS rewardItemType
-                    FROM NPC
-                    LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
-                    LEFT JOIN Item I ON Q.requiredItemName = I.itemID
-                    LEFT JOIN Item R ON Q.rewardItemName = R.itemID
-                    WHERE NPC.levelID = @levelID";
+            SELECT 
+                NPC.npcID, NPC.npcName, NPC.positionX, NPC.positionY,
+                Q.questName, Q.description, I.itemName AS requiredItemName, Q.isAccepted, Q.isCompleted,
+                NPC.dialogBeforeAccept, NPC.dialogAcceptedNotCompleted, NPC.dialogOnCompleted, NPC.dialogAlreadyCompleted,
+                R.itemName AS rewardItemName, R.itemType AS rewardItemType
+            FROM NPC
+            LEFT JOIN Quest Q ON Q.questGiver = NPC.npcID
+            LEFT JOIN Item I ON Q.requiredItemName = I.itemID
+            LEFT JOIN Item R ON Q.rewardItemName = R.itemID
+            WHERE NPC.levelID = @levelID";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -599,29 +574,22 @@ namespace Grief.Classes.GameManager
                                         _ => null
                                     }
                                     : null;
-                                
+
                                 Quest fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, rewardItem);
 
-                                if (accepted == true)
-                                {
-                                    fetchQuest.Accept();
-                                }
-
-                                if (completed == true)
-                                {
-                                    fetchQuest.Complete();
-                                }
+                                if (accepted == true) fetchQuest.Accept();
+                                if (completed == true) fetchQuest.Complete();
 
                                 quest = fetchQuest;
                             }
 
-                            //Konverter dialog
+                            // Konverter dialogstrenge til lister
                             List<string> dialogBeforeAccept = beforeAccept.Split('|').ToList();
                             List<string> dialogAcceptedNotCompleted = acceptedNotCompleted.Split('|').ToList();
                             List<string> dialogOnCompleted = onCompleted.Split('|').ToList();
                             List<string> dialogAlreadyCompleted = alreadyCompleted.Split('|').ToList();
 
-                            //Byg NPC
+                            // Byg NPC
                             var npcBuilder = new NpcBuilder();
                             var npcDirector = new GameObjectDirector(npcBuilder);
                             npcBuilder.SetPosition(new Vector2(x, y));
@@ -637,5 +605,6 @@ namespace Grief.Classes.GameManager
                 }
             }
         }
+
     }
 }
