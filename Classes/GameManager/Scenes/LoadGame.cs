@@ -82,8 +82,8 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 1 clicked!");
-                bool success = GameWorld.Instance.GameManager.LoadGame(1);
-                if (success)
+                GameWorld.Instance.GameManager.StartLoadGame(1);
+                if (GameWorld.Instance.GameManager.LoadSuccessful == true)
                 {
                     loadErrorMessage = "";
                     GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
@@ -97,8 +97,8 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 2 clicked!");
-                bool success = GameWorld.Instance.GameManager.LoadGame(2);
-                if (success)
+                GameWorld.Instance.GameManager.StartLoadGame(2);
+                if (GameWorld.Instance.GameManager.LoadSuccessful == true)
                 {
                     loadErrorMessage = "";
                     GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);
@@ -112,8 +112,8 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 3 clicked!");
-                bool success = GameWorld.Instance.GameManager.LoadGame(3);
-                if (success)
+                GameWorld.Instance.GameManager.StartLoadGame(3);
+                if (GameWorld.Instance.GameManager.LoadSuccessful == true)
                 {
                     loadErrorMessage = "";
                     GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Level);

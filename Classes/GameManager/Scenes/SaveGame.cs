@@ -94,19 +94,19 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 1 clicked!");
-                GameWorld.Instance.GameManager.SaveGame(1);
+                GameWorld.Instance.GameManager.StartSaveGame(1);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 2 clicked!");
-                GameWorld.Instance.GameManager.SaveGame(2);
+                GameWorld.Instance.GameManager.StartSaveGame(2);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 3 clicked!");
-                GameWorld.Instance.GameManager.SaveGame(3);
+                GameWorld.Instance.GameManager.StartSaveGame(3);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(backRect, mousePosition))

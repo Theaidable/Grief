@@ -17,11 +17,15 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 namespace Grief.Classes.GameManager
 {
     public class GameManager
     {
+        /// <summary>
+        /// Enumaration til game state
+        /// </summary>
         public enum GameState
         {
             MainMenu,
@@ -31,6 +35,7 @@ namespace Grief.Classes.GameManager
             Paused
         }
 
+        //Fields
         private Scene mainMenu;
         private Scene loadGameScene;
         private Scene saveGameScene;
@@ -38,15 +43,28 @@ namespace Grief.Classes.GameManager
 
         private KeyboardState previousKeyState;
 
+        //Forbidnelse til database
         private string connectionString;
 
+        //Tråde til at gøre SaveGame og LoadGame
+        private Thread saveGameThread;
+        private bool saveGameThreadRunning;
+        private readonly object saveGameLock = new object();
+        private Thread loadGameThread;
+        private bool loadGameThreadRunning;
+        private readonly object loadGameLock = new object();
+
+        //Properties
         public GameState CurrentState { get; private set; }
 
         public LevelManager LevelManager { get; private set; }
 
         public bool StartNewGameRequested { get; set; } = false;
+        public bool LoadSuccessful { get; set; }
 
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public GameManager()
         {
             mainMenu = new MainMenu();
@@ -64,6 +82,10 @@ namespace Grief.Classes.GameManager
             ChangeState(GameState.MainMenu);
         }
 
+        /// <summary>
+        /// Metode til at skifte spillets tilstand
+        /// </summary>
+        /// <param name="newState"></param>
         public void ChangeState(GameState newState)
         {
             CurrentState = newState;
@@ -160,11 +182,33 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        public void StartSaveGame(int slot)
+        {
+            if(saveGameThreadRunning == false)
+            {
+                saveGameThread = new Thread(() => SaveGame(slot));
+                saveGameThread.IsBackground = true;
+                saveGameThreadRunning = true;
+                saveGameThread.Start();
+            }
+        }
+
+        public void StartLoadGame(int slot)
+        {
+            if (loadGameThreadRunning == false)
+            {
+                loadGameThread = new Thread(() => LoadGame(slot));
+                loadGameThread.IsBackground = true;
+                loadGameThreadRunning = true;
+                loadGameThread.Start();
+            }
+        }
+
         /// <summary>
         /// Metode til at gemme spillets tilstand
         /// </summary>
         /// <param name="saveSlot"></param>
-        public void SaveGame(int saveSlot)
+        private void SaveGame(int saveSlot)
         {
             var player = LevelManager.CurrentLevel.GameObjects.FirstOrDefault(p => p.GetComponent<PlayerComponent>() != null);
             var playerComponent = player?.GetComponent<PlayerComponent>();
@@ -408,6 +452,8 @@ namespace Grief.Classes.GameManager
                     }
                 }
             }
+
+            saveGameThreadRunning = false;
         }
 
 
@@ -415,8 +461,10 @@ namespace Grief.Classes.GameManager
         /// Metode til at indlæse et tidligere spils tilstand
         /// </summary>
         /// <param name="saveSlot"></param>
-        public bool LoadGame(int saveSlot)
+        private void LoadGame(int saveSlot)
         {
+            LoadSuccessful = false;
+
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
@@ -447,10 +495,11 @@ namespace Grief.Classes.GameManager
                     }
                 }
 
-                if (!foundSave)
+                if (foundSave == false)
                 {
                     Debug.WriteLine($"No save file found for slot {saveSlot}!");
-                    return false;
+                    LoadSuccessful = false;
+                    return;
                 }
 
                 // 2. Find levelName og Load Level
@@ -591,8 +640,14 @@ namespace Grief.Classes.GameManager
 
                                 Quest fetchQuest = new FetchQuest(questName, questDesc, requiredItemName, rewardItem);
 
-                                if (accepted == true) fetchQuest.Accept();
-                                if (completed == true) fetchQuest.Complete();
+                                if (accepted == true)
+                                {
+                                    fetchQuest.Accept();
+                                }
+                                if (completed == true)
+                                {
+                                    fetchQuest.Complete();
+                                }
 
                                 quest = fetchQuest;
                             }
@@ -617,8 +672,11 @@ namespace Grief.Classes.GameManager
                         }
                     }
                 }
-                return true;
+
+                LoadSuccessful = true;
             }
+
+            loadGameThreadRunning = false;
         }
 
     }
