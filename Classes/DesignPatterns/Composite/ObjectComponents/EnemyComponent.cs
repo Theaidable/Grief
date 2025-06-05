@@ -263,9 +263,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             // Flip sprite baseret på direction
             SpriteRenderer spriteRenderer = GameObject.GetComponent<SpriteRenderer>();
             if (direction.X < 0)
+            {
                 spriteRenderer.SetEffects(SpriteEffects.FlipHorizontally);
+            }
             else if (direction.X > 0)
+            {
                 spriteRenderer.SetEffects(SpriteEffects.None);
+            }
 
             Vector2 originalPosition = GameObject.Transform.Position;
             Vector2 movement = direction * EnemySpeed * GameWorld.Instance.DeltaTime;
@@ -276,10 +280,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             bool polygonCollision = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons.Any(poly => poly.BoundingRectangle.Intersects(enemyCollider));
             bool snappedToSlope = false;
 
-            if (rectCollision && !polygonCollision)
+            if (rectCollision == true && polygonCollision == false)
+            {
                 GameObject.Transform.Position = originalPosition;
+            }
 
-            if (polygonCollision)
+            if (polygonCollision == true)
             {
                 foreach (Polygon polygon in GameWorld.Instance.GameManager.LevelManager.CurrentLevel.CollisionPolygons)
                 {
@@ -307,12 +313,18 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                             }
                         }
                     }
-                    if (snappedToSlope) break;
+
+                    if (snappedToSlope == true)
+                    {
+                        break;
+                    }
                 }
             }
 
-            if (!isAttacking && grounded)
+            if (isAttacking == false && grounded == true)
+            {
                 animator.PlayAnimation("Walk");
+            }
         }
 
         /// <summary>
@@ -322,8 +334,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool PlayerIsWithInDetectionRange()
         {
             var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            
             if (player == null)
+            {
                 return false;
+            }
 
             var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
             return distance <= EnemyDetectionRange;
@@ -334,7 +349,10 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public void Attack()
         {
-            if (isAttacking) return;
+            if (isAttacking == true)
+            {
+                return;
+            }
 
             if (cooldownTimer <= 0f)
             {
@@ -385,8 +403,12 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private bool PlayerIsWithInAttackRange()
         {
             var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
+            
             if (player == null)
+            {
                 return false;
+            }
+                
 
             var distance = Vector2.Distance(GameObject.Transform.Position, player.Transform.Position);
             return distance <= EnemyAttackRange;
@@ -453,11 +475,16 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             GameObject playerObject = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.GetComponent<PlayerComponent>() != null);
 
             if (playerObject == null)
+            {
                 return;
+            }
 
             var inventory = playerObject.GetComponent<InventoryComponent>();
+            
             if (inventory == null)
+            {
                 return;
+            }
 
             inventory.AddItemToInventory(item);
         }

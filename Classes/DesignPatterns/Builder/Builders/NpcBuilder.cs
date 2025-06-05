@@ -24,13 +24,6 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         private List<string> dialogLinesAlreadyCompleted;
         private Quest quest;
 
-        //Public properties
-        public string Name { get; private set; }
-        public List<string> DialogLinesBeforeAccept { get; private set; }
-        public List<string> DialogLinesAcceptedNotCompleted { get; private set; }
-        public List<string> DialogLinesOnCompleted { get; private set; }
-        public List<string> DialogLinesAlreadyCompleted { get; private set; }
-        public Quest Quest { get; private set; }
 
         /// <summary>
         /// Constructor

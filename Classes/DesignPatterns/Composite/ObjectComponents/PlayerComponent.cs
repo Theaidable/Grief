@@ -22,6 +22,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Animator animator;
         private Collider collider;
         private InventoryComponent inventory;
+        //private ItemComponent item;
+
         private Vector2 moveDirection;
         private Vector2 velocity;
         private float gravity = 600f;
@@ -77,6 +79,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator = GameObject.GetComponent<Animator>();
             collider = GameObject.GetComponent<Collider>();
             inventory = GameObject.GetComponent<InventoryComponent>();
+            //item = GameObject.GetComponent<ItemComponent>();
+
             AddAnimations();
             BindCommands();
             animator.PlayAnimation("Idle");
@@ -315,7 +319,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                 var nearbyItem = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects
                     .FirstOrDefault(gameObject => Vector2.Distance(gameObject.Transform.Position, GameObject.Transform.Position) < 40
-                    && gameObject.GetComponent<ItemComponent> != null);
+                    && gameObject.GetComponent<ItemComponent>() != null);
+                
                 Debug.WriteLine(nearbyItem != null, "Nearby Item blev fundet korrekt");
 
                 if (nearbyNpc != null)
@@ -324,17 +329,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 }
                 else if (nearbyItem != null)
                 {
-                    var itemComp = nearbyItem.GetComponent<ItemComponent>();
-                    Debug.WriteLine(itemComp != null, "ItemComponent blev hentet korrekt");
-
-                    if (itemComp != null)
-                    {
-                        itemComp.PickUpItem();
-                    }
-                    else
-                    {
-                        Debug.WriteLine("Fejl med at få ItemComponent");
-                    }
+                    nearbyItem.GetComponent<ItemComponent>().PickUpItem();
                 }
 
                 cooldownTimer = interactionCooldown;

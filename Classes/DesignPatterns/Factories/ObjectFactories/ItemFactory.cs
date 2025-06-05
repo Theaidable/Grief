@@ -50,11 +50,11 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
             SpriteRenderer spriteRenderer = itemObject.AddComponent<SpriteRenderer>();
             Animator animator = itemObject.AddComponent<Animator>();
             Collider collider = itemObject.AddComponent<Collider>();
-            var itemComp = itemObject.AddComponent<ItemComponent>();
+            ItemComponent itemComponent = itemObject.AddComponent<ItemComponent>();
 
-            Debug.WriteLine(itemComp != null, "ItemComponent blev tilføjet korrekt");
+            Debug.WriteLine(itemComponent != null, "ItemComponent blev tilføjet korrekt");
 
-            itemComp.Item = item;
+            itemComponent.Item = item;
             itemObject.Transform.Position = position;
             spriteRenderer.SetSprite(item.Texture);
 
