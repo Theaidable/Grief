@@ -94,7 +94,6 @@ namespace Grief.Classes.GameManager.Scenes
                 }
             }
 
-            // Gør tilsvarende for slot2Rect og slot3Rect:
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 2 clicked!");
@@ -109,6 +108,7 @@ namespace Grief.Classes.GameManager.Scenes
                     loadErrorMessage = "No save file found in slot 2!";
                 }
             }
+
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Load slot 3 clicked!");
@@ -123,6 +123,12 @@ namespace Grief.Classes.GameManager.Scenes
                     loadErrorMessage = "No save file found in slot 3!";
                 }
             }
+
+            if (IsClicked(backRect, mousePosition))
+            {
+                GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.MainMenu);
+            }
+
 
             previousMouse = currentMouse;
         }
