@@ -152,11 +152,11 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             //Fjendens AI-logik: pursue, attack, patrol
             if (EnemyHealth > 0 && isHurt == false && grounded == true)
             {
-                if (PlayerIsWithInDetectionRange() == true)
+                if (PlayerIsWithinDetectionRange() == true)
                 {
                     Pursue();
 
-                    if (PlayerIsWithInAttackRange() == true)
+                    if (PlayerIsWithinAttackRange() == true)
                     {
                         Attack();
                     }
@@ -427,7 +427,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// Tjek om spilleren er inden for attack range.
         /// </summary>
         /// <returns></returns>
-        private bool PlayerIsWithInAttackRange()
+        private bool PlayerIsWithinAttackRange()
         {
             var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(g => g.GetComponent<PlayerComponent>() != null);
             
@@ -531,7 +531,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Walk", 5f, true, walkFrames));
             animator.AddAnimation(new Animation("Attack", 10f, false, attackFrames));
             animator.AddAnimation(new Animation("Hurt", 10f, false, hurtFrames));
-            animator.AddAnimation(new Animation("Death", 2.5f, false, deathFrames));
+            animator.AddAnimation(new Animation("Death", 4f, false, deathFrames));
         }
     }
 }

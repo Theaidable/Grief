@@ -45,11 +45,14 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// </summary>
         public override void Update()
         {
-            var player = GameWorld.Instance.GameManager.LevelManager.CurrentLevel.GameObjects.FirstOrDefault(gameObject => gameObject.Tag == "Player");
-            var playerX = player.Transform.Position.X;
-            var playerY = player.Transform.Position.Y;
+            var viewport = GameWorld.Instance.GraphicsDevice.Viewport;
+            int screenWidth = viewport.Width;
+            int screenHeight = viewport.Height;
 
-            backgroundPosition = new Vector2(playerX - 100, playerY - 175);
+            Vector2 screenCenter = new Vector2(screenWidth / 2, screenHeight / 2);
+            Vector2 worldCenter = GameWorld.Instance.Camera.ScreenToWorld(screenCenter);
+
+            backgroundPosition = new Vector2(worldCenter.X - 225, worldCenter.Y - 100);
         }
 
         /// <summary>
@@ -87,13 +90,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
         /// <summary>
         /// Tegn inventory
-        /// </summary>
+        /// </summary> 
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             //Desired størrelse af baggrunden for Inventory
-            float backgroundDesiredWidth = backgroundSource.Width * 2f;
-            float backgroundDesiredHeight = backgroundSource.Height * 1f;
+            float backgroundDesiredWidth = backgroundSource.Width * 3.5f;
+            float backgroundDesiredHeight = backgroundSource.Height * 1.5f;
             Rectangle backgroundDestRect = new Rectangle((int)backgroundPosition.X, (int)backgroundPosition.Y, (int)backgroundDesiredWidth, (int)backgroundDesiredHeight);
 
             if (ShowInventory == true)
@@ -104,7 +107,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                 for (int i = 0; i < items.Count; i++)
                 {
                     string name = items[i].DisplayName;
-                    spriteBatch.DrawString(GameWorld.Instance.DefaultFont, name, new Vector2(backgroundPosition.X + 40, backgroundPosition.Y + 20 + i * 20), Color.White);
+                    spriteBatch.DrawString(GameWorld.Instance.DefaultFont, name, new Vector2(backgroundPosition.X + 75, backgroundPosition.Y + 35 + i * 20), Color.White);
                 }
             }
         }
