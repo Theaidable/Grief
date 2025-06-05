@@ -10,7 +10,6 @@ namespace Grief.Classes.GameManager.Scenes
     public class PauseOverlay : Scene
     {
         // Textures + scale
-        private Texture2D background;
         private Texture2D continueButton;
         private Texture2D saveButton;
         private Texture2D quitButton;
