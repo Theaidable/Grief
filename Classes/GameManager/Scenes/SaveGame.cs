@@ -149,10 +149,10 @@ namespace Grief.Classes.GameManager.Scenes
             spriteBatch.Draw(backButton, backButtonPos, null, IsHovering(backRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
 
             // Debug rectangles (kan fjernes)
-            spriteBatch.Draw(GameWorld.Instance.Pixel, slot1Rect, Color.Blue * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, slot2Rect, Color.Blue * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, slot3Rect, Color.Blue * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, backRect, Color.Red * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, slot1Rect, Color.Blue * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, slot2Rect, Color.Blue * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, slot3Rect, Color.Blue * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, backRect, Color.Red * 0.3f);
         }
     }
 }

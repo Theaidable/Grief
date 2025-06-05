@@ -163,9 +163,9 @@ namespace Grief.Classes.GameManager.Scenes
             spriteBatch.Draw(quitButton, quitButtonPos, null, IsHovering(quitRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);
 
             // Debug visualisering (kan fjernes)
-            spriteBatch.Draw(GameWorld.Instance.Pixel, continueRect, Color.Green * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, saveRect, Color.Blue * 0.3f);
-            spriteBatch.Draw(GameWorld.Instance.Pixel, quitRect, Color.Red * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, continueRect, Color.Green * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, saveRect, Color.Blue * 0.3f);
+            //spriteBatch.Draw(GameWorld.Instance.Pixel, quitRect, Color.Red * 0.3f);
         }
     }
 }
