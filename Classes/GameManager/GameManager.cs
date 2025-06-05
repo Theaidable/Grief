@@ -485,7 +485,7 @@ namespace Grief.Classes.GameManager
                             {
                                 "StoryItem" => new StoryItem(name, type),
                                 "QuestItem" => new QuestItem(name, type),
-                                _ => new Item(name, type)
+                                _ => throw new InvalidOperationException($"Unknown item type: {type}")
                             };
 
                             inventory.AddItemToInventory(item);
