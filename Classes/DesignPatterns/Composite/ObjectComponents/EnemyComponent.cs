@@ -421,10 +421,15 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                     if (droppedItem != null)
                     {
-                        DropItem(droppedItem);
 
-                        //For at spawne item i verdenen som gameobject, brug:
-                        GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueAdd(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position + new Vector2(0,20)));
+                        if(droppedItem.Texture != null)
+                        {
+                            GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueAdd(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position + new Vector2(0, 20)));
+                        }
+                        else
+                        {
+                            DropItem(droppedItem);
+                        }
                     }
                 };
             }

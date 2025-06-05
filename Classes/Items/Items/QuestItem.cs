@@ -14,7 +14,7 @@ namespace Grief.Classes.Items.Items
         /// <param name="itemName"></param>
         public QuestItem(string itemName)
         {
-            Texture = $"Items/QuestItems/{itemName}";
+            //Texture = $"Items/QuestItems/{itemName}";
             DisplayName = itemName;
         }
     }

@@ -17,6 +17,13 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         //Private Fields
         private GameObject npc;
 
+        private string name;
+        private List<string> dialogLinesBeforeAccept;
+        private List<string> dialogLinesAcceptedNotCompleted;
+        private List<string> dialogLinesOnCompleted;
+        private List<string> dialogLinesAlreadyCompleted;
+        private Quest quest;
+
         //Public properties
         public string Name { get; private set; }
         public List<string> DialogLinesBeforeAccept { get; private set; }
@@ -24,8 +31,6 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         public List<string> DialogLinesOnCompleted { get; private set; }
         public List<string> DialogLinesAlreadyCompleted { get; private set; }
         public Quest Quest { get; private set; }
-        public bool HasQuest { get; private set; }
-        public bool QuestGiven { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -64,7 +69,7 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         /// <returns></returns>
         public IGameObjectBuilder SetName(string name)
         {
-            Name = name;
+            this.name = name;
             return this;
         }
 
@@ -78,10 +83,10 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         /// <returns></returns>
         public IGameObjectBuilder SetDialog(List<string> linesBeforeAccept, List<string> linesAcceptedNotCompleted, List<string> linesOnCompleted, List<string> linesAlreadyCompleted)
         {
-            DialogLinesBeforeAccept = linesBeforeAccept;
-            DialogLinesAcceptedNotCompleted = linesAcceptedNotCompleted;
-            DialogLinesOnCompleted = linesOnCompleted;
-            DialogLinesAlreadyCompleted = linesAlreadyCompleted;
+            dialogLinesBeforeAccept = linesBeforeAccept;
+            dialogLinesAcceptedNotCompleted = linesAcceptedNotCompleted;
+            dialogLinesOnCompleted = linesOnCompleted;
+            dialogLinesAlreadyCompleted = linesAlreadyCompleted;
             return this;
         }
 
@@ -92,8 +97,7 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
         /// <returns></returns>
         public IGameObjectBuilder SetQuest(Quest quest)
         {
-            Quest = quest;
-            HasQuest = quest != null;
+            this.quest = quest;
             return this;
         }
 
@@ -148,13 +152,13 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
 
             if(npcComponent != null)
             {
-                npcComponent.Name = Name;
-                npcComponent.DialogLinesBeforeAccept = DialogLinesBeforeAccept;
-                npcComponent.DialogLinesAcceptedNotCompleted = DialogLinesAcceptedNotCompleted;
-                npcComponent.DialogLinesOnCompleted = DialogLinesOnCompleted;
-                npcComponent.DialogLinesAlreadyCompleted = DialogLinesAlreadyCompleted;
-                npcComponent.QuestToGive = Quest;
-                npcComponent.Portrait = GameWorld.Instance.Content.Load<Texture2D>($"NPCs/Portraits/Portrait{Name}");
+                npcComponent.Name = name;
+                npcComponent.DialogLinesBeforeAccept = dialogLinesBeforeAccept;
+                npcComponent.DialogLinesAcceptedNotCompleted = dialogLinesAcceptedNotCompleted;
+                npcComponent.DialogLinesOnCompleted = dialogLinesOnCompleted;
+                npcComponent.DialogLinesAlreadyCompleted = dialogLinesAlreadyCompleted;
+                npcComponent.QuestToGive = quest;
+                npcComponent.Portrait = GameWorld.Instance.Content.Load<Texture2D>($"NPCs/Portraits/Portrait{name}");
             }
 
             return npc;
