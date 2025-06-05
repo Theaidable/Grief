@@ -12,10 +12,11 @@ namespace Grief.Classes.Items.Items
         /// Constructor
         /// </summary>
         /// <param name="itemName"></param>
-        public StoryItem(string itemName)
+        public StoryItem(string itemName, string type)
         {
-            Texture = $"Items/StoryItems/{itemName}";
             DisplayName = itemName;
+            Type = type;
+            Texture = $"Items/{type}/{itemName}";
         }
     }
 }
