@@ -22,7 +22,9 @@ namespace Grief.Classes.Levels
         {
             // Ryd tidligere level hvis der er et
             if (CurrentLevel != null)
+            {
                 UnloadLevel();
+            }
 
             CurrentLevel = new Level(levelName);
             CurrentLevel.Load(levelName);
@@ -40,6 +42,7 @@ namespace Grief.Classes.Levels
         public void UnloadLevel()
         {
             // Ryd memory for gamle objekter, hvis nødvendigt (her sættes bare til null)
+            CurrentLevel.GameObjects.Clear();
             CurrentLevel = null;
         }
 
