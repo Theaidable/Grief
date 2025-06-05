@@ -11,6 +11,7 @@ namespace Grief.Classes.GameManager.Scenes
     {
         // Textures + scale
         private Texture2D background;
+        private Texture2D keybindsOverlay;
         private Texture2D continueButton;
         private Texture2D saveButton;
         private Texture2D quitButton;
@@ -43,6 +44,7 @@ namespace Grief.Classes.GameManager.Scenes
         public override void LoadContent()
         {
             //background = content.Load<Texture2D>("TileMaps/Assets/UI/MenuBackground/MenuBG");
+            keybindsOverlay = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/KeybindsOverlay");
             continueButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Continue");
             saveButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/SG");
             quitButton = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
@@ -156,6 +158,9 @@ namespace Grief.Classes.GameManager.Scenes
 
             // Tegn menu baggrund
             //spriteBatch.Draw(background, new Rectangle(-320, -135, 576, 324), Color.White);
+
+            // Tegn keybinds overlay
+            spriteBatch.Draw(keybindsOverlay, new Vector2(worldCenter.X - 240, worldCenter.Y - 140), null, Color.White * 1f, 0f, Vector2.Zero, 0.85f, SpriteEffects.None, 0f);
 
             // Tegn knapper (med hover)
             spriteBatch.Draw(continueButton, continueButtonPos, null, IsHovering(continueRect, mousePosition) ? Color.LightGray : Color.White, 0f, Vector2.Zero, buttonScale, SpriteEffects.None, 0f);

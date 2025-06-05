@@ -13,6 +13,7 @@ namespace Grief.Classes.GameManager.Scenes
 
         //Textures + en scale
         private Texture2D background;
+        private Texture2D keybindsOverlay;
         private Texture2D title;
         private Texture2D startButton;
         private Texture2D loadButton;
@@ -42,6 +43,7 @@ namespace Grief.Classes.GameManager.Scenes
             var content = GameWorld.Instance.Content;
             
             background = content.Load<Texture2D>("TileMaps/Assets/UI/MenuBackground/MenuBG");
+            keybindsOverlay = GameWorld.Instance.Content.Load<Texture2D>("TileMaps/Assets/UI/KeybindsOverlay");
             title = content.Load<Texture2D>("TileMaps/Assets/UI/Text/Title");
 
             startButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/NG");
@@ -133,6 +135,9 @@ namespace Grief.Classes.GameManager.Scenes
         {
             //Draw Background
             spriteBatch.Draw(background, new Rectangle(-320, -135, 576, 324), Color.White);
+
+            //Draw Keybindsoverlay
+            spriteBatch.Draw(keybindsOverlay, new Vector2(-240, -140), null, Color.White * 1f, 0f, Vector2.Zero, 0.85f, SpriteEffects.None, 0f);
 
             //Draw Title
             spriteBatch.Draw(title, new Vector2(-118, -100), null, Color.White, 0f, Vector2.Zero, 0.3f, SpriteEffects.None, 0f);
