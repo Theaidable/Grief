@@ -2,6 +2,7 @@
 using Grief.Classes.DesignPatterns.Command;
 using Grief.Classes.DesignPatterns.Command.Commands;
 using Grief.Classes.DesignPatterns.Composite.Components;
+using Grief.Classes.DesignPatterns.Factories.ObjectFactories;
 using Grief.Classes.GameManager;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,6 +33,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private float interactionCooldown = 0.1f;
         private float cooldownTimer = 0f;
         private bool isAttacking = false;
+        private bool isHurt = false;
         private bool isInteracting = false;
         private bool grounded;
 
@@ -351,8 +353,28 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         /// <param name="amount"></param>
         public void TakeDamage(int amount)
         {
-            Health -= amount;
-
+            if(Health > 0 && isHurt == false)
+            {
+                isHurt = true;
+                animator.PlayAnimation("Hurt");
+                animator.ClearOnAnimationComplete();
+                animator.OnAnimationComplete = () =>
+                {
+                    Health -= amount;
+                    isHurt = false;
+                    isAttacking = false;
+                    animator.PlayAnimation("Idle");
+                };
+            }
+            else
+            {
+                animator.PlayAnimation("Death");
+                animator.OnAnimationComplete = () =>
+                {
+                    //Try again
+                    GameWorld.Instance.GameManager.ChangeState(GameManager.GameManager.GameState.MainMenu);
+                };
+            }
         }
 
         /// <summary>
@@ -380,8 +402,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             animator.AddAnimation(new Animation("Fall", 10f, false, fallFrames));
             animator.AddAnimation(new Animation("Attack", 15f, false, attackFrames));
             animator.AddAnimation(new Animation("Blink", 5f, false, blinkFrames));
-            animator.AddAnimation(new Animation("Death", 5f, false, deathFrames));
-            animator.AddAnimation(new Animation("Die", 5f, false, dieFrames));
+            animator.AddAnimation(new Animation("Hurt", 15f, false, deathFrames));
+            animator.AddAnimation(new Animation("Death", 5f, false, dieFrames));
             animator.AddAnimation(new Animation("Sit", 5f, true, sitFrames));
         }
 
