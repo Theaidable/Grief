@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
+namespace Grief.Classes.Enemy
 {
     /// <summary>
     /// Hjælpe klasse til at give enemies forskellige stats

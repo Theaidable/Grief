@@ -74,7 +74,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         /// <summary>
         /// Hjælpemetode til at opdatere vores pixelcollider
         /// </summary>
-        public void UpdatePixelCollider()
+        private void UpdatePixelCollider()
         {
             int width = spriteRenderer.SourceRectangle?.Width ?? spriteRenderer.Sprite.Width;
             int height = spriteRenderer.SourceRectangle?.Height ?? spriteRenderer.Sprite.Height;

@@ -1,11 +1,12 @@
 ﻿using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
+using Grief.Classes.Enemy;
 using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
+namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
 {
     /// <summary>
     /// Enumaration for de forskellige typer af enemies som skal eksistere i spillet

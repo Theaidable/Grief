@@ -18,6 +18,17 @@ namespace Grief.Classes.DesignPatterns.Command
     /// </summary>
     public class InputHandler
     {
+
+        //Dictionaries
+        private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
+        private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
+        private Dictionary<Keys, ICommand> keybindsButtonUp = new Dictionary<Keys, ICommand>();
+        private Dictionary<MouseButton, ICommand> mouseButtonDownBinds = new Dictionary<MouseButton, ICommand>();
+
+        //Previousstates
+        private KeyboardState previousKeyState;
+        private MouseState previousMouseState;
+
         /// <summary>
         /// Singleton
         /// </summary>
@@ -38,16 +49,6 @@ namespace Grief.Classes.DesignPatterns.Command
         /// private constructor
         /// </summary>
         private InputHandler() { }
-
-        //Dictionaries
-        private Dictionary<Keys, ICommand> keybindsUpdate = new Dictionary<Keys, ICommand>();
-        private Dictionary<Keys, ICommand> keybindsButtonDown = new Dictionary<Keys, ICommand>();
-        private Dictionary<Keys, ICommand> keybindsButtonUp = new Dictionary<Keys, ICommand>();
-        private Dictionary<MouseButton, ICommand> mouseButtonDownBinds = new();
-        
-        //Previousstates
-        private KeyboardState previousKeyState;
-        private MouseState previousMouseState;
 
         /// <summary>
         /// Tilføje en update command - Handling som køres kontinuert mens knap holdes nede

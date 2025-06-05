@@ -1,7 +1,6 @@
 ﻿using Grief.Classes.DesignPatterns.Composite;
 using Grief.Classes.DesignPatterns.Composite.Components;
 using Grief.Classes.DesignPatterns.Composite.ObjectComponents;
-using Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy;
 using Grief.Classes.Items;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;

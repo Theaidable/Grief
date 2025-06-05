@@ -21,13 +21,14 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     public class Animator : Component
     {
         //Fields
-        public int CurrentIndex { get; private set; }
-        public Animation CurrentAnimation { get => currentAnimation; set => currentAnimation = value; }
-
         private float elapsed;
         private SpriteRenderer spriteRenderer;
         private Dictionary<string, Animation> animations = new Dictionary<string, Animation>();
-        private Animation currentAnimation;
+
+        //Properties
+        public int CurrentIndex { get; private set; }
+        public Animation CurrentAnimation { get; private set; }
+
 
         //Events
         public Action OnAnimationComplete;
