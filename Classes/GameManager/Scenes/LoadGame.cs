@@ -19,7 +19,7 @@ namespace Grief.Classes.GameManager.Scenes
         private Texture2D slot2Button;
         private Texture2D slot3Button;
         private Texture2D backButton;
-        private float buttonScale = 0.1f; // Brug 1.0f hvis dine billeder allerede er i den ønskede størrelse
+        private float buttonScale = 0.1f;
 
         private Vector2 slot1Pos = new Vector2(-40, -60);
         private Vector2 slot2Pos = new Vector2(-40, -20);

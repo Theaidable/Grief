@@ -105,19 +105,19 @@ namespace Grief.Classes.GameManager.Scenes
             if (IsClicked(slot1Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 1 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(1);
+                // Her indsættes save-funktion fx GameManager.SaveGame(1);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot2Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 2 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(2);
+                // Her indsættes save-funktion fx GameManager.SaveGame(2);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(slot3Rect, mousePosition))
             {
                 Debug.WriteLine("Save slot 3 clicked!");
-                // Her indsætter du din save-funktion fx GameManager.SaveGame(3);
+                // Her indsættes save-funktion fx GameManager.SaveGame(3);
                 GameWorld.Instance.GameManager.ChangeState(GameManager.GameState.Paused);
             }
             if (IsClicked(backRect, mousePosition))
@@ -158,7 +158,7 @@ namespace Grief.Classes.GameManager.Scenes
         /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
-            // Tegn fade overlay ligesom PauseOverlay
+            // Tegn fade overlay
             Vector2 topLeft = GameWorld.Instance.Camera.ScreenToWorld(Vector2.Zero);
             Vector2 bottomRight = GameWorld.Instance.Camera.ScreenToWorld(new Vector2(viewport.Width, viewport.Height));
             Rectangle fadeRect = new Rectangle(
