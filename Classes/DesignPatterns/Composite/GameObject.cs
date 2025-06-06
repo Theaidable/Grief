@@ -3,10 +3,14 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Grief.Classes.DesignPatterns.Composite.Components;
-using System.Diagnostics;
 
 namespace Grief.Classes.DesignPatterns.Composite
 {
+    /// <summary>
+    /// GameObject klasse
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class GameObject
     {
         //Liste af components

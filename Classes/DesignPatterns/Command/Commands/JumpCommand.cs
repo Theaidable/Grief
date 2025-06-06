@@ -6,6 +6,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
     /// <summary>
     /// Jump command - til at få spilleren til at hoppe
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class JumpCommand : ICommand
     {
         //Reference til player

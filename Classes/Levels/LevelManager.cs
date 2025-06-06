@@ -6,6 +6,8 @@ namespace Grief.Classes.Levels
     /// <summary>
     /// Kontrollerer alle levels i spillet.
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class LevelManager
     {
         /// <summary>

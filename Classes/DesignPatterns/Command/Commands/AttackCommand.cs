@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
     /// <summary>
     /// Basic Attack Command
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class AttackCommand : ICommand
     {
         //Reference til player

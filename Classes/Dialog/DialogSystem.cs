@@ -12,6 +12,7 @@ namespace Grief.Classes.Dialog
     /// <summary>
     /// System for dialog
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class DialogSystem
     {
         //Fields

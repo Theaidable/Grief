@@ -6,6 +6,7 @@ namespace Grief.Classes.DesignPatterns.Builder
     /// <summary>
     /// Interface som bruges til at bygge et objekt
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public interface IGameObjectBuilder
     {
         //Metoder som skal bruges til at bygge objekter

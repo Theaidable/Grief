@@ -1,4 +1,6 @@
-﻿-- Drop tables in reverse dependency order
+﻿-- <author>Asbjørn Ryber</author>
+
+-- Drop tables in reverse dependency order
 DROP TABLE IF EXISTS Inventory;
 DROP TABLE IF EXISTS Quest;
 DROP TABLE IF EXISTS Enemy;

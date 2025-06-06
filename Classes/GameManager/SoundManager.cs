@@ -6,6 +6,10 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Grief.Classes.GameManager
 {
+    /// <summary>
+    /// SoundManager som styrer lyd
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public static class SoundManager
     {
         private static Song menuSong;

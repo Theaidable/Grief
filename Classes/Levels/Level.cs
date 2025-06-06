@@ -27,6 +27,8 @@ namespace Grief.Classes.Levels
     /// <summary>
     /// Oprettelse af spillets levels.
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class Level
     {
         // Fields

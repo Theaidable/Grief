@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace Grief.Classes.DesignPatterns.Factories
 {
+    /// <summary>
+    /// Factory superklasse
+    /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public abstract class Factory
     {
         //Metode som alle factories skal bruge

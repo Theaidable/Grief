@@ -6,9 +6,10 @@ namespace Greif.Classes.Cameras
     /// <summary>
     /// Camera klasse til at fokusere på bestemte objekter i spillet
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Camera
     {
-        //fields:
+        //Fields
         private Vector2 position;
 
         //Properties

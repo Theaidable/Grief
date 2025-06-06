@@ -9,6 +9,7 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
     /// <summary>
     /// Concrete builder for Player
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class PlayerBuilder : IGameObjectBuilder
     {
         //Private fields

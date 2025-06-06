@@ -6,6 +6,7 @@ namespace Grief.Classes.Items.Items
     /// <summary>
     /// Story item
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class StoryItem : Item
     {
         /// <summary>

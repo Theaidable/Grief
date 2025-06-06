@@ -1,15 +1,17 @@
 ﻿using Greif;
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using System.Collections.Generic;
 using Grief.Classes.GameManager.Scenes;
 using Grief.Classes.Levels;
 
 namespace Grief.Classes.GameManager
 {
+    /// <summary>
+    /// GameManager klasse som styrer spillets tilstand
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class GameManager
     {
         public enum GameState

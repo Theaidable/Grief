@@ -4,9 +4,6 @@ using Grief.Classes.Dialog;
 using Grief.Classes.Quests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
-using MonoGame.Extended.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,6 +13,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     /// <summary>
     /// NPC component – styrer dialog, quests og grundlæggende NPC-animation.
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class NpcComponent : Component
     {
         // Fields

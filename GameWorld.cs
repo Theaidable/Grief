@@ -17,6 +17,8 @@ namespace Greif
     /// <summary>
     /// Den centrale klasse for hele spillet – Singleton mønster
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class GameWorld : Game
     {
         // Private fields

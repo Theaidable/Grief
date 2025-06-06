@@ -17,6 +17,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     /// <summary>
     /// Player component
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class PlayerComponent : Component
     {
         //Private fields
