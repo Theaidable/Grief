@@ -19,6 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Animator component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Animator : Component
     {
         //Fields
@@ -157,6 +158,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Hjælpeklasse til at holde styr på information omkring animationer
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Animation
     {
         public float FPS { get; private set; }

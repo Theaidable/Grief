@@ -245,6 +245,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Hjælpeklasse der holder styr på rectanglernes data
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class RectangleData
     {
         public Rectangle Rectangle { get; set; }

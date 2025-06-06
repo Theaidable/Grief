@@ -13,6 +13,7 @@ namespace Grief.Classes.GameManager.Scenes
     /// <author>Asbjørn Ryberg</author>
     public class LoadGame : Scene
     {
+        //Fields
         private Texture2D background;
         private Texture2D slot1Button;
         private Texture2D slot2Button;
@@ -34,6 +35,9 @@ namespace Grief.Classes.GameManager.Scenes
         private MouseState previousMouse;
         private Point mousePosition;
 
+        /// <summary>
+        /// Metoden bruges til at indlæse data
+        /// </summary>
         public override void LoadContent()
         {
             var content = GameWorld.Instance.Content;
@@ -77,6 +81,10 @@ namespace Grief.Classes.GameManager.Scenes
                 );
         }
 
+        /// <summary>
+        /// Tjekker om knapperne bliver klikket på
+        /// </summary>
+        /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
             currentMouse = Mouse.GetState();
@@ -109,11 +117,23 @@ namespace Grief.Classes.GameManager.Scenes
             previousMouse = currentMouse;
         }
 
+        /// <summary>
+        /// Tjekker om man hover en knapper
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsHovering(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition);
         }
 
+        /// <summary>
+        /// Tjekker om man klikker på en knap
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition)
@@ -121,6 +141,10 @@ namespace Grief.Classes.GameManager.Scenes
                 && previousMouse.LeftButton == ButtonState.Released;
         }
 
+        /// <summary>
+        /// Tegner scenen
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             //Draw background

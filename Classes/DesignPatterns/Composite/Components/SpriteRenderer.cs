@@ -18,6 +18,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Spriterenderer component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class SpriteRenderer : Component
     {
         //Properties

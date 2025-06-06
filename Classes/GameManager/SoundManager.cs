@@ -12,6 +12,7 @@ namespace Grief.Classes.GameManager
     /// <author>Asbjørn Ryberg</author>
     public static class SoundManager
     {
+        //Fields
         private static Song menuSong;
         private static Song levelSong;
         private static Song currentSong;
@@ -22,6 +23,10 @@ namespace Grief.Classes.GameManager
 
         private static Random random = new();
 
+        /// <summary>
+        /// Loader alle sangenen og soundeffects til deres lists
+        /// </summary>
+        /// <param name="content"></param>
         public static void LoadContent(ContentManager content)
         {
             menuSong = content.Load<Song>("Sound/BGM/Evening Harmony");
@@ -40,6 +45,9 @@ namespace Grief.Classes.GameManager
             enemyAttackSounds.Add(content.Load<SoundEffect>("Sound/SFX/human_atk_sword_3"));
         }
 
+        /// <summary>
+        /// Afspiller Menu Music
+        /// </summary>
         public static void PlayMenuMusic()
         {
             if (currentSong != menuSong)
@@ -51,6 +59,9 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Afspiller Level Music
+        /// </summary>
         public static void PlayLevelMusic()
         {
             if (currentSong != levelSong)
@@ -62,6 +73,9 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Afspiller Jump Sound
+        /// </summary>
         public static void PlayJumpSound()
         {
             if (jumpSounds.Count > 0)
@@ -71,6 +85,9 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Afspillet Attack Sound
+        /// </summary>
         public static void PlayAttackSound()
         {
             if (attackSounds.Count > 0)
@@ -80,6 +97,9 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Afspiller EnemyAttackSound
+        /// </summary>
         public static void PlayEnemyAttackSound()
         {
             if (enemyAttackSounds.Count > 0)
@@ -89,7 +109,9 @@ namespace Grief.Classes.GameManager
             }
         }
 
-
+        /// <summary>
+        /// Stopper musikken
+        /// </summary>
         public static void StopMusic()
         {
             MediaPlayer.Stop();

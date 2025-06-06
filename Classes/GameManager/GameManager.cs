@@ -14,6 +14,9 @@ namespace Grief.Classes.GameManager
     /// <author>David Gudmund Danielsen</author>
     public class GameManager
     {
+        /// <summary>
+        /// Enumartion for GameState
+        /// </summary>
         public enum GameState
         {
             MainMenu,
@@ -23,6 +26,7 @@ namespace Grief.Classes.GameManager
             Paused
         }
 
+        //Fields
         public GameState CurrentState { get; private set; }
 
         private Scene mainMenu;
@@ -34,6 +38,9 @@ namespace Grief.Classes.GameManager
 
         public LevelManager LevelManager { get; private set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public GameManager()
         {
             mainMenu = new MainMenu();
@@ -48,6 +55,10 @@ namespace Grief.Classes.GameManager
             ChangeState(GameState.MainMenu);
         }
 
+        /// <summary>
+        /// Metode som bruges til at skifte spillets tilstand
+        /// </summary>
+        /// <param name="newState"></param>
         public void ChangeState(GameState newState)
         {
             CurrentState = newState;
@@ -72,6 +83,10 @@ namespace Grief.Classes.GameManager
             }
         }
 
+        /// <summary>
+        /// Kalder update i forhold til spillets tilstand
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
             KeyboardState keyState = Keyboard.GetState();
@@ -111,6 +126,10 @@ namespace Grief.Classes.GameManager
             previousKeyState = keyState;
         }
 
+        /// <summary>
+        /// Tegner det bestemte i forhold til GameState
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             switch (CurrentState)

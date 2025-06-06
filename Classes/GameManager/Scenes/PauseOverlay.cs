@@ -45,7 +45,9 @@ namespace Grief.Classes.GameManager.Scenes
         // Keyboard state
         private KeyboardState previousKeyState;
 
-
+        /// <summary>
+        /// Loader knapperne og sprites
+        /// </summary>
         public override void LoadContent()
         {
             //background = content.Load<Texture2D>("TileMaps/Assets/UI/MenuBackground/MenuBG");
@@ -72,6 +74,10 @@ namespace Grief.Classes.GameManager.Scenes
 
         }
 
+        /// <summary>
+        /// Sætter rectanglerne, og tjkker om knapperne bliver trykker på
+        /// </summary>
+        /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
             //Opdatere postionen for rectanglerne
@@ -130,14 +136,23 @@ namespace Grief.Classes.GameManager.Scenes
             previousKeyState = keyState;
         }
 
-
-        // Hover-effekt
+        /// <summary>
+        /// Tjekker om man hover en knap
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsHovering(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition);
         }
 
-        // Klik tjek
+        /// <summary>
+        /// Tjekker om man har klikket på knappen
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition)
@@ -145,6 +160,10 @@ namespace Grief.Classes.GameManager.Scenes
                 && previousMouse.LeftButton == ButtonState.Released;
         }
 
+        /// <summary>
+        /// Tegner Pause Overlay
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Tegn mørk overlay for at "fade" baggrunden

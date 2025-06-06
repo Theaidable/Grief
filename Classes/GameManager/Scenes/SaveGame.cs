@@ -13,13 +13,13 @@ namespace Grief.Classes.GameManager.Scenes
     /// <author>Asbjørn Ryberg</author>
     public class SaveGame : Scene
     {
+        //Fields
         private Texture2D slot1Button;
         private Texture2D slot2Button;
         private Texture2D slot3Button;
         private Texture2D backButton;
         private float buttonScale = 0.1f;
 
-        // Positioner til knapper
         private Vector2 slot1Pos;
         private Vector2 slot2Pos;
         private Vector2 slot3Pos;
@@ -38,6 +38,9 @@ namespace Grief.Classes.GameManager.Scenes
         private Vector2 screenCenter;
         private Vector2 worldCenter;
 
+        /// <summary>
+        /// Loader textures
+        /// </summary>
         public override void LoadContent()
         {
             var content = GameWorld.Instance.Content;
@@ -47,6 +50,10 @@ namespace Grief.Classes.GameManager.Scenes
             backButton = content.Load<Texture2D>("TileMaps/Assets/UI/Buttons/Exit");
         }
 
+        /// <summary>
+        /// Sætter position for knapperne, og tjekker om knapperne bliver trykket på
+        /// </summary>
+        /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
             // Opdatér positions så de er centreret på skærmen uanset vinduesstørrelse
@@ -121,11 +128,23 @@ namespace Grief.Classes.GameManager.Scenes
             previousMouse = currentMouse;
         }
 
+        /// <summary>
+        /// Tjekker om man hover knapperne
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsHovering(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition);
         }
 
+        /// <summary>
+        /// Tjekker om man klikker på knapperne
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="mousePosition"></param>
+        /// <returns></returns>
         private bool IsClicked(Rectangle rect, Point mousePosition)
         {
             return rect.Contains(mousePosition)
@@ -133,6 +152,10 @@ namespace Grief.Classes.GameManager.Scenes
                 && previousMouse.LeftButton == ButtonState.Released;
         }
 
+        /// <summary>
+        /// Tegner SaveGame scenen
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             // Tegn fade overlay ligesom PauseOverlay
