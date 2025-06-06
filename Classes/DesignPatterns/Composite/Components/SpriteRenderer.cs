@@ -52,6 +52,10 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             OnSpriteChanged?.Invoke();
         }
 
+        /// <summary>
+        /// Metode som bruges til at sætte en effect til et sprite
+        /// </summary>
+        /// <param name="name"></param>
         public void SetEffects(SpriteEffects name)
         {
             Effects = name;
@@ -73,11 +77,17 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             }
         }
 
+        /// <summary>
+        /// Invoke event OnSpriteChanged
+        /// </summary>
         public void InvokeOnSpriteChanged()
         {
             OnSpriteChanged?.Invoke();
         }
 
+        /// <summary>
+        /// Invoke event OnEffectsChanged
+        /// </summary>
         public void InvokeOnEffectsChanged()
         {
             OnEffectsChanged?.Invoke();
