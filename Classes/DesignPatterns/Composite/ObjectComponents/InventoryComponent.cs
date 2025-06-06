@@ -6,13 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
 
 namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 {
     /// <summary>
     /// Inventory component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class InventoryComponent : Component
     {
         //Fields

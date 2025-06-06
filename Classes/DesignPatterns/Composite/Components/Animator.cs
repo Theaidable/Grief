@@ -9,6 +9,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Enumaration til at bestemme animationstype om det er Sprite eller SpriteSheet
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public enum AnimationType
     {
         Sprite,
@@ -18,6 +19,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Animator component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Animator : Component
     {
         //Fields

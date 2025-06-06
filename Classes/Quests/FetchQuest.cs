@@ -3,6 +3,10 @@ using Grief.Classes.Items;
 
 namespace Grief.Classes.Quests
 {
+    /// <summary>
+    /// FetchQuest klasse
+    /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class FetchQuest : Quest
     {
         //Properties

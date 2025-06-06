@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
     /// <summary>
     /// Hjælpe klasse til at give enemies forskellige stats
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class EnemyStats
     {
         public int Health { get; set; }

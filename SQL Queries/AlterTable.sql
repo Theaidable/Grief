@@ -1,4 +1,6 @@
-﻿ALTER TABLE Quest ADD rewardItemName INT NULL; -- Fremmednøgle til Item-tabellen
+﻿--<author>Asbjørn Ryberg</author>
+
+ALTER TABLE Quest ADD rewardItemName INT NULL; -- Fremmednøgle til Item-tabellen
 
 ALTER TABLE Quest
 ADD CONSTRAINT FK_Quest_Item FOREIGN KEY (rewardItemName)

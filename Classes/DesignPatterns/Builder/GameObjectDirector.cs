@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Builder
     /// <summary>
     /// Directoren bruges til at bygge objekter
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class GameObjectDirector
     {
         //Private fields

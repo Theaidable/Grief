@@ -18,6 +18,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     /// <summary>
     /// Enemy component – styrer AI, bevægelse og kamp for fjender.
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class EnemyComponent : Component
     {
         // Fields

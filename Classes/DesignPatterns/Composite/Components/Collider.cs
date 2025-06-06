@@ -10,6 +10,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Collider component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Collider : Component
     {
         //Fields

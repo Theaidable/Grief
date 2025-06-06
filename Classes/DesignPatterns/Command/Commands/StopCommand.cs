@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
     /// <summary>
     /// Command til at stoppe spilleren
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class StopCommand : ICommand
     {
         //Reference til player

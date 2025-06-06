@@ -7,6 +7,10 @@ using System.Diagnostics;
 
 namespace Grief.Classes.GameManager.Scenes
 {
+    /// <summary>
+    /// PauseOverlay Scene
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public class PauseOverlay : Scene
     {
         // Textures + scale

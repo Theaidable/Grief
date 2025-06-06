@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
     /// <summary>
     /// Interaction Command
     /// </summary>
+    /// <author>David Gudmund Danilesen</author>
     public class InteractionCommand : ICommand
     {
         //Reference til player

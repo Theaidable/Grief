@@ -12,6 +12,7 @@ namespace Grief.Classes.DesignPatterns.Builder.Builders
     /// <summary>
     /// Concrete builder for NPC'er
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class NpcBuilder : IGameObjectBuilder
     {
         //Private Fields

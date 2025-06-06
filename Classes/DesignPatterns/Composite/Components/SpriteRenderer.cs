@@ -8,6 +8,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Enumaration til at bestemme hvilken type af sprite der bruges
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public enum SpriteType
     {
         Sprite,
@@ -17,6 +18,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Spriterenderer component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class SpriteRenderer : Component
     {
         //Properties

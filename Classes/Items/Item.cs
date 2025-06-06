@@ -2,6 +2,10 @@
 
 namespace Grief.Classes.Items
 {
+    /// <summary>
+    /// Abstrakt hovedklasse for Items
+    /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public abstract class Item
     {
         public string Texture { get; protected set; }

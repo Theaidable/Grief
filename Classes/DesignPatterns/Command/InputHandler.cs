@@ -6,6 +6,8 @@ namespace Grief.Classes.DesignPatterns.Command
     /// <summary>
     /// Enumaration til de forskellige knapper på musen
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public enum MouseButton
     {
         Left,

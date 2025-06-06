@@ -1,4 +1,6 @@
-﻿-- Player
+﻿--<author>Asbjørn Ryberg</author>
+
+-- Player
 CREATE TABLE Player (
     PlayerID INT PRIMARY KEY IDENTITY,
     PlayerName NVARCHAR(50) NOT NULL

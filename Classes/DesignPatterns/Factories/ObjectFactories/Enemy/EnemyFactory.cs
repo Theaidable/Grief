@@ -9,8 +9,8 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
 {
     /// <summary>
     /// Enumaration for de forskellige typer af enemies som skal eksistere i spillet
-    /// Navne lige nu er midlertidig og skal ændres til de rigtige typer
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public enum EnemyType
     {
         Enemy1,
@@ -20,6 +20,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories.Enemy
     /// <summary>
     /// EnemyFactory som bruges til oprettelse af enemies
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class EnemyFactory : Factory
     {
         //Dicitionary til at sætte sprite til den bestemte type af enemy

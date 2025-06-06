@@ -21,6 +21,11 @@ using System.Threading;
 
 namespace Grief.Classes.GameManager
 {
+    /// <summary>
+    /// GameManager klasse som styrer spillets tilstand
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class GameManager
     {
         /// <summary>

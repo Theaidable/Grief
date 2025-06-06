@@ -7,6 +7,7 @@ namespace Grief.Classes.Algorithms
     /// <summary>
     /// AStar algoritme for Pathfinding (bruges til enemies)
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class AStar
     {
         private Dictionary<Point, Tile> tiles;

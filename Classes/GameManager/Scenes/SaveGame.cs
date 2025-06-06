@@ -7,6 +7,10 @@ using System.Diagnostics;
 
 namespace Grief.Classes.GameManager.Scenes
 {
+    /// <summary>
+    /// SaveGame Scene
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public class SaveGame : Scene
     {
         private Texture2D slot1Button;

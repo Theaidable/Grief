@@ -1,4 +1,6 @@
-﻿-- Slet alt fra afhængige tabeller først (pga. foreign keys)
+﻿--<author>Asbjørn Ryberg</author>
+
+-- Slet alt fra afhængige tabeller først (pga. foreign keys)
 DELETE FROM Inventory;
 DELETE FROM Quest;
 DELETE FROM Enemy;

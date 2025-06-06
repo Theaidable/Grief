@@ -7,6 +7,7 @@ namespace Grief.Classes.DesignPatterns.Command.Commands
     /// <summary>
     /// Debug command til at tegne objekters collisions
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class ToggleColliderDrawingCommand : ICommand
     {
         //Liste af de objekter som skal tegnes

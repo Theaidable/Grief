@@ -7,6 +7,10 @@ using System.Diagnostics;
 
 namespace Grief.Classes.GameManager.Scenes
 {
+    /// <summary>
+    /// MainMenu Scene
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public class MainMenu : Scene
     {
         //Fields

@@ -8,6 +8,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     /// <summary>
     /// Item component
     /// </summary>
+    /// <author>David GUdmund Danielsen</author>
     public class ItemComponent : Component
     {
         //Properties

@@ -2,6 +2,10 @@
 
 namespace Grief.Classes.DesignPatterns.Command.Commands
 {
+    /// <summary>
+    /// OpenIventoryCommand
+    /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class OpenInventoryCommand : ICommand
     {
         //Reference til inventory

@@ -7,6 +7,10 @@ using System.Diagnostics;
 
 namespace Grief.Classes.GameManager.Scenes
 {
+    /// <summary>
+    /// LoadGame Scene
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public class LoadGame : Scene
     {
         private Texture2D background;

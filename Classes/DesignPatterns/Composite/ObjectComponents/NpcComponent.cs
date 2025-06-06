@@ -16,6 +16,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
     /// <summary>
     /// NPC component – styrer dialog, quests og grundlæggende NPC-animation.
     /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public class NpcComponent : Component
     {
         // Fields

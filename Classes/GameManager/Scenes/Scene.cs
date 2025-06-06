@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Grief.Classes.GameManager.Scenes
 {
+    /// <summary>
+    /// Abstrkt hovedklasse for alle scener
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
     public abstract class Scene
     {
         public abstract void Update(GameTime gameTime);

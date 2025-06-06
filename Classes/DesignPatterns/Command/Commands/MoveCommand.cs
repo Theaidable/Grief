@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace Grief.Classes.DesignPatterns.Command.Commands
 {
+    /// <summary>
+    /// MoveCommand
+    /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class MoveCommand : ICommand
     {
         //Field som bruges til at bestemme bevægelsesretning

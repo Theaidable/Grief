@@ -6,6 +6,7 @@ namespace Grief.Classes.Items.Items
     /// <summary>
     /// Quest item
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class QuestItem : Item
     {
         /// <summary>

@@ -5,6 +5,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     /// <summary>
     /// Transform component
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class Transform : Component
     {
         /// <summary>

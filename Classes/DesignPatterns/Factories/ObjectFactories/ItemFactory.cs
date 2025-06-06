@@ -11,6 +11,7 @@ namespace Grief.Classes.DesignPatterns.Factories.ObjectFactories
     /// <summary>
     /// Factory til oprettelse af items
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public class ItemFactory : Factory
     {
 

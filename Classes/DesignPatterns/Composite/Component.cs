@@ -2,6 +2,11 @@
 
 namespace Grief.Classes.DesignPatterns.Composite
 {
+    /// <summary>
+    /// Abstrakt hovedklasse for components
+    /// </summary>
+    /// <author>Asbjørn Ryberg</author>
+    /// <author>David Gudmund Danielsen</author>
     public abstract class Component
     {
         //Properties for component

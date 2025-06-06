@@ -5,6 +5,7 @@ namespace Grief.Classes.Quests
     /// <summary>
     /// Superklasse for alle typer af quests
     /// </summary>
+    /// <author>David Gudmund Danielsen</author>
     public abstract class Quest
     {
         //Properties
