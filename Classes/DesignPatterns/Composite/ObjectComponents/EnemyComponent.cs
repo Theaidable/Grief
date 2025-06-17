@@ -475,7 +475,9 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
 
                         if(droppedItem.Texture != null)
                         {
-                            GameWorld.Instance.GameManager.LevelManager.CurrentLevel.QueueAdd(ItemFactory.Instance.Create(droppedItem, GameObject.Transform.Position + new Vector2(0, 20)));
+                            GameWorld.Instance.GameManager.LevelManager.CurrentLevel.
+                            QueueAdd(ItemFactory.Instance.Create
+                            (droppedItem, GameObject.Transform.Position + new Vector2(0, 20)));
                         }
                         else
                         {

@@ -89,7 +89,11 @@ namespace Grief.Classes.Levels
                     Point gridPosition = new Point(x, y);
                     Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth, Map.TileHeight);
                     bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
-                    tiles[gridPosition] = new Tile(gridPosition, walkable);
+
+                    if(walkable == true)
+                    {
+                        tiles[gridPosition] = new Tile(gridPosition, walkable);
+                    }
                 }
             }
 
@@ -149,7 +153,7 @@ namespace Grief.Classes.Levels
                             "There, there, pappa is here now"
                         },
                         new FetchQuest(
-                            "Look for Dad's Daughter",
+                            "The Missing Daughter",
                             "Look for my daughter and bring her back to me",
                             "Doll",
                             new StoryItem("DiaryPage", "StoryItem")
