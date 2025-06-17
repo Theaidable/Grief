@@ -78,6 +78,11 @@ namespace Greif
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
+            // Optimering af FPS
+            IsFixedTimeStep = true;
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60f); // 60 FPS
+            _graphics.SynchronizeWithVerticalRetrace = true; // V-Sync aktiveret
+
             // Sæt vinduestørrelse (kan tilpasses)
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;

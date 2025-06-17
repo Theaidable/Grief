@@ -245,7 +245,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     }
                 });
 
-                recalculatePathTimer = 1f;
+                recalculatePathTimer = 2f; // Optimering, øg timeren så enemy ikke søger hvert sekundt
             }
 
             lock (pathLock)
