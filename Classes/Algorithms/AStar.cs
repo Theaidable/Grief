@@ -11,8 +11,8 @@ namespace Grief.Classes.Algorithms
     public class AStar
     {
         private Dictionary<Point, Tile> tiles;
-        private readonly int[] directionsX = { 0, 1, 0, -1 };
-        private readonly int[] directionsY = { -1, 0, 1, 0 };
+        private readonly int[] directionsX = { 0, 1, 0, -1, 1, 1, -1, -1 };
+        private readonly int[] directionsY = { -1, 0, 1, 0, -1, 1, 1, -1 };
 
         /// <summary>
         /// Constructor
