@@ -46,6 +46,7 @@ namespace Grief.Classes.Levels
         private List<GameObject> objectsToAdd = new List<GameObject>();
         public List<Rectangle> CollisionRectangles { get; private set; } = new List<Rectangle>();
         public List<Polygon> CollisionPolygons { get; private set; } = new List<Polygon>();
+        public bool ShowPathfindingDebug { get; set; } = false;
 
         /// <summary>
         /// Metode til at indlæse et bestemt level gennem en switch case.
@@ -88,8 +89,47 @@ namespace Grief.Classes.Levels
                 {
                     Point gridPosition = new Point(x, y);
                     Rectangle tileRectangle = new Rectangle(x * Map.TileWidth, y * Map.TileHeight, Map.TileWidth, Map.TileHeight);
-                    bool walkable = !CollisionRectangles.Any(r => r.Intersects(tileRectangle));
-                    tiles[gridPosition] = new Tile(gridPosition, walkable);
+
+                    bool overlapsRectangle = CollisionRectangles.Any(r => r.Intersects(tileRectangle));
+                    bool overlapsPolygon = CollisionPolygons.Any(polygon =>
+                    {
+                        if (polygon.BoundingRectangle.Intersects(tileRectangle) == false)
+                        {
+                            return false;
+                        }
+
+                        foreach (var point in polygon.Vertices)
+                        {
+                            if (tileRectangle.Contains(point) == true)
+                            {
+                                return true;
+                            }
+                        }
+                        Vector2[] rectPoints = new Vector2[]
+                        {
+                            new Vector2(tileRectangle.Left, tileRectangle.Top),
+                            new Vector2(tileRectangle.Right, tileRectangle.Top),
+                            new Vector2(tileRectangle.Right, tileRectangle.Bottom),
+                            new Vector2(tileRectangle.Left, tileRectangle.Bottom)
+                        };
+
+                        foreach (var rectPoint in rectPoints)
+                        {
+                            if (polygon.Contains(rectPoint) == true)
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    bool walkable = !(overlapsRectangle || overlapsPolygon);
+
+                    if (walkable == true)
+                    {
+                        tiles[gridPosition] = new Tile(gridPosition, walkable);
+                    }
                 }
             }
 
@@ -98,6 +138,7 @@ namespace Grief.Classes.Levels
 
             // Bind test-kommando til at toggle collider drawing på det nuværende level
             InputHandler.Instance.AddButtonDownCommand(Keys.K, new ToggleColliderDrawingCommand(GameObjects));
+            InputHandler.Instance.AddButtonDownCommand(Keys.J, new TogglePathfindingDebugCommand(this));
 
             // Switch case som opretter det bestemte level
             switch (levelName)
@@ -271,6 +312,60 @@ namespace Grief.Classes.Levels
             }
         }
 
+        public void DrawPathfinding(SpriteBatch spriteBatch)
+        {
+            Texture2D pixel = GameWorld.Instance.Pixel;
+            int tileWidth = Map.TileWidth;
+            int tileHeight = Map.TileHeight;
+
+            // Tegn rødt grid over hele mappet (fast position)
+            for (int x = 0; x <= Map.Width; x++)
+            {
+                spriteBatch.Draw(pixel,
+                    new Rectangle(x * tileWidth, 0, 1, Map.Height * tileHeight),
+                    Color.Red * 0.6f);
+            }
+            for (int y = 0; y <= Map.Height; y++)
+            {
+                spriteBatch.Draw(pixel,
+                    new Rectangle(0, y * tileHeight, Map.Width * tileWidth, 1),
+                    Color.Red * 0.6f);
+            }
+
+            // Tegn walkable tiles som gennemsigtige blå
+            foreach (var kvp in TileDictionary)
+            {
+                Point pos = kvp.Key;
+                Tile tile = kvp.Value;
+
+                Rectangle tileRect = new Rectangle(
+                    pos.X * tileWidth,
+                    pos.Y * tileHeight,
+                    tileWidth,
+                    tileHeight);
+
+                if (tile.IsWalkable == true)
+                {
+                    spriteBatch.Draw(pixel, tileRect, Color.Blue * 0.3f);
+                }
+            }
+
+            // Tegn grønne tiles, hvis der er en sti
+            if (PathFinder.DebugPath != null && PathFinder.DebugPath.Count > 0)
+            {
+                foreach (Vector2 step in PathFinder.DebugPath)
+                {
+                    Rectangle pathRect = new Rectangle(
+                        (int)(step.X - tileWidth / 2),
+                        (int)(step.Y - tileHeight / 2),
+                        tileWidth,
+                        tileHeight);
+
+                    spriteBatch.Draw(pixel, pathRect, Color.Green * 0.5f);
+                }
+            }
+        }
+
         /// <summary>
         /// Tegn alle objekter i spillet, og tegn inventory til sidst.
         /// </summary>
@@ -289,6 +384,11 @@ namespace Grief.Classes.Levels
                 {
                     inventory.Draw(spriteBatch);
                 }
+            }
+
+            if(ShowPathfindingDebug == true)
+            {
+                DrawPathfinding(spriteBatch);
             }
         }
     }

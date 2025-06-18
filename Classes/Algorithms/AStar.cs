@@ -1,6 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Greif;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Grief.Classes.Algorithms
 {
@@ -11,8 +13,18 @@ namespace Grief.Classes.Algorithms
     public class AStar
     {
         private Dictionary<Point, Tile> tiles;
-        private readonly int[] directionsX = { 0, 1, 0, -1, 1, 1, -1, -1 };
-        private readonly int[] directionsY = { -1, 0, 1, 0, -1, 1, 1, -1 };
+
+        //4 Vejs
+        private readonly int[] directionsX = { 0, 1, 0, -1};
+        private readonly int[] directionsY = { -1, 0, 1, 0};
+
+        
+        //8 Vejs
+        //private readonly int[] directionsX = { 0, 1, 0, -1, 1, 1, -1, -1 };
+        //private readonly int[] directionsY = { -1, 0, 1, 0, -1, 1, 1, -1 };
+        
+
+        public List<Vector2> DebugPath { get; private set; } = new List<Vector2>();
 
         /// <summary>
         /// Constructor
@@ -31,6 +43,8 @@ namespace Grief.Classes.Algorithms
         /// <returns></returns>
         public List<Tile> FindPath(Point startPosition, Point goalPosition)
         {
+            DebugPath.Clear();
+
             //Tjek om start/goal findes i dictionary
             if(tiles.ContainsKey(startPosition) == false || tiles.ContainsKey(goalPosition) == false)
             {
@@ -70,9 +84,16 @@ namespace Grief.Classes.Algorithms
                 //1. Find cellen med lavest fCost i openList
                 Tile current = GetCellWithLowestF(openList, fCost);
 
-                if(current == goalCell)
+                if (current == goalCell)
                 {
-                    return ReconstructPath(parent, goalCell);
+                    var tilePath = ReconstructPath(parent, goalCell);
+
+                    DebugPath = tilePath.Select(t => new Vector2(
+                        t.Position.X * GameWorld.Instance.GameManager.LevelManager.CurrentLevel.Map.TileWidth + GameWorld.Instance.GameManager.LevelManager.CurrentLevel.Map.TileWidth / 2,
+                        t.Position.Y * GameWorld.Instance.GameManager.LevelManager.CurrentLevel.Map.TileHeight + GameWorld.Instance.GameManager.LevelManager.CurrentLevel.Map.TileHeight / 2))
+                        .ToList();
+
+                    return tilePath;
                 }
 
                 openList.Remove(current);
@@ -118,7 +139,12 @@ namespace Grief.Classes.Algorithms
         {
             var distanceX = Math.Abs(a.Position.X - b.Position.X);
             var distanceY = Math.Abs(a.Position.Y - b.Position.Y);
-            return distanceX + distanceY;
+
+            //Manhatten
+            //return distanceX + distanceY;
+
+            //Euklidisk
+            return (float)Math.Sqrt(distanceX * 2 + distanceY * 2);
         }
 
         /// <summary>

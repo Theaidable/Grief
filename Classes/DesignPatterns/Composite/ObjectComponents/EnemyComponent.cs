@@ -245,7 +245,7 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
                     }
                 });
 
-                recalculatePathTimer = 1f;
+                recalculatePathTimer = 0.5f;
             }
 
             lock (pathLock)
