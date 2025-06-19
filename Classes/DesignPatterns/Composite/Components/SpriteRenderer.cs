@@ -1,14 +1,16 @@
 ﻿using Greif;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using System;
+using System.Collections.Generic;
 
 namespace Grief.Classes.DesignPatterns.Composite.Components
 {
     /// <summary>
     /// Enumaration til at bestemme hvilken type af sprite der bruges
     /// </summary>
-    /// <author>David Gudmund Danielsen</author>
     public enum SpriteType
     {
         Sprite,
@@ -16,26 +18,22 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
     }
 
     /// <summary>
-    /// Spriterenderer component
+    /// Spriterenderer component med optimering (view-culling + texture-cache)
     /// </summary>
-    /// <author>David Gudmund Danielsen</author>
     public class SpriteRenderer : Component
     {
-        //Properties
+        // Texture-cache så vi ikke loader den samme sprite flere gange
+        private static Dictionary<string, Texture2D> textureCache = new Dictionary<string, Texture2D>();
+
         public Vector2 Origin { get; set; }
         public Texture2D Sprite { get; set; }
         public Color Color { get; set; }
         public Rectangle? SourceRectangle { get; set; }
         public SpriteEffects Effects { get; set; }
-        
-        //Events
+
         public event Action OnSpriteChanged;
         public event Action OnEffectsChanged;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="gameObject"></param>
         public SpriteRenderer(GameObject gameObject) : base(gameObject)
         {
             Color = Color.White;
@@ -43,26 +41,29 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         }
 
         /// <summary>
-        /// Sæt sprite af et object, kan gøre brug af et spriteSheet hvis nødvendigt
+        /// Sæt sprite, bruger texture-cache for at undgå at loade flere gange
         /// </summary>
-        /// <param name="spriteName"></param>
         public void SetSprite(string spriteName, Rectangle? sourceRectangle = null)
         {
-            Sprite = GameWorld.Instance.Content.Load<Texture2D>(spriteName);
+            if (!textureCache.TryGetValue(spriteName, out var texture))
+            {
+                texture = GameWorld.Instance.Content.Load<Texture2D>(spriteName);
+                textureCache[spriteName] = texture;
+            }
+            Sprite = texture;
             SourceRectangle = sourceRectangle;
             OnSpriteChanged?.Invoke();
         }
 
         /// <summary>
-        /// Metode som bruges til at sætte en effect til et sprite
+        /// Sæt effect på sprite (f.eks. flip horisontalt)
         /// </summary>
-        /// <param name="name"></param>
         public void SetEffects(SpriteEffects name)
         {
             Effects = name;
             OnEffectsChanged?.Invoke();
         }
-         
+
         /// <summary>
         /// Sæt origin til midten af valgt sprite
         /// </summary>
@@ -72,7 +73,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
             {
                 Origin = new Vector2(SourceRectangle.Value.Width / 2f, SourceRectangle.Value.Height / 2f);
             }
-            else
+            else if (Sprite != null)
             {
                 Origin = new Vector2(Sprite.Width / 2f, Sprite.Height / 2f);
             }
@@ -95,9 +96,8 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
         }
 
         /// <summary>
-        /// Tegn sprite af object
+        /// Tegner kun objektet hvis det er synligt på kameraet ("view frustum culling")
         /// </summary>
-        /// <param name="spriteBatch"></param>
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (Sprite == null)
@@ -106,7 +106,42 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
                 return;
             }
 
-            spriteBatch.Draw(Sprite, GameObject.Transform.Position, SourceRectangle, Color, GameObject.Transform.Rotation, Origin, GameObject.Transform.Scale, Effects, 0);
+            // --- OPTIMERING: Kun tegn hvis inden for kameraet ---
+            var camera = GameWorld.Instance.Camera;
+            RectangleF camView = camera.BoundingRectangle;
+
+            // Hent skalering på både X og Y (i tilfælde af ikke-ens skala)
+            float scaleX = GameObject.Transform.Scale.X;
+            float scaleY = GameObject.Transform.Scale.Y;
+
+            float width = (SourceRectangle?.Width ?? Sprite.Width) * scaleX;
+            float height = (SourceRectangle?.Height ?? Sprite.Height) * scaleY;
+            RectangleF objBounds = new RectangleF(
+                GameObject.Transform.Position.X - width / 2f,
+                GameObject.Transform.Position.Y - height / 2f,
+                width,
+                height
+            );
+
+            // Tjek om objektet overlapper kameraet (view-frustum culling)
+            if (!camView.Intersects(objBounds))
+            {
+                // Uden for skærmen, så returnér uden at tegne
+                return;
+            }
+
+            spriteBatch.Draw(
+                Sprite,
+                GameObject.Transform.Position,
+                SourceRectangle,
+                Color,
+                GameObject.Transform.Rotation,
+                Origin,
+                GameObject.Transform.Scale, // Her bruger vi stadig Vector2 (MonoGame overload)
+                Effects,
+                0 // layerDepth, kan evt. erstattes med GameObject.LayerDepth hvis du har det
+            );
         }
+
     }
 }

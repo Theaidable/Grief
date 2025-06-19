@@ -1,5 +1,6 @@
 ﻿using Grief.Classes.DesignPatterns.Composite;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 
 namespace Greif.Classes.Cameras
 {
@@ -16,6 +17,21 @@ namespace Greif.Classes.Cameras
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
         public float Zoom { get; private set; }
+
+        // Til optimering
+        public RectangleF BoundingRectangle
+        {
+            get
+            {
+                var viewport = GameWorld.Instance.GraphicsDevice.Viewport;
+                float width = viewport.Width / Zoom;
+                float height = viewport.Height / Zoom;
+                // Kameraets center-position i world-space:
+                float left = Position.X - width / 2f;
+                float top = Position.Y - height / 2f;
+                return new RectangleF(left, top, width, height);
+            }
+        }
 
         //Matrix
         public Matrix ViewMatrix
