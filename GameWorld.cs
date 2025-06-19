@@ -165,6 +165,9 @@ namespace Greif
 
             _spriteBatch.End();
 
+            // FPS counter til debugging
+            Window.Title = $"FPS: {(1f / (float)gameTime.ElapsedGameTime.TotalSeconds):0}";
+
             base.Draw(gameTime);
         }
     }
