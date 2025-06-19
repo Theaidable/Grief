@@ -45,6 +45,8 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] hurtFrames;
         private Texture2D[] deathFrames;
 
+        private Vector2 lastPlayerPos = Vector2.Zero; // Til optimering,  dette field holder styr på sidste kendte spillerposition
+
         private List<Vector2> path = new List<Vector2>();
         private readonly object pathLock = new object();
         private float recalculatePathTimer = 0f;
@@ -233,20 +235,35 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             Point start = new Point((int)(GameObject.Transform.Position.X / level.Map.TileWidth), (int)(GameObject.Transform.Position.Y / level.Map.TileHeight));
             Point goal = new Point((int)(player.Transform.Position.X / level.Map.TileWidth), (int)(player.Transform.Position.Y / level.Map.TileHeight));
 
-            if (path == null || path.Count == 0 || recalculatePathTimer <= 0f)
+            // OPTIMERING 
+            // Kun recalc path hvis:
+            //   - path er tom
+            //   - cooldown er udløbet
+            //   - spilleren er flyttet mere end 32 pixels siden sidste pathfinding
+            float playerMoveThreshold = 32f;
+            if (path == null || path.Count == 0 || recalculatePathTimer <= 0f ||
+                Vector2.Distance(lastPlayerPos, player.Transform.Position) > playerMoveThreshold)
             {
+                lastPlayerPos = player.Transform.Position; // Opdater sidste kendte position
+
+                // A* pathfinding kaldes i en baggrundstråd
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
                     var newPath = astar.FindPath(start, goal);
 
                     lock (pathLock)
                     {
-                        path = newPath.Select(t => new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2, GameObject.Transform.Position.Y)).ToList();
+                        // Map tile-points til world-space (X,Y) -- evt. juster Y så det matcher din spil-logik!
+                        path = newPath.Select(t =>
+                            new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2,
+                                        t.Position.Y * level.Map.TileHeight + level.Map.TileHeight / 2)
+                        ).ToList();
                     }
                 });
 
-                recalculatePathTimer = 3f; // Optimering, øg timeren så enemy ikke søger hvert sekundt
+                recalculatePathTimer = 3f; // Forlænget cooldown for optimering
             }
+
 
             lock (pathLock)
             {
