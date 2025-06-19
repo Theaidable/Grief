@@ -106,7 +106,7 @@ namespace Grief.Classes.DesignPatterns.Composite.Components
                 return;
             }
 
-            // --- OPTIMERING: Kun tegn hvis inden for kameraet ---
+            // Optimering: Kun tegn objekts hvis de er inden for kameraet
             var camera = GameWorld.Instance.Camera;
             RectangleF camView = camera.BoundingRectangle;
 
