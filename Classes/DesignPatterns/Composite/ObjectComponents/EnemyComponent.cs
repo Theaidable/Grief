@@ -45,11 +45,13 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
         private Texture2D[] hurtFrames;
         private Texture2D[] deathFrames;
 
-        private Vector2 lastPlayerPos = Vector2.Zero; // Til optimering,  dette field holder styr på sidste kendte spillerposition
 
         private List<Vector2> path = new List<Vector2>();
         private readonly object pathLock = new object();
         private float recalculatePathTimer = 0f;
+        
+        private static int activePathfindingJobs = 0; // Statisk tæller til at spore antal aktive pathfinding-jobs globalt
+        private Vector2 lastPlayerPos = Vector2.Zero; // Til optimering,  dette field holder styr på sidste kendte spillerposition
 
         // Properties
         public int EnemyHealth { get; private set; }
@@ -246,20 +248,33 @@ namespace Grief.Classes.DesignPatterns.Composite.ObjectComponents
             {
                 lastPlayerPos = player.Transform.Position; // Opdater sidste kendte position
 
-                // A* pathfinding kaldes i en baggrundstråd
+                // === DEBUG: Pathfinding thread counter ===
+                // Her tæller vi op, hver gang vi starter en ny pathfinding-job
+                Interlocked.Increment(ref activePathfindingJobs);
+                Debug.WriteLine($"[DEBUG] Pathfinding startet. Aktive pathfinding-jobs: {activePathfindingJobs} (ThreadId: {Thread.CurrentThread.ManagedThreadId})");
+
                 ThreadPool.QueueUserWorkItem(_ =>
                 {
-                    var newPath = astar.FindPath(start, goal);
-
-                    lock (pathLock)
+                    try
                     {
-                        // Map tile-points til world-space (X,Y) -- evt. juster Y så det matcher din spil-logik!
-                        path = newPath.Select(t =>
-                            new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2,
-                                        t.Position.Y * level.Map.TileHeight + level.Map.TileHeight / 2)
-                        ).ToList();
+                        var newPath = astar.FindPath(start, goal);
+
+                        lock (pathLock)
+                        {
+                            path = newPath.Select(t =>
+                                new Vector2(t.Position.X * level.Map.TileWidth + level.Map.TileWidth / 2,
+                                            t.Position.Y * level.Map.TileHeight + level.Map.TileHeight / 2)
+                            ).ToList();
+                        }
+                    }
+                    finally
+                    {
+                        // Når pathfinding er færdig, tæller vi ned igen.
+                        int jobs = Interlocked.Decrement(ref activePathfindingJobs);
+                        Debug.WriteLine($"[DEBUG] Pathfinding færdig. Aktive pathfinding-jobs: {jobs} (ThreadId: {Thread.CurrentThread.ManagedThreadId})");
                     }
                 });
+
 
                 recalculatePathTimer = 3f; // Forlænget cooldown for optimering
             }
